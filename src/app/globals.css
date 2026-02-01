@@ -1,26 +1,160 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* Core Palette: Fire */
+  --fire-red: #dc2626;
+  --fire-orange: #f97316;
+  --fire-yellow: #facc15;
+
+  /* Nuetral Bases */
+  --white: #ffffff;
+  --black: #09090b;
+  --gray-50: #fafafa;
+  --gray-100: #f4f4f5;
+  --gray-200: #e4e4e7;
+  --gray-800: #27272a;
+  --gray-900: #18181b;
+
+  /* Semantic Variables (Light Mode Default) */
+  --bg-app: var(--gray-50);
+  --bg-surface: var(--white);
+  --bg-surface-hover: var(--gray-100);
+
+  --text-primary: var(--gray-900);
+  --text-secondary: var(--gray-800);
+  --text-muted: #71717a;
+
+  --border-color: var(--gray-200);
+
+  --primary-color: var(--fire-red);
+  --primary-hover: #b91c1c;
+  --accent-color: var(--fire-orange);
+
+  --radius: 12px;
+  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+  --font-family: 'Inter', sans-serif;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+.dark {
+  /* Semantic Variables (Dark Mode) */
+  --bg-app: #000000;
+  /* Deep black for premium feel */
+  --bg-surface: var(--gray-900);
+  --bg-surface-hover: var(--gray-800);
+
+  --text-primary: var(--white);
+  --text-secondary: var(--gray-200);
+  --text-muted: #a1a1aa;
+
+  --border-color: var(--gray-800);
+
+  /* In dark mode, Fire Orange pops more as primary accent */
+  --primary-color: var(--fire-orange);
+  --primary-hover: var(--fire-yellow);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+/* Base Reset & Typography */
+body {
+  background-color: var(--bg-app);
+  color: var(--text-primary);
+  font-family: var(--font-family);
+  transition: background-color 0.3s ease, color 0.3s ease;
+  margin: 0;
+  padding: 0;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Reusable Utility Classes (Vanilla CSS Style) */
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 1rem;
+}
+
+.card {
+  background-color: var(--bg-surface);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius);
+  padding: 1.5rem;
+  box-shadow: var(--shadow-sm);
+  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+}
+
+.card:hover {
+  border-color: var(--primary-color);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.75rem 1.5rem;
+  border-radius: var(--radius);
+  font-weight: 600;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: none;
+  gap: 0.5rem;
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, var(--fire-red), var(--fire-orange));
+  color: white;
+  box-shadow: 0 4px 12px rgba(249, 115, 22, 0.3);
+  /* Subtle glow */
+}
+
+.btn-primary:hover {
+  filter: brightness(110%);
+  transform: scale(1.02);
+}
+
+.btn-ghost {
+  background: transparent;
+  color: var(--text-primary);
+}
+
+.btn-ghost:hover {
+  background-color: var(--bg-surface-hover);
+}
+
+/* Inputs */
+.input-field {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  border-radius: var(--radius);
+  border: 1px solid var(--border-color);
+  background-color: var(--bg-surface);
+  color: var(--text-primary);
+  font-size: 1rem;
+  transition: border-color 0.2s ease;
+  outline: none;
+}
+
+.input-field:focus {
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 2px rgba(249, 115, 22, 0.1);
+}
+
+/* Utility Animations */
+@keyframes flame-flicker {
+
+  0%,
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+
+  50% {
+    opacity: 0.8;
+    transform: scale(1.05);
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+.animate-flame {
+  animation: flame-flicker 2s infinite ease-in-out;
 }
