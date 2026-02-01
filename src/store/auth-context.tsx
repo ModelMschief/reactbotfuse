@@ -1,21 +1,27 @@
 "use client";
 
-import React, { createContext, useContext, useState, useEffect } from "react";
+import React, { createContext, useContext, useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
+import { api } from "@/lib/api";
+import { jwtDecode } from "jwt-decode";
 
 interface User {
-    email: string;
+    id: string; // From 'sub'
+    email?: string;
     isPremium: boolean;
     telegramId?: string;
+    planExpiry?: string;
 }
 
 interface AuthContextType {
     user: User | null;
     login: (email: string, pass: string) => Promise<boolean>;
-    signup: (email: string, pass: string, tgId: string) => Promise<boolean>;
+    signupInit: (email: string, pass: string, tgId: string) => Promise<boolean>; // Returns true if OTP sent
+    verifyOtp: (email: string, otp: string) => Promise<boolean>;
     logout: () => void;
-    redeemCode: (code: string) => boolean;
+    checkSession: () => Promise<void>;
     isGlobalFireActive: boolean;
+    setGlobalFireActive: (v: boolean) => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -25,57 +31,86 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const [isGlobalFireActive, setGlobalFireActive] = useState(false);
     const router = useRouter();
 
-    // Simulate persistent session - DISABLED for Prototype to ensure Landing Page testing
-    // useEffect(() => {
-    //     const savedUser = localStorage.getItem("app_user");
-    //     if (savedUser) {
-    //         setUser(JSON.parse(savedUser));
-    //     }
-    // }, []);
+    // Define logout first (needed by checkSession)
+    const logout = useCallback(() => {
+        setUser(null);
+        localStorage.removeItem("jwtToken");
+        router.push("/login");
+    }, [router]);
+
+    // Define checkSession (depends on logout)
+    const checkSession = useCallback(async () => {
+        const token = localStorage.getItem("jwtToken");
+        if (token) {
+            try {
+                const decoded: any = jwtDecode(token);
+                // Check expiry
+                if (decoded.exp * 1000 < Date.now()) {
+                    logout();
+                    return;
+                }
+
+                // For now, we only get ID from token. 
+                // To get full User object (email, plan), we need a creating '/me' endpoint or store it in localstorage too.
+                // For this architecture, we will fetch full dashboard data later, 
+                // here we just restore the session ID.
+                setUser({
+                    id: decoded.sub,
+                    isPremium: false // Will be updated by Dashboard fetch 
+                });
+
+            } catch (e) {
+                console.error("Invalid token", e);
+                logout();
+            }
+        }
+    }, [logout]);
+
+    // Check session on load
+    useEffect(() => {
+        checkSession();
+    }, [checkSession]);
 
     const login = async (email: string, pass: string) => {
-        // Mock Logic
-        if (email === "s@s.com" && pass === "user") {
-            const mockUser = { email, isPremium: false }; // Default standard
-            setUser(mockUser);
-            localStorage.setItem("app_user", JSON.stringify(mockUser));
-            return true;
+        try {
+            const res = await api.post("/login", { email, password: pass });
+            if (res.data.token) {
+                localStorage.setItem("jwtToken", res.data.token);
+                await checkSession(); // Decode and set user
+                return true;
+            }
+        } catch (e) {
+            console.error("Login failed", e);
         }
         return false;
     };
 
-    const signup = async (email: string, pass: string, tgId: string) => {
-        if (email && pass && tgId) {
-            const mockUser = { email, isPremium: false, telegramId: tgId };
-            setUser(mockUser);
-            localStorage.setItem("app_user", JSON.stringify(mockUser));
-            return true;
+    const signupInit = async (email: string, pass: string, tgId: string) => {
+        try {
+            await api.post("/signup", { email, password: pass, telegram_id: tgId });
+            return true; // OTP Sent
+        } catch (e) {
+            console.error("Signup Init failed", e);
+            throw e; // Let UI handle error message
         }
-        return false;
     };
 
-    const logout = () => {
-        setUser(null);
-        localStorage.removeItem("app_user");
-        router.push("/login");
-    };
-
-    const redeemCode = (code: string) => {
-        if (code === "redeem" && user) {
-            const updatedUser = { ...user, isPremium: true };
-            setUser(updatedUser);
-            localStorage.setItem("app_user", JSON.stringify(updatedUser));
-
-            // Trigger Fire Effect
-            setGlobalFireActive(true);
-            setTimeout(() => setGlobalFireActive(false), 3000); // 3s visual effect
-            return true;
+    const verifyOtp = async (email: string, otp: string) => {
+        try {
+            const res = await api.post("/verify-otp", { email, otp });
+            if (res.data.token) {
+                localStorage.setItem("jwtToken", res.data.token);
+                await checkSession();
+                return true;
+            }
+        } catch (e) {
+            console.error("OTP Verify failed", e);
         }
         return false;
     };
 
     return (
-        <AuthContext.Provider value={{ user, login, signup, logout, redeemCode, isGlobalFireActive }}>
+        <AuthContext.Provider value={{ user, login, signupInit, verifyOtp, logout, checkSession, isGlobalFireActive, setGlobalFireActive }}>
             {children}
         </AuthContext.Provider>
     );

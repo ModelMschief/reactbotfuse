@@ -1,4 +1,3 @@
-import { LucideIcon, BarChart3, Users, CreditCard, Activity, Bot, Key } from "lucide-react";
 
 // --- Types ---
 export interface BotData {
