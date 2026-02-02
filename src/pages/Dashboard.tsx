@@ -1,12 +1,8 @@
-"use client";
-
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
     Users,
     Send,
-    Settings,
     Plus,
-    MoreVertical,
     FileUp,
     Activity,
     Zap,
@@ -14,14 +10,14 @@ import {
     Bot as BotIcon,
     Loader2,
     UploadCloud,
-    X
+    X,
+    BarChart3
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useDashboard } from "@/hooks/use-dashboard";
-import { api } from "@/lib/api";
 import { BroadcastWizard } from "@/components/broadcast-wizard";
 
-export default function DashboardPage() {
+export default function Dashboard() {
     const { bots, tasks, plan, loading, refresh, addBot, deleteBot, uploadUsers } = useDashboard();
 
     // Local UI State
@@ -37,6 +33,16 @@ export default function DashboardPage() {
 
     // Broadcast State
     const [isBroadcastOpen, setIsBroadcastOpen] = useState(false);
+
+    // Mobile Stats Modal State
+    const [isMobileStatsOpen, setMobileStatsOpen] = useState(false);
+
+    // Listen for openStatsModal event from navbar
+    useEffect(() => {
+        const handleOpenStats = () => setMobileStatsOpen(true);
+        window.addEventListener("openStatsModal", handleOpenStats);
+        return () => window.removeEventListener("openStatsModal", handleOpenStats);
+    }, []);
 
     // Stats Calculation
     const totalUsers = bots.reduce((acc, bot) => acc + bot.user_count, 0);
@@ -57,7 +63,7 @@ export default function DashboardPage() {
         }
     };
 
-    const handleTaskStarted = (taskId: string) => {
+    const handleTaskStarted = () => {
         refresh(); // Reload tasks list
         // We don't close the wizard automatically, let it stay open to show progress
     };
@@ -72,8 +78,8 @@ export default function DashboardPage() {
 
     return (
         <div className="space-y-8">
-            {/* Header Stats */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {/* Header Stats - Hidden on mobile, use navbar "Stats & History" instead */}
+            <div className="hidden md:grid grid-cols-1 md:grid-cols-3 gap-6">
                 <StatsCard
                     title="Total Audience"
                     value={totalUsers.toLocaleString()}
@@ -186,8 +192,8 @@ export default function DashboardPage() {
                     </div>
                 </div>
 
-                {/* Right Column: Recent Activity (Tasks) */}
-                <div className="lg:col-span-1 space-y-6">
+                {/* Right Column: Recent Activity (Tasks) - Hidden on mobile/tablet */}
+                <div className="hidden lg:block lg:col-span-1 space-y-6">
                     <h2 className="text-xl font-bold flex items-center gap-2">
                         <Activity className="text-blue-400" size={20} />
                         Recent Tasks
@@ -369,6 +375,108 @@ export default function DashboardPage() {
                                 </div>
                             </div>
                         </motion.div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
+
+            {/* Mobile Stats & History Modal */}
+            <AnimatePresence>
+                {isMobileStatsOpen && (
+                    <motion.div
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        className="fixed inset-0 z-50 bg-[var(--bg-app)] overflow-y-auto md:hidden"
+                    >
+                        <div className="p-4 space-y-6">
+                            {/* Header */}
+                            <div className="flex items-center justify-between">
+                                <h2 className="text-xl font-bold flex items-center gap-2">
+                                    <BarChart3 className="text-blue-400" size={24} />
+                                    Stats & History
+                                </h2>
+                                <button
+                                    onClick={() => setMobileStatsOpen(false)}
+                                    className="p-2 bg-[var(--bg-surface)] rounded-full border border-[var(--border-color)]"
+                                >
+                                    <X size={20} />
+                                </button>
+                            </div>
+
+                            {/* Stats Cards */}
+                            <div className="grid grid-cols-1 gap-4">
+                                <StatsCard
+                                    title="Total Audience"
+                                    value={totalUsers.toLocaleString()}
+                                    icon={<Users className="text-blue-400" />}
+                                    trend="+12% this week"
+                                />
+                                <StatsCard
+                                    title="Active Bots"
+                                    value={bots.length.toString()}
+                                    icon={<BotIcon className="text-purple-400" />}
+                                />
+                                <StatsCard
+                                    title="Broadcasts"
+                                    value={tasks.length.toString()}
+                                    icon={<Activity className="text-green-400" />}
+                                    trend={`${activeBroadcasts} running`}
+                                />
+                            </div>
+
+                            {/* Recent Tasks */}
+                            <div className="space-y-4">
+                                <h3 className="text-lg font-bold flex items-center gap-2">
+                                    <Activity className="text-blue-400" size={18} />
+                                    Recent Tasks
+                                </h3>
+                                <div className="space-y-3">
+                                    {tasks.length === 0 ? (
+                                        <p className="text-center text-[var(--text-muted)] py-4 bg-[var(--bg-surface)] rounded-lg border border-[var(--border-color)]">
+                                            No recent activity.
+                                        </p>
+                                    ) : (
+                                        tasks.slice(0, 10).map((task) => (
+                                            <div key={task._id} className="p-3 bg-[var(--bg-surface)] rounded-lg border border-[var(--border-color)]">
+                                                <div className="flex justify-between items-start mb-2">
+                                                    <span className={`text-xs font-bold uppercase px-2 py-0.5 rounded ${task.status === 'complete' ? 'bg-green-500/10 text-green-500' :
+                                                        task.status === 'failed' ? 'bg-red-500/10 text-red-500' :
+                                                            'bg-blue-500/10 text-blue-500 animate-pulse'
+                                                        }`}>
+                                                        {task.status}
+                                                    </span>
+                                                    <span className="text-[10px] text-[var(--text-muted)]">
+                                                        {new Date(task.created_at).toLocaleTimeString()}
+                                                    </span>
+                                                </div>
+                                                <p className="text-sm font-medium mb-1">
+                                                    {task.type === 'broadcast' ? '📢 Broadcast' : '📂 File Parse'}
+                                                </p>
+                                                {task.type === 'broadcast' && task.progress && (
+                                                    <div className="text-xs text-[var(--text-muted)]">
+                                                        Sent: {task.progress.sent} / {task.progress.total}
+                                                        {task.progress.failed ? <span className="text-red-400 ml-2">({task.progress.failed} failed)</span> : null}
+                                                    </div>
+                                                )}
+                                                {task.type === 'file_parse' && task.progress && (
+                                                    <div className="text-xs text-[var(--text-muted)]">
+                                                        Found: {task.progress.found} | Added: {task.progress.added}
+                                                    </div>
+                                                )}
+                                            </div>
+                                        ))
+                                    )}
+                                </div>
+                            </div>
+
+                            {/* Close button at bottom */}
+                            <button
+                                onClick={() => setMobileStatsOpen(false)}
+                                className="w-full btn bg-[var(--bg-surface)] border border-[var(--border-color)] py-3"
+                            >
+                                Close
+                            </button>
+                        </div>
                     </motion.div>
                 )}
             </AnimatePresence>

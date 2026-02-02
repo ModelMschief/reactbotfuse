@@ -1,7 +1,5 @@
-"use client";
-
 import React, { createContext, useContext, useState, useEffect, useCallback } from "react";
-import { useRouter } from "next/navigation";
+import { useNavigate } from "react-router-dom";
 import { api } from "@/lib/api";
 import { jwtDecode } from "jwt-decode";
 
@@ -29,14 +27,14 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export function AuthProvider({ children }: { children: React.ReactNode }) {
     const [user, setUser] = useState<User | null>(null);
     const [isGlobalFireActive, setGlobalFireActive] = useState(false);
-    const router = useRouter();
+    const navigate = useNavigate();
 
     // Define logout first (needed by checkSession)
     const logout = useCallback(() => {
         setUser(null);
         localStorage.removeItem("jwtToken");
-        router.push("/login");
-    }, [router]);
+        navigate("/login");
+    }, [navigate]);
 
     // Define checkSession (depends on logout)
     const checkSession = useCallback(async () => {

@@ -1,15 +1,12 @@
-"use client";
-
 import { useState, useEffect } from "react";
 import { Key, RefreshCw, AlertTriangle, Terminal, ArrowLeft, Copy, Check } from "lucide-react";
-import { motion } from "framer-motion";
+import { Link } from "react-router-dom";
 import { api } from "@/lib/api";
-import Link from "next/link";
 
 // Use environment variable or fallback for API documentation
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "https://botfusion.onrender.com";
+const API_BASE_URL = import.meta.env.VITE_API_URL || "https://botfusion.onrender.com";
 
-export default function AutoUpPage() {
+export default function Autoup() {
     const [connectionKey, setConnectionKey] = useState<string | null>(null);
     const [loading, setLoading] = useState(true);
     const [generating, setGenerating] = useState(false);
@@ -61,7 +58,7 @@ export default function AutoUpPage() {
 
             {/* Header */}
             <div>
-                <Link href="/dashboard" className="text-[var(--text-muted)] hover:text-white flex items-center gap-2 mb-6 transition-colors">
+                <Link to="/dashboard" className="text-[var(--text-muted)] hover:text-white flex items-center gap-2 mb-6 transition-colors">
                     <ArrowLeft size={16} /> Back to Dashboard
                 </Link>
                 <h1 className="text-3xl font-bold flex items-center gap-3 text-cyan-400">

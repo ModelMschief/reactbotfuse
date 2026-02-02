@@ -1,8 +1,6 @@
-"use client";
-
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { Crown, Zap, Check, Gift, Loader2, Star } from "lucide-react";
+import { Crown, Check, Gift, Loader2 } from "lucide-react";
 import { useDashboard } from "@/hooks/use-dashboard";
 import { api } from "@/lib/api";
 import { AxiosError } from "axios";
@@ -17,7 +15,7 @@ interface Plan {
     color?: string;
 }
 
-export default function PremiumPage() {
+export default function Premium() {
     const { plan, refresh } = useDashboard();
 
     const [redeemCode, setRedeemCode] = useState("");
@@ -28,7 +26,7 @@ export default function PremiumPage() {
     const isPremium = plan.type === 'premium';
 
     // Exact plans as requested
-    const PLANS = [
+    const PLANS: Plan[] = [
         {
             id: "1m",
             title: "Starter",

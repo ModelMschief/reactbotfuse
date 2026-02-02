@@ -82,7 +82,11 @@ export function BroadcastWizard({ isOpen, onClose, bots, onTaskStarted }: Broadc
         const formData = new FormData();
         formData.append("message", message);
         formData.append("content_type", contentType);
-        formData.append("buttons", JSON.stringify(buttons));
+
+        // Flatten the 2D buttons array to 1D - backend expects [{text, url}, ...] 
+        // and wraps it in [] for Telegram's inline_keyboard format
+        const flattenedButtons = buttons.flat().filter(btn => btn.text && btn.url);
+        formData.append("buttons", JSON.stringify(flattenedButtons));
         formData.append("excluded_bot_tokens", JSON.stringify(excludedBots));
 
         if (file) formData.append("file", file);

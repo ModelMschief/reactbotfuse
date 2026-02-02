@@ -1,15 +1,12 @@
-"use client";
-
 import { useState } from "react";
 import { useAuth } from "@/store/auth-context";
-import { useRouter } from "next/navigation";
-import Image from "next/image";
+import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { Shield, Lock, Smartphone, ArrowRight, Loader2 } from "lucide-react";
+import { Shield, Lock, Smartphone, Loader2 } from "lucide-react";
 
-export default function LoginPage() {
+export default function Login() {
     const { login, signupInit, verifyOtp } = useAuth();
-    const router = useRouter();
+    const navigate = useNavigate();
 
     const [isSignup, setIsSignup] = useState(false);
     const [email, setEmail] = useState("");
@@ -36,7 +33,7 @@ export default function LoginPage() {
                 // Login Flow
                 const success = await login(email, password);
                 if (success) {
-                    router.push("/dashboard");
+                    navigate("/dashboard");
                 } else {
                     setError("Invalid email or password");
                 }
@@ -60,7 +57,7 @@ export default function LoginPage() {
         try {
             const success = await verifyOtp(email, otp);
             if (success) {
-                router.push("/dashboard");
+                navigate("/dashboard");
             } else {
                 setError("Invalid OTP");
             }
