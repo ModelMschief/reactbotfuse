@@ -8,6 +8,8 @@ import Login from '@/pages/Login';
 import Dashboard from '@/pages/Dashboard';
 import Autoup from '@/pages/Autoup';
 import Premium from '@/pages/Premium';
+import ForgotPassword from '@/pages/ForgotPassword';
+import ResetPassword from '@/pages/ResetPassword';
 
 function App() {
     return (
@@ -22,6 +24,8 @@ function App() {
                         <Route path="/dashboard" element={<Dashboard />} />
                         <Route path="/autoup" element={<Autoup />} />
                         <Route path="/premium" element={<Premium />} />
+                        <Route path="/forgot-password" element={<ForgotPassword />} />
+                        <Route path="/reset-password" element={<ResetPassword />} />
                     </Routes>
                 </div>
             </AuthProvider>
@@ -30,3 +34,4 @@ function App() {
 }
 
 export default App;
+

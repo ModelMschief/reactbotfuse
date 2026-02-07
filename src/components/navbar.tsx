@@ -1,8 +1,8 @@
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "@/store/auth-context";
 import { ThemeToggle } from "./theme-toggle";
-import { Menu, X, Shield, Key, Flame, BarChart3 } from "lucide-react";
-import { useState } from "react";
+import { Menu, X, Shield, Key, Flame, BarChart3, LogOut, Sun, Home, User } from "lucide-react";
+import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 
 // Import logo image
@@ -19,15 +19,42 @@ export function Navbar() {
     const { user, logout } = useAuth();
     const [isMobileOpen, setMobileOpen] = useState(false);
     const location = useLocation();
+    const navigate = useNavigate();
     const pathname = location.pathname;
+    const drawerRef = useRef<HTMLDivElement>(null);
 
-    // Hide nav on login page usually, but for prototype we can keep it or conditional render
-    if (pathname === "/login") return null;
+    // Close drawer when clicking outside
+    useEffect(() => {
+        const handleClickOutside = (event: MouseEvent) => {
+            if (drawerRef.current && !drawerRef.current.contains(event.target as Node)) {
+                setMobileOpen(false);
+            }
+        };
+
+        if (isMobileOpen) {
+            document.addEventListener("mousedown", handleClickOutside);
+            // Prevent body scroll when drawer is open
+            document.body.style.overflow = "hidden";
+        }
+
+        return () => {
+            document.removeEventListener("mousedown", handleClickOutside);
+            document.body.style.overflow = "";
+        };
+    }, [isMobileOpen]);
+
+    // Close drawer on route change
+    useEffect(() => {
+        setMobileOpen(false);
+    }, [pathname]);
+
+    // Hide nav on login/forgot/reset pages
+    if (pathname === "/login" || pathname === "/forgot-password" || pathname === "/reset-password") return null;
 
     const links = [
-        { href: "/dashboard", label: "Dashboard", icon: <Shield size={18} /> },
-        { href: "/autoup", label: "AutoUp", icon: <Key size={18} /> },
-        { href: "/premium", label: "Premium", icon: <Flame size={18} /> },
+        { href: "/dashboard", label: "Dashboard", icon: <Shield size={20} /> },
+        { href: "/autoup", label: "AutoUp", icon: <Key size={20} /> },
+        { href: "/premium", label: "Premium", icon: <Flame size={20} /> },
     ];
 
     return (
@@ -54,7 +81,7 @@ export function Navbar() {
                     ))}
                 </nav>
 
-                {/* Actions */}
+                {/* Desktop Actions */}
                 <div className="hidden md:flex items-center gap-4">
                     <ThemeToggle />
 
@@ -81,83 +108,209 @@ export function Navbar() {
 
                 {/* Mobile Toggle */}
                 <button
-                    className="md:hidden p-2 text-[var(--text-primary)]"
+                    className="md:hidden p-2 text-[var(--text-primary)] hover:bg-[var(--bg-surface)] rounded-lg transition-colors"
                     onClick={() => setMobileOpen(true)}
+                    aria-label="Open menu"
                 >
-                    <Menu />
+                    <Menu size={24} />
                 </button>
             </div>
 
-            {/* Mobile Menu Overlay */}
+            {/* Mobile Drawer */}
             <AnimatePresence>
                 {isMobileOpen && (
-                    <motion.div
-                        initial={{ opacity: 0, x: "100%" }}
-                        animate={{ opacity: 1, x: 0 }}
-                        exit={{ opacity: 0, x: "100%" }}
-                        transition={{ type: "spring", damping: 20 }}
-                        className="fixed inset-0 z-50 bg-[var(--bg-app)] flex flex-col p-6 md:hidden"
-                    >
-                        <div className="flex justify-between items-center mb-8">
-                            <span className="text-2xl font-bold flex items-center gap-2">
-                                <img src={appleTouchIcon} alt="Menu" width={32} height={32} className="rounded-md" /> Menu
-                            </span>
-                            <button onClick={() => setMobileOpen(false)} className="p-2 bg-[var(--bg-surface)] rounded-full border border-[var(--border-color)]">
-                                <X />
-                            </button>
-                        </div>
+                    <>
+                        {/* Backdrop */}
+                        <motion.div
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            exit={{ opacity: 0 }}
+                            transition={{ duration: 0.2 }}
+                            className="fixed inset-0 z-40 bg-black/60 backdrop-blur-sm md:hidden"
+                            onClick={() => setMobileOpen(false)}
+                        />
 
-                        <div className="flex flex-col gap-4">
-                            {user && links.map((link) => (
-                                <Link
-                                    key={link.href}
-                                    to={link.href}
-                                    onClick={() => setMobileOpen(false)}
-                                    className="p-4 text-lg font-medium border border-[var(--border-color)] rounded-xl bg-[var(--bg-surface)] flex items-center gap-3 active:scale-95 transition-transform"
-                                >
-                                    <span className="text-[var(--primary-color)]">{link.icon}</span>
-                                    {link.label}
-                                </Link>
-                            ))}
-
-                            {/* Stats & History - Only on dashboard for mobile */}
-                            {user && pathname === "/dashboard" && (
+                        {/* Drawer Panel */}
+                        <motion.div
+                            ref={drawerRef}
+                            initial={{ x: "100%" }}
+                            animate={{ x: 0 }}
+                            exit={{ x: "100%" }}
+                            transition={{ type: "spring", damping: 25, stiffness: 300 }}
+                            className="fixed top-0 right-0 bottom-0 z-50 w-[70%] max-w-xs bg-[var(--bg-surface)] border-l border-[var(--border-color)] shadow-2xl md:hidden flex flex-col"
+                        >
+                            {/* Drawer Header */}
+                            <div className="flex items-center justify-between p-4 border-b border-[var(--border-color)]">
+                                <div className="flex items-center gap-2">
+                                    <img src={appleTouchIcon} alt="Menu" width={28} height={28} className="rounded-md" />
+                                    <span className="font-bold text-lg">Menu</span>
+                                </div>
                                 <button
-                                    onClick={() => {
-                                        openStatsModal();
-                                        setMobileOpen(false);
-                                    }}
-                                    className="p-4 text-lg font-medium border border-blue-500/30 rounded-xl bg-blue-500/10 flex items-center gap-3 active:scale-95 transition-transform text-blue-400"
-                                >
-                                    <BarChart3 size={18} />
-                                    Stats & History
-                                </button>
-                            )}
-
-                            {!user && (
-                                <Link
-                                    to="/login"
                                     onClick={() => setMobileOpen(false)}
-                                    className="p-4 text-lg font-medium border border-[var(--border-color)] rounded-xl bg-[var(--primary-color)] text-white flex items-center justify-center gap-3 active:scale-95 transition-transform"
+                                    className="p-2 hover:bg-[var(--bg-app)] rounded-lg transition-colors"
+                                    aria-label="Close menu"
                                 >
-                                    Login or Sign Up
-                                </Link>
-                            )}
-
-                            <div className="mt-8 border-t border-[var(--border-color)] pt-8 flex justify-between items-center">
-                                <span className="text-[var(--text-muted)]">Theme</span>
-                                <ThemeToggle />
+                                    <X size={20} />
+                                </button>
                             </div>
 
-                            {user && (
-                                <button onClick={() => { logout(); setMobileOpen(false); }} className="mt-4 btn btn-ghost w-full border border-[var(--border-color)] text-[var(--text-muted)]">
-                                    Logout
-                                </button>
-                            )}
-                        </div>
-                    </motion.div>
+                            {/* Navigation Links */}
+                            <nav className="flex-1 overflow-y-auto">
+                                <ul className="py-2">
+                                    {/* Home Link - Always visible */}
+                                    <li>
+                                        <Link
+                                            to="/"
+                                            onClick={() => setMobileOpen(false)}
+                                            className={`flex items-center gap-3 px-4 py-3 border-b border-[var(--border-color)]/50 transition-colors ${pathname === "/"
+                                                ? "bg-[var(--primary-color)]/10 text-[var(--primary-color)]"
+                                                : "text-[var(--text-primary)] hover:bg-[var(--bg-app)]"
+                                                }`}
+                                        >
+                                            <span className={pathname === "/" ? "text-[var(--primary-color)]" : "text-[var(--text-muted)]"}>
+                                                <Home size={20} />
+                                            </span>
+                                            <span className="font-medium">Home</span>
+                                        </Link>
+                                    </li>
+
+                                    {/* Main Navigation Links - Explicitly listed for mobile */}
+                                    <li>
+                                        <Link
+                                            to="/dashboard"
+                                            onClick={() => setMobileOpen(false)}
+                                            className={`flex items-center gap-3 px-4 py-3 border-b border-[var(--border-color)]/50 transition-colors ${pathname === "/dashboard"
+                                                ? "bg-[var(--primary-color)]/10 text-[var(--primary-color)]"
+                                                : "text-[var(--text-primary)] hover:bg-[var(--bg-app)]"
+                                                }`}
+                                        >
+                                            <span className={pathname === "/dashboard" ? "text-[var(--primary-color)]" : "text-[var(--text-muted)]"}>
+                                                <Shield size={20} />
+                                            </span>
+                                            <span className="font-medium">Dashboard</span>
+                                        </Link>
+                                    </li>
+                                    <li>
+                                        <Link
+                                            to="/autoup"
+                                            onClick={() => setMobileOpen(false)}
+                                            className={`flex items-center gap-3 px-4 py-3 border-b border-[var(--border-color)]/50 transition-colors ${pathname === "/autoup"
+                                                ? "bg-[var(--primary-color)]/10 text-[var(--primary-color)]"
+                                                : "text-[var(--text-primary)] hover:bg-[var(--bg-app)]"
+                                                }`}
+                                        >
+                                            <span className={pathname === "/autoup" ? "text-[var(--primary-color)]" : "text-[var(--text-muted)]"}>
+                                                <Key size={20} />
+                                            </span>
+                                            <span className="font-medium">AutoUp API</span>
+                                        </Link>
+                                    </li>
+                                    <li>
+                                        <Link
+                                            to="/premium"
+                                            onClick={() => setMobileOpen(false)}
+                                            className={`flex items-center gap-3 px-4 py-3 border-b border-[var(--border-color)]/50 transition-colors ${pathname === "/premium"
+                                                ? "bg-[var(--primary-color)]/10 text-[var(--primary-color)]"
+                                                : "text-[var(--text-primary)] hover:bg-[var(--bg-app)]"
+                                                }`}
+                                        >
+                                            <span className={pathname === "/premium" ? "text-[var(--primary-color)]" : "text-[var(--text-muted)]"}>
+                                                <Flame size={20} />
+                                            </span>
+                                            <span className="font-medium">Premium</span>
+                                        </Link>
+                                    </li>
+
+                                    {/* History & Stats - Available to logged in users */}
+                                    {user && (
+                                        <>
+                                            <li>
+                                                <button
+                                                    onClick={() => {
+                                                        setMobileOpen(false);
+                                                        if (pathname === "/dashboard") {
+                                                            openStatsModal();
+                                                        } else {
+                                                            navigate("/dashboard#stats");
+                                                        }
+                                                    }}
+                                                    className="w-full flex items-center gap-3 px-4 py-3 border-b border-[var(--border-color)]/50 text-[var(--text-primary)] hover:bg-[var(--bg-app)] transition-colors text-left"
+                                                >
+                                                    <span className="text-[var(--text-muted)]">
+                                                        <BarChart3 size={20} />
+                                                    </span>
+                                                    <span className="font-medium">History</span>
+                                                </button>
+                                            </li>
+                                            <li>
+                                                <button
+                                                    onClick={() => {
+                                                        setMobileOpen(false);
+                                                        if (pathname === "/dashboard") {
+                                                            openStatsModal();
+                                                        } else {
+                                                            navigate("/dashboard#stats");
+                                                        }
+                                                    }}
+                                                    className="w-full flex items-center gap-3 px-4 py-3 border-b border-[var(--border-color)]/50 text-[var(--text-primary)] hover:bg-[var(--bg-app)] transition-colors text-left"
+                                                >
+                                                    <span className="text-[var(--text-muted)]">
+                                                        <BarChart3 size={20} />
+                                                    </span>
+                                                    <span className="font-medium">Stats</span>
+                                                </button>
+                                            </li>
+                                        </>
+                                    )}
+
+                                    {/* Removed old conditional stats link */}
+
+                                    {/* Login link for non-authenticated users */}
+                                    {!user && (
+                                        <li>
+                                            <Link
+                                                to="/login"
+                                                onClick={() => setMobileOpen(false)}
+                                                className="flex items-center gap-3 px-4 py-3 border-b border-[var(--border-color)]/50 text-[var(--primary-color)] hover:bg-[var(--primary-color)]/10 transition-colors"
+                                            >
+                                                <User size={20} />
+                                                <span className="font-medium">Login or Sign Up</span>
+                                            </Link>
+                                        </li>
+                                    )}
+                                </ul>
+                            </nav>
+
+                            {/* Drawer Footer */}
+                            <div className="border-t border-[var(--border-color)] p-4 space-y-3">
+                                {/* Theme Toggle Row */}
+                                <div className="flex items-center justify-between py-2">
+                                    <div className="flex items-center gap-2 text-[var(--text-muted)]">
+                                        <Sun size={18} />
+                                        <span className="text-sm">Theme</span>
+                                    </div>
+                                    <ThemeToggle />
+                                </div>
+
+                                {/* Logout Button */}
+                                {user && (
+                                    <button
+                                        onClick={() => {
+                                            logout();
+                                            setMobileOpen(false);
+                                        }}
+                                        className="w-full flex items-center justify-center gap-2 py-3 text-sm font-medium text-[var(--text-muted)] hover:text-[var(--destructive)] hover:bg-red-500/10 rounded-lg transition-colors border border-[var(--border-color)]"
+                                    >
+                                        <LogOut size={18} />
+                                        Logout
+                                    </button>
+                                )}
+                            </div>
+                        </motion.div>
+                    </>
                 )}
             </AnimatePresence>
         </header>
     );
 }
+

@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useLocation } from "react-router-dom";
 import {
     Users,
     Send,
@@ -19,6 +20,7 @@ import { BroadcastWizard } from "@/components/broadcast-wizard";
 
 export default function Dashboard() {
     const { bots, tasks, plan, loading, refresh, addBot, deleteBot, uploadUsers } = useDashboard();
+    const location = useLocation();
 
     // Local UI State
     const [isAddBotOpen, setIsAddBotOpen] = useState(false);
@@ -41,8 +43,13 @@ export default function Dashboard() {
     useEffect(() => {
         const handleOpenStats = () => setMobileStatsOpen(true);
         window.addEventListener("openStatsModal", handleOpenStats);
+
+        if (location.hash === "#stats") {
+            setMobileStatsOpen(true);
+        }
+
         return () => window.removeEventListener("openStatsModal", handleOpenStats);
-    }, []);
+    }, [location]);
 
     // Stats Calculation
     const totalUsers = bots.reduce((acc, bot) => acc + bot.user_count, 0);
@@ -84,7 +91,6 @@ export default function Dashboard() {
                     title="Total Audience"
                     value={totalUsers.toLocaleString()}
                     icon={<Users className="text-blue-400" />}
-                    trend="+12% this week"
                 />
                 <StatsCard
                     title="Active Bots"
@@ -409,7 +415,6 @@ export default function Dashboard() {
                                     title="Total Audience"
                                     value={totalUsers.toLocaleString()}
                                     icon={<Users className="text-blue-400" />}
-                                    trend="+12% this week"
                                 />
                                 <StatsCard
                                     title="Active Bots"

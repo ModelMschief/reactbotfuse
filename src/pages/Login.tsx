@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useAuth } from "@/store/auth-context";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { Shield, Lock, Smartphone, Loader2 } from "lucide-react";
 
@@ -236,6 +236,18 @@ export default function Login() {
                                     {isSignup ? "Log In" : "Sign up"}
                                 </button>
                             </div>
+
+                            {/* Forgot Password Link - Only show on login */}
+                            {!isSignup && (
+                                <div className="mt-4 text-center">
+                                    <Link
+                                        to="/forgot-password"
+                                        className="text-sm text-[var(--text-muted)] hover:text-[var(--primary-color)] hover:underline"
+                                    >
+                                        Forgot Password?
+                                    </Link>
+                                </div>
+                            )}
                         </motion.div>
                     )}
                 </AnimatePresence>
