@@ -45,6 +45,9 @@ export function BroadcastWizard({ isOpen, onClose, bots, onTaskStarted }: Broadc
     // Bot Selection State
     const [excludedBots, setExcludedBots] = useState<string[]>([]);
 
+    // Pin Message State
+    const [pinMessage, setPinMessage] = useState(false);
+
     const pollRef = useRef<NodeJS.Timeout | null>(null);
 
     const handleAddButtonRow = () => {
@@ -88,6 +91,7 @@ export function BroadcastWizard({ isOpen, onClose, bots, onTaskStarted }: Broadc
         const flattenedButtons = buttons.flat().filter(btn => btn.text && btn.url);
         formData.append("buttons", JSON.stringify(flattenedButtons));
         formData.append("excluded_bot_tokens", JSON.stringify(excludedBots));
+        formData.append("pin_message", pinMessage.toString());
 
         if (file) formData.append("file", file);
 
@@ -157,6 +161,7 @@ export function BroadcastWizard({ isOpen, onClose, bots, onTaskStarted }: Broadc
         setMessage("");
         setFile(null);
         setButtons([]);
+        setPinMessage(false);
     }
 
     // STRICT VISIBILITY CONTROL: If !isOpen, return null immediately.
@@ -316,6 +321,24 @@ export function BroadcastWizard({ isOpen, onClose, bots, onTaskStarted }: Broadc
                                         </div>
                                     ))}
                                 </div>
+                            </div>
+
+                            {/* Pin Message Toggle */}
+                            <div className="bg-[var(--bg-app)] rounded-lg p-4 border border-[var(--border-color)]">
+                                <label className="flex items-center justify-between cursor-pointer">
+                                    <div>
+                                        <span className="text-sm font-bold">Pin Message</span>
+                                        <p className="text-xs text-[var(--text-muted)] mt-1">
+                                            ⚠️ Pinning adds a small delay to avoid rate limits.
+                                        </p>
+                                    </div>
+                                    <input
+                                        type="checkbox"
+                                        checked={pinMessage}
+                                        onChange={(e) => setPinMessage(e.target.checked)}
+                                        className="w-5 h-5 rounded accent-[var(--primary-color)]"
+                                    />
+                                </label>
                             </div>
                         </>
                     )}
