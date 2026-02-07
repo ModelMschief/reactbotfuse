@@ -107,13 +107,15 @@ export function Navbar() {
                 </div>
 
                 {/* Mobile Toggle */}
-                <button
-                    className="md:hidden p-2 text-[var(--text-primary)] hover:bg-[var(--bg-surface)] rounded-lg transition-colors"
-                    onClick={() => setMobileOpen(true)}
-                    aria-label="Open menu"
-                >
-                    <Menu size={24} />
-                </button>
+                {user && (
+                    <button
+                        className="md:hidden p-2 text-[var(--text-primary)] hover:bg-[var(--bg-surface)] rounded-lg transition-colors"
+                        onClick={() => setMobileOpen(true)}
+                        aria-label="Open menu"
+                    >
+                        <Menu size={24} />
+                    </button>
+                )}
             </div>
 
             {/* Mobile Drawer */}
@@ -157,24 +159,6 @@ export function Navbar() {
                             {/* Navigation Links */}
                             <nav className="flex-1 overflow-y-auto">
                                 <ul className="py-2">
-                                    {/* Home Link - Always visible */}
-                                    <li>
-                                        <Link
-                                            to="/"
-                                            onClick={() => setMobileOpen(false)}
-                                            className={`flex items-center gap-3 px-4 py-3 border-b border-[var(--border-color)]/50 transition-colors ${pathname === "/"
-                                                ? "bg-[var(--primary-color)]/10 text-[var(--primary-color)]"
-                                                : "text-[var(--text-primary)] hover:bg-[var(--bg-app)]"
-                                                }`}
-                                        >
-                                            <span className={pathname === "/" ? "text-[var(--primary-color)]" : "text-[var(--text-muted)]"}>
-                                                <Home size={20} />
-                                            </span>
-                                            <span className="font-medium">Home</span>
-                                        </Link>
-                                    </li>
-
-                                    {/* Main Navigation Links - Explicitly listed for mobile */}
                                     <li>
                                         <Link
                                             to="/dashboard"
@@ -188,55 +172,6 @@ export function Navbar() {
                                                 <Shield size={20} />
                                             </span>
                                             <span className="font-medium">Dashboard</span>
-                                        </Link>
-                                    </li>
-
-                                    {user && (
-                                        <>
-                                            <li>
-                                                <button
-                                                    onClick={() => {
-                                                        setMobileOpen(false);
-                                                        navigate("/dashboard#broadcast");
-                                                    }}
-                                                    className="w-full flex items-center gap-3 px-4 py-3 border-b border-[var(--border-color)]/50 text-[var(--text-primary)] hover:bg-[var(--bg-app)] transition-colors text-left"
-                                                >
-                                                    <span className="text-[var(--text-muted)]">
-                                                        <Send size={20} />
-                                                    </span>
-                                                    <span className="font-medium">Broadcast</span>
-                                                </button>
-                                            </li>
-                                            <li>
-                                                <button
-                                                    onClick={() => {
-                                                        setMobileOpen(false);
-                                                        navigate("/dashboard#mybots");
-                                                    }}
-                                                    className="w-full flex items-center gap-3 px-4 py-3 border-b border-[var(--border-color)]/50 text-[var(--text-primary)] hover:bg-[var(--bg-app)] transition-colors text-left"
-                                                >
-                                                    <span className="text-[var(--text-muted)]">
-                                                        <Zap size={20} />
-                                                    </span>
-                                                    <span className="font-medium">My Bots</span>
-                                                </button>
-                                            </li>
-                                        </>
-                                    )}
-
-                                    <li>
-                                        <Link
-                                            to="/autoup"
-                                            onClick={() => setMobileOpen(false)}
-                                            className={`flex items-center gap-3 px-4 py-3 border-b border-[var(--border-color)]/50 transition-colors ${pathname === "/autoup"
-                                                ? "bg-[var(--primary-color)]/10 text-[var(--primary-color)]"
-                                                : "text-[var(--text-primary)] hover:bg-[var(--bg-app)]"
-                                                }`}
-                                        >
-                                            <span className={pathname === "/autoup" ? "text-[var(--primary-color)]" : "text-[var(--text-muted)]"}>
-                                                <Key size={20} />
-                                            </span>
-                                            <span className="font-medium">AutoUp API</span>
                                         </Link>
                                     </li>
                                     <li>
@@ -254,82 +189,21 @@ export function Navbar() {
                                             <span className="font-medium">Premium</span>
                                         </Link>
                                     </li>
-
-                                    {user && (
-                                        <li>
-                                            <Link
-                                                to="/settings"
-                                                onClick={() => setMobileOpen(false)}
-                                                className={`flex items-center gap-3 px-4 py-3 border-b border-[var(--border-color)]/50 transition-colors ${pathname === "/settings"
-                                                    ? "bg-[var(--primary-color)]/10 text-[var(--primary-color)]"
-                                                    : "text-[var(--text-primary)] hover:bg-[var(--bg-app)]"
-                                                    }`}
-                                            >
-                                                <span className={pathname === "/settings" ? "text-[var(--primary-color)]" : "text-[var(--text-muted)]"}>
-                                                    <Settings size={20} />
-                                                </span>
-                                                <span className="font-medium">Settings</span>
-                                            </Link>
-                                        </li>
-                                    )}
-
-                                    {/* History & Stats - Available to logged in users */}
-                                    {user && (
-                                        <>
-                                            <li>
-                                                <button
-                                                    onClick={() => {
-                                                        setMobileOpen(false);
-                                                        if (pathname === "/dashboard") {
-                                                            openStatsModal();
-                                                        } else {
-                                                            navigate("/dashboard#stats");
-                                                        }
-                                                    }}
-                                                    className="w-full flex items-center gap-3 px-4 py-3 border-b border-[var(--border-color)]/50 text-[var(--text-primary)] hover:bg-[var(--bg-app)] transition-colors text-left"
-                                                >
-                                                    <span className="text-[var(--text-muted)]">
-                                                        <BarChart3 size={20} />
-                                                    </span>
-                                                    <span className="font-medium">History</span>
-                                                </button>
-                                            </li>
-                                            <li>
-                                                <button
-                                                    onClick={() => {
-                                                        setMobileOpen(false);
-                                                        if (pathname === "/dashboard") {
-                                                            openStatsModal();
-                                                        } else {
-                                                            navigate("/dashboard#stats");
-                                                        }
-                                                    }}
-                                                    className="w-full flex items-center gap-3 px-4 py-3 border-b border-[var(--border-color)]/50 text-[var(--text-primary)] hover:bg-[var(--bg-app)] transition-colors text-left"
-                                                >
-                                                    <span className="text-[var(--text-muted)]">
-                                                        <BarChart3 size={20} />
-                                                    </span>
-                                                    <span className="font-medium">Stats</span>
-                                                </button>
-                                            </li>
-                                        </>
-                                    )}
-
-                                    {/* Removed old conditional stats link */}
-
-                                    {/* Login link for non-authenticated users */}
-                                    {!user && (
-                                        <li>
-                                            <Link
-                                                to="/login"
-                                                onClick={() => setMobileOpen(false)}
-                                                className="flex items-center gap-3 px-4 py-3 border-b border-[var(--border-color)]/50 text-[var(--primary-color)] hover:bg-[var(--primary-color)]/10 transition-colors"
-                                            >
-                                                <User size={20} />
-                                                <span className="font-medium">Login or Sign Up</span>
-                                            </Link>
-                                        </li>
-                                    )}
+                                    <li>
+                                        <Link
+                                            to="/autoup"
+                                            onClick={() => setMobileOpen(false)}
+                                            className={`flex items-center gap-3 px-4 py-3 border-b border-[var(--border-color)]/50 transition-colors ${pathname === "/autoup"
+                                                ? "bg-[var(--primary-color)]/10 text-[var(--primary-color)]"
+                                                : "text-[var(--text-primary)] hover:bg-[var(--bg-app)]"
+                                                }`}
+                                        >
+                                            <span className={pathname === "/autoup" ? "text-[var(--primary-color)]" : "text-[var(--text-muted)]"}>
+                                                <Key size={20} />
+                                            </span>
+                                            <span className="font-medium">AutoUp API</span>
+                                        </Link>
+                                    </li>
                                 </ul>
                             </nav>
 
