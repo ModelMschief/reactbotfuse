@@ -1,0 +1,15 @@
+
+> temp_ui@0.1.0 dev
+> vite --port 3000
+
+
+  VITE v7.3.1  ready in 488 ms
+
+  ➜  Local:   http://localhost:3000/
+  ➜  Network: use --host to expose
+9:05:13 AM [vite] (client) hmr update /src/index.css
+9:06:27 AM [vite] (client) hmr update /src/index.css
+9:07:28 AM [vite] (client) hmr update /src/index.css
+9:08:18 AM [vite] (client) hmr update /src/index.css
+9:09:22 AM [vite] (client) hmr update /src/components/navbar.tsx, /src/index.css
+9:09:49 AM [vite] (client) hmr update /src/index.css

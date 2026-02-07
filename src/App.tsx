@@ -10,6 +10,7 @@ import Autoup from '@/pages/Autoup';
 import Premium from '@/pages/Premium';
 import ForgotPassword from '@/pages/ForgotPassword';
 import ResetPassword from '@/pages/ResetPassword';
+import Settings from '@/pages/Settings';
 
 function App() {
     return (
@@ -24,6 +25,7 @@ function App() {
                         <Route path="/dashboard" element={<Dashboard />} />
                         <Route path="/autoup" element={<Autoup />} />
                         <Route path="/premium" element={<Premium />} />
+                        <Route path="/settings" element={<Settings />} />
                         <Route path="/forgot-password" element={<ForgotPassword />} />
                         <Route path="/reset-password" element={<ResetPassword />} />
                     </Routes>

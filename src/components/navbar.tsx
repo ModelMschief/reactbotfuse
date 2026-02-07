@@ -1,7 +1,7 @@
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "@/store/auth-context";
 import { ThemeToggle } from "./theme-toggle";
-import { Menu, X, Shield, Key, Flame, BarChart3, LogOut, Sun, Home, User } from "lucide-react";
+import { Menu, X, Shield, Key, Flame, BarChart3, LogOut, Sun, Home, User, Send, Zap, Settings } from "lucide-react";
 import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 
@@ -137,7 +137,7 @@ export function Navbar() {
                             animate={{ x: 0 }}
                             exit={{ x: "100%" }}
                             transition={{ type: "spring", damping: 25, stiffness: 300 }}
-                            className="fixed top-0 right-0 bottom-0 z-50 w-[70%] max-w-xs bg-[var(--bg-surface)] border-l border-[var(--border-color)] shadow-2xl md:hidden flex flex-col"
+                            className="fixed top-0 right-0 bottom-0 z-50 w-[70%] max-w-xs bg-white dark:bg-[#18181b] border-l border-[var(--border-color)] shadow-2xl md:hidden flex flex-col"
                         >
                             {/* Drawer Header */}
                             <div className="flex items-center justify-between p-4 border-b border-[var(--border-color)]">
@@ -190,6 +190,40 @@ export function Navbar() {
                                             <span className="font-medium">Dashboard</span>
                                         </Link>
                                     </li>
+
+                                    {user && (
+                                        <>
+                                            <li>
+                                                <button
+                                                    onClick={() => {
+                                                        setMobileOpen(false);
+                                                        navigate("/dashboard#broadcast");
+                                                    }}
+                                                    className="w-full flex items-center gap-3 px-4 py-3 border-b border-[var(--border-color)]/50 text-[var(--text-primary)] hover:bg-[var(--bg-app)] transition-colors text-left"
+                                                >
+                                                    <span className="text-[var(--text-muted)]">
+                                                        <Send size={20} />
+                                                    </span>
+                                                    <span className="font-medium">Broadcast</span>
+                                                </button>
+                                            </li>
+                                            <li>
+                                                <button
+                                                    onClick={() => {
+                                                        setMobileOpen(false);
+                                                        navigate("/dashboard#mybots");
+                                                    }}
+                                                    className="w-full flex items-center gap-3 px-4 py-3 border-b border-[var(--border-color)]/50 text-[var(--text-primary)] hover:bg-[var(--bg-app)] transition-colors text-left"
+                                                >
+                                                    <span className="text-[var(--text-muted)]">
+                                                        <Zap size={20} />
+                                                    </span>
+                                                    <span className="font-medium">My Bots</span>
+                                                </button>
+                                            </li>
+                                        </>
+                                    )}
+
                                     <li>
                                         <Link
                                             to="/autoup"
@@ -220,6 +254,24 @@ export function Navbar() {
                                             <span className="font-medium">Premium</span>
                                         </Link>
                                     </li>
+
+                                    {user && (
+                                        <li>
+                                            <Link
+                                                to="/settings"
+                                                onClick={() => setMobileOpen(false)}
+                                                className={`flex items-center gap-3 px-4 py-3 border-b border-[var(--border-color)]/50 transition-colors ${pathname === "/settings"
+                                                    ? "bg-[var(--primary-color)]/10 text-[var(--primary-color)]"
+                                                    : "text-[var(--text-primary)] hover:bg-[var(--bg-app)]"
+                                                    }`}
+                                            >
+                                                <span className={pathname === "/settings" ? "text-[var(--primary-color)]" : "text-[var(--text-muted)]"}>
+                                                    <Settings size={20} />
+                                                </span>
+                                                <span className="font-medium">Settings</span>
+                                            </Link>
+                                        </li>
+                                    )}
 
                                     {/* History & Stats - Available to logged in users */}
                                     {user && (

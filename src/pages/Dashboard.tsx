@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import {
     Users,
     Send,
@@ -12,7 +12,8 @@ import {
     Loader2,
     UploadCloud,
     X,
-    BarChart3
+    BarChart3,
+    Gift
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useDashboard } from "@/hooks/use-dashboard";
@@ -21,6 +22,7 @@ import { BroadcastWizard } from "@/components/broadcast-wizard";
 export default function Dashboard() {
     const { bots, tasks, plan, loading, refresh, addBot, deleteBot, uploadUsers } = useDashboard();
     const location = useLocation();
+    const navigate = useNavigate();
 
     // Local UI State
     const [isAddBotOpen, setIsAddBotOpen] = useState(false);
@@ -46,10 +48,17 @@ export default function Dashboard() {
 
         if (location.hash === "#stats") {
             setMobileStatsOpen(true);
+        } else if (location.hash === "#broadcast") {
+            setIsBroadcastOpen(true);
+        } else if (location.hash === "#mybots") {
+            const element = document.getElementById("my-bots-section");
+            if (element) {
+                element.scrollIntoView({ behavior: "smooth" });
+            }
         }
 
         return () => window.removeEventListener("openStatsModal", handleOpenStats);
-    }, [location]);
+    }, [location, loading]);
 
     // Stats Calculation
     const totalUsers = bots.reduce((acc, bot) => acc + bot.user_count, 0);
@@ -85,6 +94,17 @@ export default function Dashboard() {
 
     return (
         <div className="space-y-8">
+            {/* Premium CTA - Visible on all devices */}
+            <div className="flex justify-center">
+                <button
+                    onClick={() => navigate("/premium")}
+                    className="w-full md:w-auto bg-gradient-to-r from-purple-600 to-pink-600 text-white font-bold py-3 px-8 rounded-full shadow-lg hover:shadow-purple-500/50 transform hover:scale-105 transition-all flex items-center justify-center gap-2"
+                >
+                    <Gift size={24} className="animate-bounce" />
+                    Get Premium - Unlock All Features
+                </button>
+            </div>
+
             {/* Header Stats - Hidden on mobile, use navbar "Stats & History" instead */}
             <div className="hidden md:grid grid-cols-1 md:grid-cols-3 gap-6">
                 <StatsCard
@@ -109,7 +129,7 @@ export default function Dashboard() {
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
 
                 {/* Left Column: Bot Management */}
-                <div className="lg:col-span-2 space-y-6">
+                <div className="lg:col-span-2 space-y-6" id="my-bots-section">
                     <div className="flex items-center justify-between">
                         <h2 className="text-xl font-bold flex items-center gap-2">
                             <Zap className="text-[var(--primary-color)]" size={20} />
