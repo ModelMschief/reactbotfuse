@@ -106,15 +106,26 @@ export function Navbar() {
                     )}
                 </div>
 
-                {/* Mobile Toggle */}
+                {/* Mobile Actions */}
                 {user && (
-                    <button
-                        className="md:hidden p-2 text-[var(--text-primary)] hover:bg-[var(--bg-surface)] rounded-lg transition-colors"
-                        onClick={() => setMobileOpen(true)}
-                        aria-label="Open menu"
-                    >
-                        <Menu size={24} />
-                    </button>
+                    <div className="md:hidden flex items-center gap-2">
+                        {/* AutoUp Shortcut for Mobile */}
+                        <Link
+                            to="/autoup"
+                            className="p-2 text-gray-600 dark:text-gray-300 hover:text-orange-500 dark:hover:text-orange-400 transition-colors"
+                            title="AutoUp API"
+                        >
+                            <Key size={24} />
+                        </Link>
+
+                        <button
+                            className="p-2 text-gray-900 dark:text-white hover:bg-gray-100 dark:hover:bg-zinc-800 rounded-lg transition-colors"
+                            onClick={() => setMobileOpen(true)}
+                            aria-label="Open menu"
+                        >
+                            <Menu size={24} />
+                        </button>
+                    </div>
                 )}
             </div>
 
@@ -139,17 +150,17 @@ export function Navbar() {
                             animate={{ x: 0 }}
                             exit={{ x: "100%" }}
                             transition={{ type: "spring", damping: 25, stiffness: 300 }}
-                            className="fixed top-0 right-0 bottom-0 z-50 w-[70%] max-w-xs bg-white dark:bg-[#18181b] border-l border-[var(--border-color)] shadow-2xl md:hidden flex flex-col"
+                            className="fixed top-0 right-0 bottom-0 z-50 w-[80%] max-w-xs bg-white dark:bg-zinc-900 border-l border-gray-200 dark:border-zinc-800 shadow-2xl md:hidden flex flex-col text-gray-900 dark:text-gray-100"
                         >
                             {/* Drawer Header */}
-                            <div className="flex items-center justify-between p-4 border-b border-[var(--border-color)]">
+                            <div className="flex items-center justify-between p-4 border-b border-gray-200 dark:border-zinc-800">
                                 <div className="flex items-center gap-2">
                                     <img src={appleTouchIcon} alt="Menu" width={28} height={28} className="rounded-md" />
                                     <span className="font-bold text-lg">Menu</span>
                                 </div>
                                 <button
                                     onClick={() => setMobileOpen(false)}
-                                    className="p-2 hover:bg-[var(--bg-app)] rounded-lg transition-colors"
+                                    className="p-2 text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-zinc-800 rounded-lg transition-colors"
                                     aria-label="Close menu"
                                 >
                                     <X size={20} />
@@ -157,58 +168,52 @@ export function Navbar() {
                             </div>
 
                             {/* Navigation Links */}
-                            <nav className="flex-1 overflow-y-auto">
-                                <ul className="py-2">
+                            <nav className="flex-1 overflow-y-auto p-2">
+                                <ul className="space-y-1">
                                     <li>
                                         <Link
                                             to="/dashboard"
                                             onClick={() => setMobileOpen(false)}
-                                            className={`flex items-center gap-3 px-4 py-3 border-b border-[var(--border-color)]/50 transition-colors ${pathname === "/dashboard"
-                                                ? "bg-[var(--primary-color)]/10 text-[var(--primary-color)]"
-                                                : "text-[var(--text-primary)] hover:bg-[var(--bg-app)]"
+                                            className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${pathname === "/dashboard"
+                                                ? "bg-orange-500/10 text-orange-600 dark:text-orange-500 font-semibold"
+                                                : "text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-zinc-800"
                                                 }`}
                                         >
-                                            <span className={pathname === "/dashboard" ? "text-[var(--primary-color)]" : "text-[var(--text-muted)]"}>
-                                                <Shield size={20} />
-                                            </span>
-                                            <span className="font-medium">Dashboard</span>
+                                            <Shield size={20} className={pathname === "/dashboard" ? "text-orange-500" : "text-gray-400"} />
+                                            <span>Dashboard</span>
                                         </Link>
                                     </li>
                                     <li>
                                         <Link
                                             to="/premium"
                                             onClick={() => setMobileOpen(false)}
-                                            className={`flex items-center gap-3 px-4 py-3 border-b border-[var(--border-color)]/50 transition-colors ${pathname === "/premium"
-                                                ? "bg-[var(--primary-color)]/10 text-[var(--primary-color)]"
-                                                : "text-[var(--text-primary)] hover:bg-[var(--bg-app)]"
+                                            className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${pathname === "/premium"
+                                                ? "bg-purple-500/10 text-purple-600 dark:text-purple-400 font-semibold"
+                                                : "text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-zinc-800"
                                                 }`}
                                         >
-                                            <span className={pathname === "/premium" ? "text-[var(--primary-color)]" : "text-[var(--text-muted)]"}>
-                                                <Flame size={20} />
-                                            </span>
-                                            <span className="font-medium">Premium</span>
+                                            <Flame size={20} className={pathname === "/premium" ? "text-purple-500" : "text-gray-400"} />
+                                            <span>Premium</span>
                                         </Link>
                                     </li>
                                     <li>
                                         <Link
                                             to="/autoup"
                                             onClick={() => setMobileOpen(false)}
-                                            className={`flex items-center gap-3 px-4 py-3 border-b border-[var(--border-color)]/50 transition-colors ${pathname === "/autoup"
-                                                ? "bg-[var(--primary-color)]/10 text-[var(--primary-color)]"
-                                                : "text-[var(--text-primary)] hover:bg-[var(--bg-app)]"
+                                            className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${pathname === "/autoup"
+                                                ? "bg-blue-500/10 text-blue-600 dark:text-blue-400 font-semibold"
+                                                : "text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-zinc-800"
                                                 }`}
                                         >
-                                            <span className={pathname === "/autoup" ? "text-[var(--primary-color)]" : "text-[var(--text-muted)]"}>
-                                                <Key size={20} />
-                                            </span>
-                                            <span className="font-medium">AutoUp API</span>
+                                            <Key size={20} className={pathname === "/autoup" ? "text-blue-500" : "text-gray-400"} />
+                                            <span>AutoUp API</span>
                                         </Link>
                                     </li>
                                 </ul>
                             </nav>
 
                             {/* Drawer Footer */}
-                            <div className="border-t border-[var(--border-color)] p-4 space-y-3">
+                            <div className="border-t border-gray-200 dark:border-zinc-800 p-4 space-y-3 bg-gray-50 dark:bg-zinc-900/50">
                                 {/* Theme Toggle Row */}
                                 <div className="flex items-center justify-between py-2">
                                     <div className="flex items-center gap-2 text-[var(--text-muted)]">
