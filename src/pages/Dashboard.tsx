@@ -90,8 +90,8 @@ export default function Dashboard() {
                     onClick={() => navigate("/premium")}
                     className="w-full md:w-auto bg-gradient-to-r from-purple-600 to-pink-600 text-white font-bold py-3 px-8 rounded-full shadow-lg hover:shadow-purple-500/50 transform hover:scale-105 transition-all flex items-center justify-center gap-2"
                 >
-                    <Gift size={24} className="animate-bounce" />
-                    Get Premium - Unlock All Features
+                    <Gift size={24} />
+                    Get Premium Now
                 </button>
             </div>
 

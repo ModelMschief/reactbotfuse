@@ -1,4 +1,5 @@
 import { Link } from "react-router-dom";
+import { useAuth } from "@/store/auth-context";
 import { motion } from "framer-motion";
 import { Shield, Zap, Activity, Server, Lock, Layers, ExternalLink } from "lucide-react";
 import { ParticleBackground } from "@/components/particle-background";
@@ -7,6 +8,7 @@ import { ParticleBackground } from "@/components/particle-background";
 import appleTouchIcon from "/apple-touch-icon.png";
 
 export default function Home() {
+    const { user } = useAuth();
     const containerVariants = {
         hidden: { opacity: 0 },
         visible: {
@@ -67,7 +69,7 @@ export default function Home() {
                         transition={{ duration: 0.8, delay: 0.1 }}
                         className="text-5xl md:text-7xl font-bold tracking-tight mb-6 leading-[1.1] drop-shadow-2xl"
                     >
-                        Unitify Your Bots <br className="hidden md:block" />
+                        Unify Your Bots <br className="hidden md:block" />
                         <span className="text-transparent bg-clip-text bg-gradient-to-br from-[var(--primary-color)] via-orange-500 to-yellow-500 animate-gradient-x">
                             Telegram Bot Armies
                         </span>
@@ -89,7 +91,7 @@ export default function Home() {
                         transition={{ duration: 0.8, delay: 0.3 }}
                         className="flex flex-col sm:flex-row items-center justify-center gap-4"
                     >
-                        <Link to="/login" className="btn btn-primary h-12 px-8 text-base font-bold shadow-[0_0_30px_rgba(220,38,38,0.4)] hover:shadow-[0_0_50px_rgba(220,38,38,0.6)] hover:scale-105 transition-all">
+                        <Link to={user ? "/dashboard" : "/login"} className="btn btn-primary h-12 px-8 text-base font-bold shadow-[0_0_30px_rgba(220,38,38,0.4)] hover:shadow-[0_0_50px_rgba(220,38,38,0.6)] hover:scale-105 transition-all">
                             Get Started
                         </Link>
                         <a href="https://modelmschief.github.io/BotFusionDoc/" target="_blank" rel="noopener noreferrer" className="btn bg-white/5 border border-white/10 hover:bg-white/10 hover:border-[var(--primary-color)] hover:text-[var(--primary-color)] h-12 px-8 text-base backdrop-blur-md transition-all">

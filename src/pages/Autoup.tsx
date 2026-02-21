@@ -110,7 +110,7 @@ export default function Autoup() {
                                 <RefreshCw size={14} className={generating ? "animate-spin" : ""} /> Revoke & Generate New
                             </button>
                             <p className="text-xs text-[var(--text-muted)] bg-[var(--bg-app)] px-2 py-1 rounded">
-                                <AlertTriangle size={12} className="inline mr-1 text-yellow-500" /> Not a secret key. Used for mapping only.
+                                <AlertTriangle size={12} className="inline mr-1 text-yellow-500" /> This is a secret key. Keep it safe.
                             </p>
                         </div>
                     </div>
