@@ -108,7 +108,7 @@ export default function Login() {
                                 </div>
                                 <h2 className="text-2xl font-bold">Verify Account</h2>
                                 <p className="text-[var(--text-muted)] text-sm mt-2">
-                                    We sent a code to your Telegram ID linked to <b>{email}</b>.
+                                    We sent a code to your Telegram ID through <a href="https://t.me/authentcastbot" style={{ color: "blue" }}>BotFusion Bot</a>.<br />Check your Telegram for the OTP.
                                 </p>
                             </div>
 
@@ -202,7 +202,7 @@ export default function Login() {
                                                     placeholder="e.g. 1928631932"
                                                     required={isSignup}
                                                 />
-                                                <p className="text-xs text-[var(--text-muted)] mt-1 ml-1">Required for OTP verification.</p>
+                                                <p className="text-xs text-[var(--text-muted)] mt-1 ml-1">/start <a href="https://t.me/authentcastbot" style={{ color: "blue" }}>BotFusion Bot</a> for get your Telegram ID. <br />Required for OTP verification.</p>
                                             </div>
                                         </motion.div>
                                     )}

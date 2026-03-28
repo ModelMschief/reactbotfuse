@@ -33,6 +33,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const logout = useCallback(() => {
         setUser(null);
         localStorage.removeItem("jwtToken");
+        localStorage.removeItem("userEmail");
         navigate("/login");
     }, [navigate]);
 
@@ -48,12 +49,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                     return;
                 }
 
-                // For now, we only get ID from token. 
-                // To get full User object (email, plan), we need a creating '/me' endpoint or store it in localstorage too.
-                // For this architecture, we will fetch full dashboard data later, 
-                // here we just restore the session ID.
+                const savedEmail = localStorage.getItem("userEmail") || undefined;
                 setUser({
                     id: decoded.sub,
+                    email: savedEmail,
                     isPremium: false // Will be updated by Dashboard fetch 
                 });
 
@@ -74,6 +73,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             const res = await api.post("/login", { email, password: pass });
             if (res.data.token) {
                 localStorage.setItem("jwtToken", res.data.token);
+                localStorage.setItem("userEmail", email);
                 await checkSession(); // Decode and set user
                 return true;
             }
@@ -98,6 +98,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             const res = await api.post("/verify-otp", { email, otp });
             if (res.data.token) {
                 localStorage.setItem("jwtToken", res.data.token);
+                localStorage.setItem("userEmail", email);
                 await checkSession();
                 return true;
             }

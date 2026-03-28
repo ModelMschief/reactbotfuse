@@ -44,9 +44,9 @@ export default function ForgotPassword() {
                         <div className="w-16 h-16 bg-green-500/10 text-green-400 rounded-full flex items-center justify-center mx-auto mb-6">
                             <CheckCircle size={32} />
                         </div>
-                        <h2 className="text-2xl font-bold mb-4">Check Your Telegram</h2>
+                        <h2 className="text-2xl font-bold mb-4">Check Your <a href="https://t.me/authentcastbot" style={{ color: "blue" }}>Telegram</a></h2>
                         <p className="text-[var(--text-muted)] mb-6">
-                            If your email and Telegram ID match an account, we've sent a reset link to your Telegram.
+                            If your email and Telegram ID match an account, we've sent a reset link to <a href="https://t.me/authentcastbot" style={{ color: "blue" }}>BotFusion Bot</a>. Check the Bot
                         </p>
                         <p className="text-sm text-yellow-500/80 bg-yellow-500/10 p-3 rounded-lg mb-6">
                             ⚠️ The link expires in 5 minutes

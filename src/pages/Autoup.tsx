@@ -1,7 +1,8 @@
 import { useState, useEffect } from "react";
-import { Key, RefreshCw, AlertTriangle, Terminal, ArrowLeft, Copy, Check } from "lucide-react";
+import { Key, RefreshCw, AlertTriangle, Terminal, ArrowLeft, Copy, Check, ChevronDown, ChevronUp, Bot, ShieldAlert } from "lucide-react";
 import { Link } from "react-router-dom";
 import { api } from "@/lib/api";
+import { motion, AnimatePresence } from "framer-motion";
 
 // Use environment variable or fallback for API documentation
 const API_BASE_URL = import.meta.env.VITE_API_URL || "https://botfusion.onrender.com";
@@ -11,6 +12,8 @@ export default function Autoup() {
     const [loading, setLoading] = useState(true);
     const [generating, setGenerating] = useState(false);
     const [copied, setCopied] = useState(false);
+    const [showAutoUpDetails, setShowAutoUpDetails] = useState(false);
+    const [showAnomalyDetails, setShowAnomalyDetails] = useState(false);
 
     useEffect(() => {
         loadKey();
@@ -62,10 +65,10 @@ export default function Autoup() {
                     <ArrowLeft size={16} /> Back to Dashboard
                 </Link>
                 <h1 className="text-3xl font-bold flex items-center gap-3 text-cyan-400">
-                    <Key size={32} /> AutoUp Bot Integration
+                    <Key size={32} /> API Integrations
                 </h1>
                 <p className="text-[var(--text-muted)] mt-2 text-lg">
-                    Automatically sync new Telegram users to your bot audience without manual uploads.
+                    Manage your connection key for AutoUp user syncing and Automated Account Detection.
                 </p>
             </div>
 
@@ -117,73 +120,215 @@ export default function Autoup() {
                 )}
             </div>
 
-            {/* How It Works */}
+            {/* AutoUp Section */}
             <div className="card bg-[var(--bg-surface)] border-[var(--border-color)]">
-                <h2 className="text-xl font-bold mb-4">How AutoUp Works</h2>
-                <ol className="space-y-3 text-[var(--text-muted)] list-decimal list-inside marker:text-cyan-500">
-                    <li>A user sends <code className="bg-[#020617] px-1 py-0.5 rounded text-cyan-400">/start</code> to your Telegram bot.</li>
-                    <li>Your bot sends the user ID to the AutoUp API.</li>
-                    <li>Backend verifying ownership using your Connection Key.</li>
-                    <li>User ID is stored under the correct bot automatically.</li>
-                    <li>Broadcast system detects the new user instantly.</li>
-                </ol>
-            </div>
-
-            {/* API Spec */}
-            <div className="card bg-[var(--bg-surface)] border-[var(--border-color)] space-y-6">
-                <h2 className="text-xl font-bold">API Usage</h2>
-
-                <div className="space-y-2">
-                    <div className="flex items-center gap-2">
-                        <span className="bg-green-500/10 text-green-500 px-2 py-1 rounded text-xs font-bold">POST</span>
-                        <code className="bg-[var(--bg-app)] px-3 py-1 rounded text-sm flex-1">{API_BASE_URL}/autoup</code>
+                <div 
+                    className="flex justify-between items-center cursor-pointer group"
+                    onClick={() => setShowAutoUpDetails(!showAutoUpDetails)}
+                >
+                    <div className="flex items-center gap-3">
+                        <Bot className="text-cyan-400" size={24} />
+                        <div>
+                            <h2 className="text-xl font-bold group-hover:text-cyan-400 transition-colors">AutoUp Integration API</h2>
+                            <p className="text-sm text-[var(--text-muted)] font-normal mt-1">
+                                Instantly sync new Telegram users to your bot audience dynamically. No manual CSV uploads needed.
+                            </p>
+                        </div>
                     </div>
+                    <button className="p-2 rounded-full hover:bg-[var(--bg-app)] text-[var(--text-muted)]">
+                        {showAutoUpDetails ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
+                    </button>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div>
-                        <h3 className="font-bold text-sm mb-2 text-[var(--text-muted)]">Headers</h3>
-                        <pre className="bg-[var(--bg-app)] p-4 rounded-lg border border-[var(--border-color)] text-xs font-mono text-[var(--primary-color)] overflow-x-auto">
-                            {`X-CONNECTION-KEY: ${connectionKey || 'YOUR_KEY'}
+                <AnimatePresence>
+                    {showAutoUpDetails && (
+                        <motion.div
+                            initial={{ height: 0, opacity: 0 }}
+                            animate={{ height: "auto", opacity: 1 }}
+                            exit={{ height: 0, opacity: 0 }}
+                            className="overflow-hidden"
+                        >
+                            <div className="pt-8 space-y-6">
+                                <h3 className="font-bold text-sm text-[var(--text-secondary)]">How It Works</h3>
+                                <ol className="space-y-3 text-sm text-[var(--text-muted)] list-decimal list-inside marker:text-cyan-500 mb-6 bg-[var(--bg-app)] p-4 rounded-lg border border-[var(--border-color)]">
+                                    <li>A user sends <code className="bg-[#020617] px-1 py-0.5 rounded text-cyan-400">/start</code> to your Telegram bot.</li>
+                                    <li>Your bot sends the user ID to the AutoUp API.</li>
+                                    <li>Backend verifying ownership using your Connection Key.</li>
+                                    <li>User ID is stored under the correct bot automatically.</li>
+                                    <li>Broadcast system detects the new user instantly.</li>
+                                </ol>
+
+                                <div className="space-y-2 mb-6">
+                                    <div className="flex items-center gap-2">
+                                        <span className="bg-green-500/10 text-green-500 px-2 py-1 rounded text-xs font-bold">POST</span>
+                                        <code className="bg-[var(--bg-app)] px-3 py-1 rounded text-sm flex-1">{API_BASE_URL}/autoup</code>
+                                    </div>
+                                    <p className="text-xs text-[var(--text-muted)] flex items-center gap-1 mt-2">
+                                         Uses the exact same <b>X-CONNECTION-KEY</b> header.
+                                    </p>
+                                </div>
+
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                                    <div>
+                                        <h3 className="font-bold text-sm mb-2 text-[var(--text-muted)]">Headers</h3>
+                                        <pre className="bg-[var(--bg-app)] p-4 rounded-lg border border-[var(--border-color)] text-xs font-mono text-[var(--primary-color)] overflow-x-auto h-[250px]">
+                                            {`X-CONNECTION-KEY: \n${connectionKey || 'YOUR_KEY'}
 Content-Type: application/json`}
-                        </pre>
-                    </div>
-                    <div>
-                        <h3 className="font-bold text-sm mb-2 text-[var(--text-muted)]">Body</h3>
-                        <pre className="bg-[var(--bg-app)] p-4 rounded-lg border border-[var(--border-color)] text-xs font-mono text-[var(--primary-color)] overflow-x-auto">
-                            {`{
+                                        </pre>
+                                    </div>
+                                    <div>
+                                        <h3 className="font-bold text-sm mb-2 text-[var(--text-muted)]">Body</h3>
+                                        <pre className="bg-[var(--bg-app)] p-4 rounded-lg border border-[var(--border-color)] text-xs font-mono text-[var(--primary-color)] overflow-x-auto h-[250px]">
+                                            {`{
   "bot_username": "@yourbot",
   "user_id": 123456789
 }`}
-                        </pre>
-                    </div>
-                </div>
-            </div>
+                                        </pre>
+                                    </div>
+                                </div>
 
-            {/* Code Example */}
-            <div className="card bg-[var(--bg-surface)] border-[var(--border-color)]">
-                <h2 className="text-xl font-bold mb-4 flex items-center gap-2">
-                    <Terminal size={20} className="text-cyan-400" />
-                    Example (Python)
-                </h2>
-
-                <pre className="bg-[var(--bg-app)] p-4 rounded-lg border border-[var(--border-color)] text-sm font-mono text-[var(--text-secondary)] overflow-x-auto">
-                    {`import requests
+                                <h3 className="font-bold text-sm mb-2 flex items-center gap-2">
+                                    <Terminal size={16} className="text-cyan-400" />
+                                    AutoUp Example (Python)
+                                </h3>
+                                <pre className="bg-[var(--bg-app)] p-4 rounded-lg border border-[var(--border-color)] text-xs font-mono text-[var(--text-secondary)] overflow-x-auto h-[250px]">
+                                    {`import requests
 
 def update_user(user_id, bot_username):
-    requests.post(
+    response = requests.post(
         "${API_BASE_URL}/autoup",
         headers={
-            "X-CONNECTION-KEY": "${connectionKey || 'YOUR_KEY'}"
+            "X-CONNECTION-KEY": "${connectionKey || 'YOUR_KEY'}",
+            "Content-Type": "application/json"
         },
         json={
             "bot_username": bot_username,
             "user_id": user_id
         }
     )
+    return response.json()
+# Call 'update_user' inside /start handler`}
+                                </pre>
 
-# Call 'update_user' inside your /start command handler`}
-                </pre>
+                                <div className="pt-4 border-t border-[var(--border-color)] mt-4">
+                                    <a 
+                                        href="https://modelmschief.github.io/BotFusionDoc/" 
+                                        target="_blank" 
+                                        rel="noopener noreferrer"
+                                        className="text-cyan-400 hover:text-cyan-300 text-sm font-semibold flex items-center gap-1 transition-colors"
+                                    >
+                                        View AutoUp Documentation 
+                                    </a>
+                                </div>
+                            </div>
+                        </motion.div>
+                    )}
+                </AnimatePresence>
+            </div>
+
+            {/* Automated Account Detection API Section */}
+            <div className="card bg-[var(--bg-surface)] border-[var(--border-color)]">
+                <div 
+                    className="flex justify-between items-center cursor-pointer group"
+                    onClick={() => setShowAnomalyDetails(!showAnomalyDetails)}
+                >
+                    <div className="flex items-center gap-3">
+                        <ShieldAlert className="text-purple-400" size={24} />
+                        <div>
+                            <h2 className="text-xl font-bold group-hover:text-purple-400 transition-colors">Automated Account Detection API</h2>
+                            <p className="text-sm text-[var(--text-muted)] font-normal mt-1">
+                                Real-time behavioral risk scoring. Protect your bot from userbots and automated spam directly via API.
+                            </p>
+                        </div>
+                    </div>
+                    <button className="p-2 rounded-full hover:bg-[var(--bg-app)] text-[var(--text-muted)]">
+                        {showAnomalyDetails ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
+                    </button>
+                </div>
+
+                <AnimatePresence>
+                    {showAnomalyDetails && (
+                        <motion.div
+                            initial={{ height: 0, opacity: 0 }}
+                            animate={{ height: "auto", opacity: 1 }}
+                            exit={{ height: 0, opacity: 0 }}
+                            className="overflow-hidden"
+                        >
+                            <div className="pt-8 space-y-6">
+                                <p className="text-[var(--text-muted)]">
+                                    Feed user activity logs into our machine learning model to receive a real-time behavioral risk score. Ideal for moderation bots handling thousands of users.
+                                </p>
+                                
+                                <div className="bg-[var(--bg-app)] p-4 rounded-lg border border-[var(--border-color)]">
+                                    <h3 className="font-bold mb-3 text-sm text-[var(--text-secondary)]">Integration Strategy</h3>
+                                    <ul className="space-y-3 text-sm text-[var(--text-muted)]">
+                                        <li><strong className="text-purple-400">1. Event Collection:</strong> Log user activity structurally locally (chat_id, timestamp, text, type). You can safely anonymize text based on your privacy rules.</li>
+                                        <li><strong className="text-purple-400">2. API Triggers:</strong> Do not call the API on every single message to respect rate limits. Call it at specific checkpoints (e.g., 20th, 100th message).</li>
+                                        <li><strong className="text-purple-400">3. History Limit:</strong> Pass a brief history of the most recent ~300 events per user to prevent memory bloat.</li>
+                                    </ul>
+                                </div>
+
+                                <div className="space-y-2">
+                                    <div className="flex items-center gap-2">
+                                        <span className="bg-green-500/10 text-green-500 px-2 py-1 rounded text-xs font-bold">POST</span>
+                                        <code className="bg-[var(--bg-app)] px-3 py-1 rounded text-sm flex-1">{API_BASE_URL}/score_user</code>
+                                    </div>
+                                    <p className="text-xs text-[var(--text-muted)] flex items-center gap-1 mt-2">
+                                         Uses the exact same <b>X-CONNECTION-KEY</b> header as AutoUp above.
+                                    </p>
+                                </div>
+
+                                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                                    <div>
+                                        <h3 className="font-bold text-sm mb-2 text-[var(--text-muted)]">Request Body</h3>
+                                        <pre className="bg-[var(--bg-app)] p-4 rounded-lg border border-[var(--border-color)] text-xs font-mono text-purple-400 overflow-x-auto h-[250px]">
+                                            {`{
+  "user_id": 4021189931,
+  "events": [
+    {
+      "chat_id": -100123456,
+      "timestamp": 1769401000,
+      "text": "Hello",
+      "type": "text"
+    }
+    // ... recent events (max ~300)
+  ]
+}`}
+                                        </pre>
+                                    </div>
+                                    <div>
+                                        <h3 className="font-bold text-sm mb-2 text-[var(--text-muted)]">Response</h3>
+                                        <pre className="bg-[var(--bg-app)] p-4 rounded-lg border border-[var(--border-color)] text-xs font-mono text-green-400 overflow-x-auto h-[250px]">
+                                            {`{
+  "user_id": 4021189931,
+  "anomaly_score": 0.67,
+  "risk_level": "HIGH",
+  "confidence_band": "top_5_percent"
+}`}
+                                        </pre>
+                                    </div>
+                                </div>
+
+                                <div className="pt-4 border-t border-[var(--border-color)] mt-4">
+                                    <a 
+                                        href="https://modelmschief.github.io/BotFusionDoc/" 
+                                        target="_blank" 
+                                        rel="noopener noreferrer"
+                                        className="text-purple-400 hover:text-purple-300 text-sm font-semibold flex items-center gap-1 transition-colors"
+                                    >
+                                        View Full Documentation 
+                                    </a>
+                                </div>
+                            </div>
+                        </motion.div>
+                    )}
+                </AnimatePresence>
+            </div>
+
+            {/* Footer */}
+            <div className="text-center py-10 mt-12 mb-4">
+                <p className="text-[var(--text-secondary)] font-medium text-lg">Built by developers, for developers.</p>
+                <p className="text-[var(--text-muted)] text-sm mt-2">Integrate seamlessly and scale your Telegram presence securely with BotFusion APIs.</p>
             </div>
 
         </div>
