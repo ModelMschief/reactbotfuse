@@ -1,6 +1,7 @@
 import { HashRouter, Routes, Route } from 'react-router-dom';
 import { AuthProvider } from '@/store/auth-context';
 import { Navbar } from '@/components/navbar';
+import { VersionChecker } from '@/components/VersionChecker';
 
 // Pages
 import Home from '@/pages/Home';
@@ -16,6 +17,7 @@ function App() {
     return (
         <HashRouter>
             <AuthProvider>
+                <VersionChecker />
                 <Navbar />
                 {/* Spacer for fixed navbar */}
                 <div className="pt-20">
