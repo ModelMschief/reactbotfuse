@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Key, RefreshCw, AlertTriangle, Terminal, ArrowLeft, Copy, Check, ChevronDown, ChevronUp, Bot, ShieldAlert } from "lucide-react";
+import { Key, RefreshCw, AlertTriangle, Terminal, ArrowLeft, Copy, Check, ChevronDown, ChevronUp, Bot, ShieldAlert, QrCode } from "lucide-react";
 import { Link } from "react-router-dom";
 import { api } from "@/lib/api";
 import { motion, AnimatePresence } from "framer-motion";
@@ -14,6 +14,7 @@ export default function Autoup() {
     const [copied, setCopied] = useState(false);
     const [showAutoUpDetails, setShowAutoUpDetails] = useState(false);
     const [showAnomalyDetails, setShowAnomalyDetails] = useState(false);
+    const [showQrDetails, setShowQrDetails] = useState(false);
 
     useEffect(() => {
         loadKey();
@@ -122,7 +123,7 @@ export default function Autoup() {
 
             {/* AutoUp Section */}
             <div className="card bg-[var(--bg-surface)] border-[var(--border-color)]">
-                <div 
+                <div
                     className="flex justify-between items-center cursor-pointer group"
                     onClick={() => setShowAutoUpDetails(!showAutoUpDetails)}
                 >
@@ -164,7 +165,7 @@ export default function Autoup() {
                                         <code className="bg-[var(--bg-app)] px-3 py-1 rounded text-sm flex-1">{API_BASE_URL}/autoup</code>
                                     </div>
                                     <p className="text-xs text-[var(--text-muted)] flex items-center gap-1 mt-2">
-                                         Uses the exact same <b>X-CONNECTION-KEY</b> header.
+                                        Uses the exact same <b>X-CONNECTION-KEY</b> header.
                                     </p>
                                 </div>
 
@@ -211,13 +212,13 @@ def update_user(user_id, bot_username):
                                 </pre>
 
                                 <div className="pt-4 border-t border-[var(--border-color)] mt-4">
-                                    <a 
-                                        href="https://modelmschief.github.io/BotFusionDoc/" 
-                                        target="_blank" 
+                                    <a
+                                        href="/docs.html#api-autoup"
+                                        target="_blank"
                                         rel="noopener noreferrer"
                                         className="text-cyan-400 hover:text-cyan-300 text-sm font-semibold flex items-center gap-1 transition-colors"
                                     >
-                                        View AutoUp Documentation 
+                                        View AutoUp Documentation
                                     </a>
                                 </div>
                             </div>
@@ -228,7 +229,7 @@ def update_user(user_id, bot_username):
 
             {/* Automated Account Detection API Section */}
             <div className="card bg-[var(--bg-surface)] border-[var(--border-color)]">
-                <div 
+                <div
                     className="flex justify-between items-center cursor-pointer group"
                     onClick={() => setShowAnomalyDetails(!showAnomalyDetails)}
                 >
@@ -258,7 +259,7 @@ def update_user(user_id, bot_username):
                                 <p className="text-[var(--text-muted)]">
                                     Feed user activity logs into our machine learning model to receive a real-time behavioral risk score. Ideal for moderation bots handling thousands of users.
                                 </p>
-                                
+
                                 <div className="bg-[var(--bg-app)] p-4 rounded-lg border border-[var(--border-color)]">
                                     <h3 className="font-bold mb-3 text-sm text-[var(--text-secondary)]">Integration Strategy</h3>
                                     <ul className="space-y-3 text-sm text-[var(--text-muted)]">
@@ -274,7 +275,7 @@ def update_user(user_id, bot_username):
                                         <code className="bg-[var(--bg-app)] px-3 py-1 rounded text-sm flex-1">{API_BASE_URL}/score_user</code>
                                     </div>
                                     <p className="text-xs text-[var(--text-muted)] flex items-center gap-1 mt-2">
-                                         Uses the exact same <b>X-CONNECTION-KEY</b> header as AutoUp above.
+                                        Uses the exact same <b>X-CONNECTION-KEY</b> header as AutoUp above.
                                     </p>
                                 </div>
 
@@ -310,13 +311,93 @@ def update_user(user_id, bot_username):
                                 </div>
 
                                 <div className="pt-4 border-t border-[var(--border-color)] mt-4">
-                                    <a 
-                                        href="https://modelmschief.github.io/BotFusionDoc/" 
-                                        target="_blank" 
+                                    <a
+                                        href="/docs.html#api-anomaly"
+                                        target="_blank"
                                         rel="noopener noreferrer"
                                         className="text-purple-400 hover:text-purple-300 text-sm font-semibold flex items-center gap-1 transition-colors"
                                     >
-                                        View Full Documentation 
+                                        View Full Documentation
+                                    </a>
+                                </div>
+                            </div>
+                        </motion.div>
+                    )}
+                </AnimatePresence>
+            </div>
+
+            {/* QR Code Generation API Section */}
+            <div className="card bg-[var(--bg-surface)] border-[var(--border-color)]">
+                <div
+                    className="flex justify-between items-center cursor-pointer group"
+                    onClick={() => setShowQrDetails(!showQrDetails)}
+                >
+                    <div className="flex items-center gap-3">
+                        <QrCode className="text-orange-400" size={24} />
+                        <div>
+                            <h2 className="text-xl font-bold group-hover:text-orange-400 transition-colors">QR Code Generation API</h2>
+                            <p className="text-sm text-[var(--text-muted)] font-normal mt-1">
+                                Generate high-performance, stylized QR codes with deep customization and logo integration via API.
+                            </p>
+                        </div>
+                    </div>
+                    <button className="p-2 rounded-full hover:bg-[var(--bg-app)] text-[var(--text-muted)]">
+                        {showQrDetails ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
+                    </button>
+                </div>
+
+                <AnimatePresence>
+                    {showQrDetails && (
+                        <motion.div
+                            initial={{ height: 0, opacity: 0 }}
+                            animate={{ height: "auto", opacity: 1 }}
+                            exit={{ height: 0, opacity: 0 }}
+                            className="overflow-hidden"
+                        >
+                            <div className="pt-8 space-y-6">
+                                <p className="text-[var(--text-muted)]">
+                                    Embed Telegram links, profiles, or custom data into generated QRs. Supports extensive customization including gradients, custom finder shapes, and central logo embedding.
+                                </p>
+
+                                <div className="space-y-2">
+                                    <div className="flex items-center gap-2">
+                                        <span className="bg-green-500/10 text-green-500 px-2 py-1 rounded text-xs font-bold">POST</span>
+                                        <code className="bg-[var(--bg-app)] px-3 py-1 rounded text-sm flex-1">{API_BASE_URL}/genqr</code>
+                                    </div>
+                                    <p className="text-xs text-[var(--text-muted)] flex items-center gap-1 mt-2">
+                                        Uses the exact same <b>X-CONNECTION-KEY</b> header as other APIs. Rate limit: 20 req/sec.
+                                    </p>
+                                </div>
+
+                                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                                    <div>
+                                        <h3 className="font-bold text-sm mb-2 text-[var(--text-muted)]">Headers</h3>
+                                        <pre className="bg-[var(--bg-app)] p-4 rounded-lg border border-[var(--border-color)] text-xs font-mono text-orange-400 overflow-x-auto h-[250px]">
+                                            {`X-CONNECTION-KEY: \n${connectionKey || 'YOUR_KEY'}
+Content-Type: application/json`}
+                                        </pre>
+                                    </div>
+                                    <div>
+                                        <h3 className="font-bold text-sm mb-2 text-[var(--text-muted)]">Body (Example Scenario A)</h3>
+                                        <pre className="bg-[var(--bg-app)] p-4 rounded-lg border border-[var(--border-color)] text-xs font-mono text-orange-400 overflow-x-auto h-[250px]">
+                                            {`{
+  "data": "https://botfusion.wuaze.com",
+  "telegram_url": "https://api.telegram.org/file/bot789/photos/file_1.jpg",
+  "dot_style": "rounded",
+  "gradient": true
+}`}
+                                        </pre>
+                                    </div>
+                                </div>
+
+                                <div className="pt-4 border-t border-[var(--border-color)] mt-4">
+                                    <a
+                                        href="/docs.html#api-genqr"
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="text-orange-400 hover:text-orange-300 text-sm font-semibold flex items-center gap-1 transition-colors"
+                                    >
+                                        View Full Documentation
                                     </a>
                                 </div>
                             </div>

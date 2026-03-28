@@ -15,10 +15,33 @@ from flask import Flask, request, jsonify, g, make_response, send_file
 from flask_cors import CORS
 from waitress import serve
 from concurrent.futures import ThreadPoolExecutor, as_completed
+import io
 
 # --- MongoDB Setup ---
 from pymongo import MongoClient
 from pymongo.errors import PyMongoError, DuplicateKeyError
+
+# Create a persistent session for the ML Server
+# Create a persistent session for the ML Server
+ml_session = requests.Session()
+tg_session = requests.Session()
+
+# Configure the connection pool to handle high concurrency
+from requests.adapters import HTTPAdapter
+from urllib3.util.retry import Retry # <-- Add this import
+
+# Configure automatic retries for dropped connections
+retries = Retry(
+    total=3,                # Try 3 times before giving up
+    backoff_factor=0.5,     # Wait 0.5s, 1s, 2s between retries
+    status_forcelist=[500, 502, 503, 504],
+    allowed_methods=["POST", "GET"] # explicitly allow retries on POST
+)
+
+# Attach the retry logic to the adapter
+adapter = HTTPAdapter(pool_connections=15, pool_maxsize=15, max_retries=retries)
+ml_session.mount('https://', adapter)
+tg_session.mount('https://', adapter)
 
 # ---- In-memory rate limiter (key-based) ----
 _RATE_BUCKET = {}  # connection_key -> [timestamps]
@@ -89,7 +112,7 @@ def is_ip_blocked(ip_address, limit=5, window=1):
     return False # SAFE
     
 # --- Configuration ---
-MONGO_URI = os.getenv("MONGO_URI", "mongodb+srv://mygojo:mygojo@cluster0.uparevo.mongodb.net/?appName=Cluster0").strip()
+MONGO_URI = os.getenv("MONGO_URI", "").strip()
 
 try:
     mongo_client = MongoClient(MONGO_URI)
@@ -102,12 +125,12 @@ except Exception as e:
     
 mongo_db = mongo_client['telegram_broadcast_db']
 
-AUTH_BOT_TOKEN = os.getenv("AUTH_BOT_TOKEN", "8542693699:AAG6ifaM_4MyBE1S87luBRYtzdSP2DcFFvc").strip()
-JWT_SECRET = os.getenv("JWT_SECRET", "new_secret").strip()
+AUTH_BOT_TOKEN = os.getenv("AUTH_BOT_TOKEN", "").strip()
+JWT_SECRET = os.getenv("JWT_SECRET", "").strip()
 ADMIN_CHAT_ID = os.getenv("ADMIN_CHAT_ID", "1928631932")
 ADMIN_SECRET = os.getenv("ADMIN_SECRET", "ADMIN_SECRET_KEY")
 
-BROADCAST_EXECUTOR = ThreadPoolExecutor(max_workers=5)
+BROADCAST_EXECUTOR = ThreadPoolExecutor(max_workers=2)
 
 # --- RAM Storage for files (Temporary) ---
 file_ram_storage = {} # task_id -> { "filename": "...", "content": b"..." }
@@ -156,24 +179,36 @@ def get_account_by_connection_key(conn_key: str):
 
 def bot_belongs_to_account(user_id, bot_username: str) -> bool:
     """
-    Checks whether the bot belongs to the account
+    Checks whether the bot belongs to the account.
+    Converts user_id to string to match UUID storage.
     """
-    return mongo_db.bots.find_one(
+    # Ensure user_id is a string because UUIDs are stored as strings
+    search_id = str(user_id)
+    
+    # Normalize username
+    if not bot_username.startswith("@"):
+        bot_username = "@" + bot_username
+
+    # Search for the document where _id matches AND the list contains the username
+    bot_doc = mongo_db.bots.find_one(
         {
-            "_id": user_id,
+            "_id": search_id,
             "list.username": bot_username
         },
         {"_id": 1}
-    ) is not None
+    )
+    
+    return bot_doc is not None
 
 
-def add_user_id_to_bot(user_id, bot_username: str, telegram_user_id: int):
+def add_user_id_to_bot(user_id, bot_username: str, telegram_user_id: int) -> bool:
     """
-    Adds user_id to bot using $addToSet (no duplicates)
+    Adds user_id to bot using $addToSet.
+    Returns True if a new ID was added, False if it was already there.
     """
-    mongo_db.bots.update_one(
+    result = mongo_db.bots.update_one(
         {
-            "_id": user_id,
+            "_id": str(user_id), # Make sure this is a string to match your DB!
             "list.username": bot_username
         },
         {
@@ -182,6 +217,9 @@ def add_user_id_to_bot(user_id, bot_username: str, telegram_user_id: int):
             }
         }
     )
+    
+    # If MongoDB actually changed the document, modified_count will be > 0
+    return result.modified_count > 0
 
 
 # --- Telegram Helpers (using Requests) ---
@@ -192,7 +230,7 @@ def pin_telegram_message_requests(bot_token, chat_id, message_id):
     """
     url = f"https://api.telegram.org/bot{bot_token}/pinChatMessage"
     try:
-        response = requests.post(url, json={
+        response = tg_session.post(url, json={
             "chat_id": chat_id,
             "message_id": message_id,
             "disable_notification": True
@@ -213,9 +251,9 @@ def send_with_retries(url, data=None, json_payload=None, files=None, timeout=10,
     for attempt in range(retries):
         try:
             if json_payload:
-                response = requests.post(url, json=json_payload, timeout=timeout)
+                response = tg_session.post(url, json=json_payload, timeout=timeout)
             else:
-                response = requests.post(url, data=data, files=files, timeout=timeout)
+                response = tg_session.post(url, data=data, files=files, timeout=timeout)
             
             if response.status_code == 429:
                 # Rate limit hit
@@ -317,7 +355,7 @@ def get_bot_username_requests(bot_token):
     """Uses the requests library to synchronously validate a token."""
     url = f"https://api.telegram.org/bot{bot_token}/getMe"
     try:
-        response = requests.get(url, timeout=5) # 5-second timeout
+        response = tg_session.get(url, timeout=5) # 5-second timeout
         response.raise_for_status()
         data = response.json()
         if data.get("ok"):
@@ -417,7 +455,7 @@ def auth_middleware():
         }), 429   
     
     g.user_id = None
-    if request.path in ['/', '/premium', '/login', '/signup', '/verify-otp', '/health', '/autoup', '/request-password-reset', '/reset-password']:
+    if request.path in ['/', '/premium', '/login', '/signup', '/verify-otp', '/health', '/autoup','/request-password-reset', '/reset-password', '/score_user','/genqr']:
         return  # Skip auth for these routes
 
     auth_header = request.headers.get('Authorization')
@@ -445,7 +483,7 @@ def auth_middleware():
 
 @app.route('/')
 def index():
-    return send_file('backup.html')
+    return send_file('index.html')
 
 @app.route('/premium')
 def premium_page():
@@ -622,7 +660,7 @@ def request_password_reset():
     
     # Build reset URL (frontend route)
     # Using relative path that works with HashRouter
-    frontend_url = os.getenv("FRONTEND_URL", "https://modelmschief.github.io/botfusionV2")
+    frontend_url = os.getenv("FRONTEND_URL", "https://bot-fusion.wuaze.com")
     reset_url = f"{frontend_url}/#/reset-password?token={reset_token}"
     
     # Send Telegram message with inline button
@@ -632,7 +670,7 @@ def request_password_reset():
         "⚠️ This link expires in <b>5 minutes</b>."
     )
     
-    buttons = [{"text": "🔑 Reset Password", "url": reset_url}]
+    buttons = [{"text": "🔑 Reset Password", "url": reset_url ,"style":"success"}]
     
     status, _ = send_telegram_message_requests(AUTH_BOT_TOKEN, telegram_id, reset_message, buttons=buttons)
     
@@ -853,6 +891,177 @@ def integration_info():
         "bots": bots
     }), 200
 
+@app.route('/score_user', methods=['POST'])
+def score_user():
+    # 1. Header validation
+    conn_key = request.headers.get("X-CONNECTION-KEY")
+    if not conn_key:
+        return jsonify({"error": "Missing connection key"}), 401
+
+    # 2. Rate limiting (shares the limit bucket with /autoup)
+    if not rate_limit_ok(conn_key, limit=20, window=1):
+        return jsonify({"error": "Rate limit exceeded"}), 429
+
+    # 3. Resolve account (verifies the key is real)
+    account = get_account_by_connection_key(conn_key)
+    if not account:
+        return jsonify({"error": "Invalid connection key"}), 403
+
+    # 4. Extract the payload
+    try:
+        data = request.get_json(force=True)
+    except Exception:
+        return jsonify({"error": "Invalid JSON body"}), 400
+
+    # 5. Forward to the Render ML Server
+    ml_url = "https://anomalyendpoint.onrender.com/score_user"
+    try:
+        # Added a 15s timeout in case the free Render instance is waking up
+        ml_response = ml_session.post(ml_url, json=data, timeout=20)
+        
+        # Parse and return the exact response from the ML server
+        try:
+            return jsonify(ml_response.json()), ml_response.status_code
+        except ValueError:
+            logger.error(f"ML server returned non-JSON. Status: {ml_response.status_code}")
+            return jsonify({"error": "Invalid response from ML server"}), 502
+            
+    except requests.exceptions.Timeout:
+        return jsonify({"error": "ML server timeout (might be waking up). Try again."}), 504
+    except requests.exceptions.RequestException as e:
+        logger.error(f"Error communicating with ML server: {e}")
+        return jsonify({"error": "Failed to connect to ML server."}), 502
+    
+@app.route('/genqr', methods=['POST'])
+def generate_qr_proxy():
+    # 1. Header validation
+    conn_key = request.headers.get("X-CONNECTION-KEY")
+    if not conn_key:
+        return jsonify({"error": "Missing connection key"}), 401
+
+    # 2. Rate limiting
+    if not rate_limit_ok(conn_key, limit=20, window=1):
+        return jsonify({"error": "Rate limit exceeded"}), 429
+
+    # 3. Resolve account
+    account = get_account_by_connection_key(conn_key)
+    if not account:
+        return jsonify({"error": "Invalid connection key"}), 403
+
+    qr_engine_url = "https://anomalyendpoint.onrender.com/generate_qr"
+    
+    try:
+        files_to_forward = {}
+        data_to_forward = {}
+        is_multipart = False
+        telegram_url = None
+
+        # 4. PARSE INCOMING REQUEST
+        if request.files or request.form:
+            is_multipart = True
+            # A. Extract any direct file uploads
+            if request.files:
+                for key, file_storage in request.files.items():
+                    file_content = file_storage.read()
+                    if len(file_content) > 10 * 1024 * 1024:
+                        return jsonify({"error": "File size exceeds 10 MB limit"}), 400
+                    files_to_forward[key] = (file_storage.filename, file_content, file_storage.content_type)
+            
+            # B. Extract form data and look for telegram_url
+            data_to_forward = request.form.to_dict()
+            telegram_url = data_to_forward.pop("telegram_url", None)
+            
+        else:
+            # C. Parse standard JSON
+            try:
+                payload = request.get_json(force=True)
+                if payload is None: payload = {}
+            except Exception:
+                return jsonify({"error": "Invalid JSON body"}), 400
+
+            telegram_url = payload.pop("telegram_url", None)
+            
+            # If a telegram_url is in the JSON, we MUST convert this request to multipart
+            # so the sub-server can receive the downloaded file properly.
+            if telegram_url:
+                is_multipart = True
+                if "data" in payload:
+                    data_to_forward["data"] = payload.pop("data")
+                # The remaining JSON becomes the stringified "config" expected by the sub-server
+                data_to_forward["config"] = json.dumps(payload)
+            else:
+                data_to_forward = payload # Standard pass-through
+
+        # 5. RESOLVE TELEGRAM URL (If provided and no direct file was uploaded)
+        if telegram_url and "logo" not in files_to_forward:
+            try:
+                tg_resp = tg_session.get(telegram_url, timeout=15)
+                if tg_resp.status_code != 200:
+                    return jsonify({"error": f"Failed to fetch image from Telegram (HTTP {tg_resp.status_code})"}), 400
+                
+                tg_content = tg_resp.content
+                if len(tg_content) > 10 * 1024 * 1024:
+                    return jsonify({"error": "Telegram image exceeds 10 MB limit"}), 400
+                
+                # --- ROBUST EXTENSION MAPPING ---
+                content_type = tg_resp.headers.get('Content-Type', '').lower()
+                
+                # Map Telegram's raw types (like octet-stream) to engine-approved extensions
+                ext_map = {
+                    'image/jpeg': 'jpg',
+                    'image/jpg': 'jpg',
+                    'image/png': 'png',
+                    'image/webp': 'webp',
+                    'application/octet-stream': 'jpg' 
+                }
+                
+                ext = ext_map.get(content_type)
+                if not ext:
+                    ext = content_type.split('/')[-1] if '/' in content_type else 'jpg'
+                
+                # Final safety check for Engine compatibility
+                if ext not in ['jpg', 'jpeg', 'png', 'webp']:
+                    ext = 'jpg'
+                
+                # Pack the fetched image as if it were a direct file upload
+                files_to_forward["logo"] = (f"tg_logo.{ext}", tg_content, content_type)
+                is_multipart = True 
+                
+            except requests.exceptions.RequestException as e:
+                logger.error(f"Error fetching Telegram URL: {e}")
+                return jsonify({"error": "Failed to connect to Telegram API to fetch image."}), 400
+
+        # 6. FORWARD TO RENDER ENGINE
+        if is_multipart:
+            qr_response = ml_session.post(
+                qr_engine_url, 
+                data=data_to_forward, 
+                files=files_to_forward if files_to_forward else None, 
+                timeout=45 
+            )
+        else:
+            # Strictly raw JSON bodies (No files, no telegram urls)
+            qr_response = ml_session.post(qr_engine_url, json=data_to_forward, timeout=30)
+
+        # 7. RESPONSE HANDLING
+        if qr_response.headers.get('Content-Type') == 'image/png':
+            return send_file(
+                io.BytesIO(qr_response.content),
+                mimetype='image/png',
+                as_attachment=True,
+                download_name='botfusion_qr.png'
+            )
+        else:
+            try:
+                return jsonify(qr_response.json()), qr_response.status_code
+            except ValueError:
+                return jsonify({"error": "Invalid response from QR Engine"}), 502
+                
+    except requests.exceptions.Timeout:
+        return jsonify({"error": "QR Engine timeout. Try again."}), 504
+    except requests.exceptions.RequestException as e:
+        logger.error(f"Error communicating with QR Engine: {e}")
+        return jsonify({"error": "Failed to connect to QR Engine."}), 502
 
 @app.route('/autoup', methods=['POST'])
 def autoup():
@@ -877,9 +1086,14 @@ def autoup():
     if not bot_username or not isinstance(bot_username, str):
         return jsonify({"error": "Invalid bot_username"}), 400
 
-    if not telegram_user_id or not isinstance(telegram_user_id, int):
+    if not telegram_user_id:
         return jsonify({"error": "Invalid user_id"}), 400
+    
+    bot_username = bot_username.lower()
+    telegram_user_id = str(telegram_user_id).strip() # Ensure it's a string for consistent storage
 
+    if not telegram_user_id.isdigit():
+        return jsonify({"error": "user_id must contain only numbers"}), 400
     # normalize username
     if not bot_username.startswith("@"):
         bot_username = "@" + bot_username
@@ -897,17 +1111,26 @@ def autoup():
 
     # ---- Insert user ID (idempotent) ----
     try:
-        add_user_id_to_bot(owner_id, bot_username, telegram_user_id)
+        is_new_user = add_user_id_to_bot(owner_id, bot_username, telegram_user_id)
     except Exception as e:
         # DB failure should not crash bot apps
         return jsonify({"error": "Database error"}), 500
 
     # ---- Success ----
-    return jsonify({
-        "status": "ok",
-        "bot": bot_username,
-        "user_id": telegram_user_id
-    }), 200
+    if is_new_user:
+        return jsonify({
+            "status": "ok",
+            "message": "User added successfully",
+            "bot": bot_username,
+            "user_id": telegram_user_id
+        }), 200
+    else:
+        return jsonify({
+            "status": "ok",
+            "message": "User ID already exists",
+            "bot": bot_username,
+            "user_id": telegram_user_id
+        }), 200
 
 
 @app.route('/dashboard', methods=['GET'])
@@ -956,8 +1179,11 @@ def add_bot():
         return jsonify({"error": "Bot token is required"}), 400
         
     username = get_bot_username_requests(bot_token)
+    
     if not username:
         return jsonify({"error": "Invalid bot token"}), 400
+    
+    username = username.lower()
         
     logger.info(f"Adding bot @{username} for user {user_id}")
         
@@ -1021,7 +1247,7 @@ def task_run_file_parse(task_id, file_content, bot_token, user_id):
     """
     logger.info(f"[Task {task_id}] Starting file parse...")
     try:
-        found_ids = set(re.findall(r'\b\d{5,}\b', file_content))
+        found_ids = set(re.findall(r'\b\d{9,11}\b', file_content))
         
         if not found_ids:
             raise ValueError("No valid Telegram IDs found in the file.")
@@ -1173,9 +1399,9 @@ def task_run_broadcast(task_id, bot_tokens_map, all_user_ids, user_id):
     # Structure: { "bot_token": [user_id_1, user_id_2] }
     blocked_users_map = {} 
 
-    BATCH_SIZE = 50 
+    BATCH_SIZE = 10
     
-    with ThreadPoolExecutor(max_workers=10) as executor:
+    with ThreadPoolExecutor(max_workers=3) as executor:
         for i in range(0, total_recipients, BATCH_SIZE):
             # Check for STOP signal from DB
             current_task_state = mongo_db.tasks.find_one({"_id": task_id}, {"status": 1})
@@ -1229,6 +1455,7 @@ def task_run_broadcast(task_id, bot_tokens_map, all_user_ids, user_id):
                     "progress.failed": failed_count
                 }}
             )
+            time.sleep(0.4)
 
     # --- CLEANUP: Remove blocked users from DB ---
     if blocked_users_map:
@@ -1379,4 +1606,4 @@ def get_task_status(task_id):
 if __name__ == '__main__':
     logger.info("Starting services...")
     logger.info(f"Starting Flask web server on http://0.0.0.0:8080")
-    serve(app, host='0.0.0.0', port=8080, threads=8)
+    serve(app, host='0.0.0.0', port=8080, threads=15)

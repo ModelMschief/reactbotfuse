@@ -69,9 +69,9 @@ export default function Home() {
                         transition={{ duration: 0.8, delay: 0.1 }}
                         className="text-5xl md:text-7xl font-bold tracking-tight mb-6 leading-[1.1] drop-shadow-2xl"
                     >
-                        Unify Your Bots <br className="hidden md:block" />
+                        Unify Your Bots & <br className="hidden md:block" />
                         <span className="text-transparent bg-clip-text bg-gradient-to-br from-[var(--primary-color)] via-orange-500 to-yellow-500 animate-gradient-x">
-                            Telegram Bot Armies
+                            Deploy Powerful APIs
                         </span>
                     </motion.h1>
 
@@ -81,8 +81,7 @@ export default function Home() {
                         transition={{ duration: 0.8, delay: 0.2 }}
                         className="text-lg md:text-xl text-[var(--text-muted)] max-w-2xl mx-auto mb-10 leading-relaxed font-light drop-shadow-md"
                     >
-                        Centralize management, sync user bases automatically, and broadcast to millions.
-                        Engineered for technical bot owners who need scale without bans.
+                        Centralize bot management, integrate advanced behavioral APIs, generate custom QR codes, and broadcast to millions. Engineered for technical bot owners who demand flexibility and scale.
                     </motion.p>
 
                     <motion.div
@@ -94,7 +93,7 @@ export default function Home() {
                         <Link to={user ? "/dashboard" : "/login"} className="btn btn-primary h-12 px-8 text-base font-bold shadow-[0_0_30px_rgba(220,38,38,0.4)] hover:shadow-[0_0_50px_rgba(220,38,38,0.6)] hover:scale-105 transition-all">
                             Get Started
                         </Link>
-                        <a href="https://modelmschief.github.io/BotFusionDoc/" target="_blank" rel="noopener noreferrer" className="btn bg-white/5 border border-white/10 hover:bg-white/10 hover:border-[var(--primary-color)] hover:text-[var(--primary-color)] h-12 px-8 text-base backdrop-blur-md transition-all">
+                        <a href="/docs.html" target="_blank" rel="noopener noreferrer" className="btn bg-white/5 border border-white/10 hover:bg-white/10 hover:border-[var(--primary-color)] hover:text-[var(--primary-color)] h-12 px-8 text-base backdrop-blur-md transition-all">
                             Documentation <ExternalLink size={16} className="ml-2" />
                         </a>
                     </motion.div>
@@ -174,21 +173,28 @@ export default function Home() {
                             </p>
                         </motion.div>
 
-                        {/* AutoUp */}
+                        {/* Advanced APIs */}
                         <motion.div variants={itemVariants} className="md:col-span-2 card p-8 group hover:border-[var(--primary-color)]/30 transition-colors">
                             <div className="flex flex-col md:flex-row gap-8 items-start">
                                 <div className="flex-1">
                                     <div className="w-12 h-12 bg-[var(--bg-app)] border border-[var(--border-color)] rounded-lg flex items-center justify-center mb-6 text-[var(--primary-color)] group-hover:scale-110 transition-transform">
                                         <Shield size={24} />
                                     </div>
-                                    <h3 className="text-2xl font-bold mb-3">AutoUp User Sync Protocol</h3>
+                                    <h3 className="text-2xl font-bold mb-3">Enterprise Developer APIs</h3>
                                     <p className="text-[var(--text-muted)] leading-relaxed text-lg mb-4">
-                                        Use our API endpoint to automatically push new users from your bot code to our database.
-                                        Forget manual CSV exports. As users <code className="bg-[var(--bg-app)] px-1 py-0.5 rounded text-sm font-mono border border-[var(--border-color)]">/start</code> your bot, they are instantly broadcast-ready.
+                                        Integrate our powerful suite of APIs directly into your bot code. Use <strong>AutoUp</strong> for real-time user syncing, deploy our <strong>Anomaly Detection ML</strong> for automated spam protection, and generate highly-customized, branded QR codes instantly.
                                     </p>
-                                    <span className="font-mono text-xs p-2 rounded bg-[var(--primary-color)]/10 text-[var(--primary-color)] border border-[var(--primary-color)]/20">
-                                        POST /autoup
-                                    </span>
+                                    <div className="flex gap-2 flex-wrap">
+                                        <span className="font-mono text-xs p-2 rounded bg-[var(--primary-color)]/10 text-[var(--primary-color)] border border-[var(--primary-color)]/20">
+                                            POST /autoup
+                                        </span>
+                                        <span className="font-mono text-xs p-2 rounded bg-purple-500/10 text-purple-400 border border-purple-500/20">
+                                            POST /score_user
+                                        </span>
+                                        <span className="font-mono text-xs p-2 rounded bg-orange-500/10 text-orange-400 border border-orange-500/20">
+                                            POST /genqr
+                                        </span>
+                                    </div>
                                 </div>
                             </div>
                         </motion.div>
@@ -289,6 +295,37 @@ export default function Home() {
                     </div>
                 </div>
             </section>
+            {/* SEO Content Section */}
+            <section className="py-20 border-t border-[var(--border-color)]">
+                <div className="container mx-auto px-4 max-w-4xl">
+                    <h2 className="text-3xl font-bold mb-6 text-[var(--text-primary)]">
+                        Telegram Bot APIs and Automation Platform
+                    </h2>
+
+                    <p className="text-[var(--text-muted)] mb-6 leading-relaxed">
+                        BotFusion is a Telegram bot developer platform that provides infrastructure,
+                        automation tools, and APIs for building and scaling Telegram bots. Developers
+                        can manage multiple bots, broadcast messages, synchronize users in real time
+                        using the AutoUp API, analyze user behavior using anomaly detection, generate
+                        QR codes, track links, and monitor bot analytics from a unified dashboard.
+                    </p>
+
+                    <h3 className="text-xl font-semibold mb-3 text-[var(--text-primary)]">
+                        Platform Features
+                    </h3>
+
+                    <ul className="list-disc pl-6 space-y-2 text-[var(--text-muted)]">
+                        <li>Telegram Broadcast System</li>
+                        <li>Auto User Sync API (AutoUp)</li>
+                        <li>Telegram User Behavior Analysis and Anomaly Detection</li>
+                        <li>QR Code Generator API for Telegram Bots</li>
+                        <li>Telegram Link Tracking and Analytics</li>
+                        <li>Multi-Bot Management Dashboard</li>
+                        <li>Telegram Moderation and NSFW Detection API</li>
+                        <li>Automation Webhooks and Developer APIs</li>
+                    </ul>
+                </div>
+            </section>
 
             {/* Footer */}
             <footer className="bg-[var(--bg-surface)] border-t border-[var(--border-color)] pt-20 pb-8">
@@ -308,17 +345,17 @@ export default function Home() {
                             <h5 className="font-bold mb-4 uppercase text-xs tracking-wider text-[var(--text-primary)]">Platform</h5>
                             <ul className="space-y-3 text-sm text-[var(--text-muted)]">
                                 <li><Link to="/dashboard" className="hover:text-[var(--primary-color)] transition-colors">Dashboard</Link></li>
-                                <li><a href="https://modelmschief.github.io/BotFusionDoc/#autoup-system" target="_blank" rel="noopener noreferrer" className="hover:text-[var(--primary-color)] transition-colors">AutoUp Integration</a></li>
-                                <li><a href="https://modelmschief.github.io/BotFusionDoc/#premium-plans" target="_blank" rel="noopener noreferrer" className="hover:text-[var(--primary-color)] transition-colors">Premium Plans</a></li>
+                                <li><a href="/docs.html#api-autoup" target="_blank" rel="noopener noreferrer" className="hover:text-[var(--primary-color)] transition-colors">AutoUp Integration</a></li>
+                                <li><a href="/docs.html#premium-plans" target="_blank" rel="noopener noreferrer" className="hover:text-[var(--primary-color)] transition-colors">Premium Plans</a></li>
                             </ul>
                         </div>
 
                         <div>
                             <h5 className="font-bold mb-4 uppercase text-xs tracking-wider text-[var(--text-primary)]">Developers</h5>
                             <ul className="space-y-3 text-sm text-[var(--text-muted)]">
-                                <li><a href="https://modelmschief.github.io/BotFusionDoc/" target="_blank" rel="noopener noreferrer" className="hover:text-[var(--primary-color)] transition-colors">Documentation</a></li>
-                                <li><a href="https://modelmschief.github.io/BotFusionDoc/#api-reference" target="_blank" rel="noopener noreferrer" className="hover:text-[var(--primary-color)] transition-colors">API Reference</a></li>
-                                <li><a href="https://modelmschief.github.io/BotFusionDoc/#rate-limits" target="_blank" rel="noopener noreferrer" className="hover:text-[var(--primary-color)] transition-colors">Rate Limits</a></li>
+                                <li><a href="/docs.html" target="_blank" rel="noopener noreferrer" className="hover:text-[var(--primary-color)] transition-colors">Documentation</a></li>
+                                <li><a href="/docs.html#api-auth" target="_blank" rel="noopener noreferrer" className="hover:text-[var(--primary-color)] transition-colors">API Reference</a></li>
+                                <li><a href="/docs.html#api-limits-errors" target="_blank" rel="noopener noreferrer" className="hover:text-[var(--primary-color)] transition-colors">Rate Limits</a></li>
                             </ul>
                         </div>
 
@@ -335,8 +372,8 @@ export default function Home() {
                     <div className="pt-8 border-t border-[var(--border-color)] flex flex-col md:flex-row justify-between items-center gap-4 text-xs text-[var(--text-muted)]">
                         <div>&copy; 2025 BotFusion Inc. All rights reserved.</div>
                         <div className="flex gap-6">
-                            <a href="#" className="hover:text-[var(--text-primary)]">Privacy</a>
-                            <a href="#" className="hover:text-[var(--text-primary)]">Terms</a>
+                            <a href="/privacy.html" className="hover:text-[var(--text-primary)]">Privacy</a>
+                            <a href="/terms.html" className="hover:text-[var(--text-primary)]">Terms</a>
                         </div>
                     </div>
                 </div>

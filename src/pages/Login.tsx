@@ -237,6 +237,11 @@ export default function Login() {
                                 </button>
                             </div>
 
+                            {/* Terms and Privacy Reference */}
+                            <div className="mt-4 text-center text-xs text-[var(--text-muted)]">
+                                By continuing, you agree to our <a href="/terms.html" target="_blank" rel="noopener noreferrer" className="hover:text-[var(--primary-color)] underline">Terms of Service</a> and <a href="/privacy.html" target="_blank" rel="noopener noreferrer" className="hover:text-[var(--primary-color)] underline">Privacy Policy</a>.
+                            </div>
+
                             {/* Forgot Password Link - Only show on login */}
                             {!isSignup && (
                                 <div className="mt-4 text-center">
