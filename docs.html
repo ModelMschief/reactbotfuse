@@ -1,0 +1,1394 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BotFusion Documentation | Technical Guide</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap"
+        rel="stylesheet">
+
+    <!-- PrismJS Dark Theme & Toolbar CSS -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/toolbar/prism-toolbar.min.css"
+        rel="stylesheet" />
+
+    <style>
+        :root {
+            --primary: #06b6d4;
+            /* Cyan */
+            --primary-dark: #0891b2;
+            --text-main: #111827;
+            --text-muted: #4b5563;
+            --text-light: #9ca3af;
+            --bg-body: #ffffff;
+            --bg-sidebar: #f9fafb;
+            --border: #e5e7eb;
+            --code-bg: #f3f4f6;
+            --code-text: #1f2937;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+            scroll-padding-top: 2rem;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            color: var(--text-main);
+            background: var(--bg-body);
+            margin: 0;
+            display: flex;
+            min-height: 100vh;
+            line-height: 1.6;
+        }
+
+        /* --- Left Sidebar Navigation --- */
+        .sidebar {
+            width: 260px;
+            background: var(--bg-sidebar);
+            border-right: 1px solid var(--border);
+            height: 100vh;
+            position: fixed;
+            overflow-y: auto;
+            padding: 2rem 1.5rem;
+            top: 0;
+            left: 0;
+            z-index: 10;
+        }
+
+        .brand {
+            font-weight: 700;
+            font-size: 1.25rem;
+            color: var(--text-main);
+            margin-bottom: 2rem;
+            display: block;
+            text-decoration: none;
+        }
+
+        .brand span {
+            color: var(--primary);
+        }
+
+        .nav-group {
+            margin-bottom: 1.75rem;
+        }
+
+        .nav-header {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--text-light);
+            font-weight: 700;
+            margin-bottom: 0.75rem;
+        }
+
+        .nav-link {
+            display: block;
+            color: var(--text-muted);
+            text-decoration: none;
+            padding: 0.4rem 0;
+            font-size: 0.95rem;
+            transition: color 0.2s;
+        }
+
+        .nav-link:hover,
+        .nav-link.active {
+            color: var(--primary-dark);
+            font-weight: 500;
+        }
+
+        /* --- Right TOC Sidebar --- */
+        .toc-sidebar {
+            width: 240px;
+            position: fixed;
+            right: 0;
+            top: 0;
+            height: 100vh;
+            padding: 2rem 1.5rem;
+            border-left: 1px solid var(--border);
+            background: var(--bg-body);
+            overflow-y: auto;
+            z-index: 10;
+        }
+
+        .toc-title {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            font-weight: 700;
+            color: var(--text-main);
+            margin-bottom: 1rem;
+            letter-spacing: 0.05em;
+        }
+
+        .toc-link {
+            display: block;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            text-decoration: none;
+            margin-bottom: 0.5rem;
+            border-left: 2px solid transparent;
+            padding-left: 10px;
+            transition: all 0.2s;
+            line-height: 1.4;
+        }
+
+        .toc-link:hover {
+            color: var(--primary-dark);
+            border-left-color: var(--border);
+        }
+
+        .toc-link.active {
+            color: var(--primary-dark);
+            border-left-color: var(--primary);
+            font-weight: 500;
+        }
+
+        .toc-link.sub {
+            padding-left: 20px;
+            font-size: 0.8rem;
+            margin-top: -0.25rem;
+        }
+
+        .toc-link.sub:hover {
+            border-left-color: transparent;
+        }
+
+        .toc-link.sub.active {
+            border-left-color: transparent;
+            color: var(--primary-dark);
+        }
+
+        /* --- Main Content --- */
+        .content {
+            margin-left: 260px;
+            margin-right: 240px;
+            padding: 3rem 4rem;
+            max-width: 900px;
+            width: 100%;
+        }
+
+        section {
+            margin-bottom: 4rem;
+            scroll-margin-top: 2rem;
+        }
+
+        .sub-section {
+            margin-top: 2.5rem;
+            scroll-margin-top: 2rem;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            letter-spacing: -0.025em;
+            margin-bottom: 1rem;
+            color: var(--text-main);
+        }
+
+        h2 {
+            font-size: 1.75rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 0.5rem;
+            color: var(--text-main);
+        }
+
+        h3 {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-top: 2rem;
+            margin-bottom: 0.75rem;
+            color: var(--text-main);
+        }
+
+        h4 {
+            font-size: 1rem;
+            font-weight: 600;
+            margin-top: 1.5rem;
+            margin-bottom: 0.5rem;
+            color: var(--text-main);
+        }
+
+        p {
+            margin-bottom: 1.25rem;
+            color: var(--text-muted);
+        }
+
+        ul,
+        ol {
+            margin-bottom: 1.5rem;
+            color: var(--text-muted);
+            padding-left: 1.5rem;
+        }
+
+        li {
+            margin-bottom: 0.5rem;
+        }
+
+        strong {
+            color: var(--text-main);
+        }
+
+        /* --- Code Blocks --- */
+        pre {
+            background: #1e1e1e !important;
+            color: #e5e7eb !important;
+            padding: 1.25rem !important;
+            border-radius: 8px;
+            overflow-x: auto;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.3rem;
+            margin: 1.5rem 0 !important;
+            border: 1px solid var(--border);
+            line-height: 1.2;
+        }
+
+        code {
+            background: var(--code-bg);
+            color: var(--primary-dark);
+            padding: 0.2rem 0.4rem;
+            border-radius: 4px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.85em;
+            word-break: break-all;
+        }
+
+        pre code {
+            background: transparent;
+            color: inherit;
+            padding: 0;
+            word-break: normal;
+        }
+
+        /* --- Components --- */
+        .callout {
+            background: #ecfeff;
+            border-left: 4px solid var(--primary);
+            padding: 1.25rem;
+            margin: 1.5rem 0;
+            border-radius: 0 8px 8px 0;
+        }
+
+        .callout.warning {
+            background: #fffbeb;
+            border-left-color: #f59e0b;
+        }
+
+        .callout-title {
+            font-weight: 600;
+            color: var(--primary-dark);
+            margin-bottom: 0.5rem;
+            display: block;
+        }
+
+        .callout.warning .callout-title {
+            color: #b45309;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .badge-get {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+
+        .badge-post {
+            background: #dcfce7;
+            color: #166534;
+        }
+
+        .badge-header {
+            background: #f3f4f6;
+            color: #374151;
+            border: 1px solid #d1d5db;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.7rem;
+        }
+
+        /* Wraps tables for mobile scrolling */
+        .table-responsive {
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+            margin: 1.5rem 0;
+            width: 100%;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.95rem;
+            min-width: 500px;
+        }
+
+        th,
+        td {
+            border: 1px solid var(--border);
+            padding: 0.75rem 1rem;
+            text-align: left;
+            vertical-align: top;
+        }
+
+        th {
+            background: var(--bg-sidebar);
+            font-weight: 600;
+            color: var(--text-main);
+        }
+
+        tr:nth-child(even) {
+            background: #fafafa;
+        }
+
+        footer {
+            margin-top: 5rem;
+            padding-top: 2rem;
+            border-top: 1px solid var(--border);
+            color: var(--text-muted);
+            font-size: 0.875rem;
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        footer a {
+            color: var(--primary-dark);
+            text-decoration: none;
+        }
+
+        /* --- Mobile Navigation --- */
+        .mobile-header {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 60px;
+            background: var(--bg-body);
+            border-bottom: 1px solid var(--border);
+            z-index: 20;
+            align-items: center;
+            padding: 0 1.5rem;
+        }
+
+        .hamburger-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: var(--text-main);
+            padding: 0;
+            margin-right: 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .mobile-brand {
+            margin-bottom: 0;
+            font-size: 1.2rem;
+        }
+
+        .mobile-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 15;
+        }
+
+        /* --- PrismJS Copy Button Positioning & Styling --- */
+        .code-toolbar {
+            position: relative;
+            /* Prism wrapper */
+        }
+
+        /* Copy button - matches your theme */
+        div.code-toolbar>.toolbar {
+            position: absolute !important;
+            top: 0.75rem !important;
+            right: 0.75rem !important;
+            opacity: 1 !important;
+        }
+
+        div.code-toolbar>.toolbar button.copy-to-clipboard-button {
+            background: var(--text-main) !important;
+            /* #111827 */
+            color: white !important;
+            border: 1px solid var(--border) !important;
+            border-radius: 6px !important;
+            padding: 0.4rem 0.75rem !important;
+            font-size: 0.8rem !important;
+            font-family: 'Inter', sans-serif !important;
+            cursor: pointer !important;
+            font-weight: 500 !important;
+            opacity: 0.9 !important;
+            transition: all 0.2s ease !important;
+            box-shadow: none !important;
+        }
+
+        div.code-toolbar>.toolbar button.copy-to-clipboard-button:hover {
+            background: var(--primary-dark) !important;
+            /* #0891b2 */
+            opacity: 1 !important;
+            transform: translateY(-1px) !important;
+        }
+
+        div.code-toolbar>.toolbar button.copy-to-clipboard-button:active {
+            transform: translateY(0) !important;
+        }
+
+        /* Hide default button text, show icon */
+        div.code-toolbar>.toolbar button.copy-to-clipboard-button span {
+            display: none !important;
+        }
+
+        div.code-toolbar>.toolbar button.copy-to-clipboard-button::after {
+            content: "📋" !important;
+            font-size: 0.9rem !important;
+        }
+
+        /* Copied State Icon Update */
+        div.code-toolbar>.toolbar button.copy-to-clipboard-button[data-copy-state="copy-success"]::after {
+            content: "✅" !important;
+        }
+
+        /* --- Responsive --- */
+        @media (max-width: 1200px) {
+            .toc-sidebar {
+                display: none;
+            }
+
+            .content {
+                margin-right: 0;
+            }
+        }
+
+        @media (max-width: 850px) {
+            body {
+                padding-top: 60px;
+            }
+
+            .mobile-header {
+                display: flex;
+            }
+
+            .sidebar {
+                display: block;
+                transform: translateX(-100%);
+                transition: transform 0.3s ease;
+                z-index: 30;
+                width: 260px;
+            }
+
+            .sidebar.open {
+                transform: translateX(0);
+            }
+
+            .mobile-overlay.open {
+                display: block;
+            }
+
+            .content {
+                margin-left: 0;
+                padding: 2rem;
+            }
+        }
+
+        @media (max-width: 500px) {
+            .content {
+                padding: 1.5rem;
+            }
+
+            h1 {
+                font-size: 2rem;
+            }
+
+            h2 {
+                font-size: 1.5rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Scripts for PrismJS (Core, Languages, Toolbar, and Copy-to-Clipboard) -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-json.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-python.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/toolbar/prism-toolbar.min.js"></script>
+    <script
+        src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/copy-to-clipboard/prism-copy-to-clipboard.min.js"></script>
+
+    <!-- Mobile Header with Hamburger -->
+    <header class="mobile-header">
+        <button class="hamburger-btn" id="mobile-menu-btn" aria-label="Toggle Menu">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                stroke-linecap="round" stroke-linejoin="round">
+                <line x1="3" y1="12" x2="21" y2="12"></line>
+                <line x1="3" y1="6" x2="21" y2="6"></line>
+                <line x1="3" y1="18" x2="21" y2="18"></line>
+            </svg>
+        </button>
+        <a href="#" class="brand mobile-brand"><span>Bot</span>Fusion</a>
+    </header>
+
+    <!-- Mobile Overlay -->
+    <div class="mobile-overlay" id="mobile-overlay"></div>
+
+    <!-- Left Sidebar Navigation -->
+    <nav class="sidebar">
+        <a href="#" class="brand"><span>Bot</span>Fusion Docs</a>
+
+        <div class="nav-group">
+            <div class="nav-header">Introduction</div>
+            <a href="#overview" class="nav-link">Overview & Setup</a>
+        </div>
+
+        <div class="nav-group">
+            <div class="nav-header">Dashboard Features</div>
+            <a href="#bot-management" class="nav-link">Bot Management</a>
+            <a href="#file-uploads" class="nav-link">Importing Users</a>
+            <a href="#broadcasting" class="nav-link">Broadcasting</a>
+        </div>
+
+        <div class="nav-group">
+            <div class="nav-header">Core Concepts</div>
+            <a href="#concepts-spam-behavior" class="nav-link">Spam vs Behavior</a>
+        </div>
+
+        <div class="nav-group">
+            <div class="nav-header">API & Integration</div>
+            <a href="#api-auth" class="nav-link">Connection Keys</a>
+            <a href="#api-autoup" class="nav-link">AutoUp API</a>
+            <a href="#api-anomaly" class="nav-link">Anomaly Detection API</a>
+            <a href="#api-genqr" class="nav-link">QR Generation API</a>
+            <a href="#api-limits-errors" class="nav-link">Limits & Errors</a>
+        </div>
+
+        <div class="nav-group">
+            <div class="nav-header">Platform Info</div>
+            <a href="#premium-plans" class="nav-link">Premium Plans</a>
+            <a href="#faq" class="nav-link">FAQ</a>
+        </div>
+    </nav>
+
+    <!-- Right TOC Sidebar (Auto-highlighted via JS) -->
+    <aside class="toc-sidebar">
+        <div class="toc-title">On this page</div>
+
+        <!-- Overview -->
+        <a href="#overview" class="toc-link">Overview</a>
+        <a href="#getting-started" class="toc-link sub">Getting Started</a>
+
+        <!-- Dashboard -->
+        <a href="#bot-management" class="toc-link">Bot Management</a>
+        <a href="#file-uploads" class="toc-link">Importing Users</a>
+        <a href="#broadcasting" class="toc-link">Broadcasting</a>
+
+        <!-- Concepts -->
+        <a href="#concepts-spam-behavior" class="toc-link">Spam vs Behavior</a>
+
+        <!-- API -->
+        <a href="#api-auth" class="toc-link">Connection Keys</a>
+        <a href="#api-autoup" class="toc-link">AutoUp API</a>
+        <a href="#api-anomaly" class="toc-link">Anomaly API</a>
+        <a href="#api-genqr" class="toc-link">QR Generation API</a>
+        <a href="#genqr-params" class="toc-link sub">QR Parameters</a>
+        <a href="#genqr-scenarios" class="toc-link sub">QR Scenarios</a>
+        <a href="#api-limits-errors" class="toc-link">Limits & Errors</a>
+
+        <!-- Info -->
+        <a href="#premium-plans" class="toc-link">Premium Plans</a>
+        <a href="#faq" class="toc-link">FAQ</a>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="content">
+
+        <!-- ================= INTRODUCTION ================= -->
+        <section id="overview">
+            <h1>BotFusion Documentation</h1>
+            <p>Welcome to the official technical documentation for BotFusion. This platform allows you to manage
+                multiple Telegram bots, aggregate user bases, and broadcast messages (text, image, video) to thousands
+                of users simultaneously.</p>
+            <p>Our system is designed for high-throughput messaging, seamless user synchronization, and advanced
+                AI-driven user behavior analysis.We provide some usefull API keys and tool</p>
+
+            <div id="getting-started" class="sub-section">
+                <h3>Getting Started</h3>
+                <p>To start using BotFusion, you need a Telegram account and at least one Bot Token from BotFather.</p>
+
+                <h4>1. Sign Up</h4>
+                <ol>
+                    <li>Navigate to the <a href="https://botfusion.wuaze.com">signup page</a>.</li>
+                    <li>Enter your email, desired password, and your <strong>Telegram User ID</strong>.</li>
+                    <li>You can find your Telegram ID by messaging our <a href="https://t.me/authentcastbot"
+                            target="_blank">Auth Bot</a> (<code>/start</code>) You must start the bot first.</li>
+                </ol>
+
+                <h4>2. Verification</h4>
+                <p>For security, we use Telegram-based 2FA. Upon signup, an OTP (One-Time Password) is sent to your
+                    Telegram account via our Auth Bot. Enter this code to verify your account.</p>
+            </div>
+        </section>
+
+        <!-- ================= DASHBOARD ================= -->
+        <section id="bot-management">
+            <h2>Bot Management</h2>
+            <p>Once logged in, the Dashboard is your mission control.</p>
+
+            <h3>Adding a Bot</h3>
+            <p>Enter your Bot Token (provided by @BotFather) into the "Add a New Bot" panel. The system will:</p>
+            <ul>
+                <li>Validate the token with Telegram APIs.</li>
+                <li>Verify your plan limits (Free plan: max 10 bots).</li>
+                <li>Fetch the bot's username automatically.</li>
+            </ul>
+
+            <div class="callout warning">
+                <span class="callout-title">Bot Ownership Required</span>
+                You must be the owner or administrator of the bot you are adding. The system validates ownership during
+                critical operations like API Integration.
+            </div>
+        </section>
+
+        <section id="file-uploads">
+            <h2>Importing Users</h2>
+            <p>You can import existing user lists into BotFusion using file uploads.</p>
+            <p>For normal vps or server developers, the database is enough. For TBC developers, the users list will be
+                available in bot dashboard.</p>
+            <ul>
+                <li><strong>Supported Formats:</strong> <code>.txt</code>, <code>.csv</code>, <code>.json</code></li>
+                <li><strong>Format:</strong> The file is parsed via regex for any string of 9-11 digits. You do not need
+                    a strict CSV format; a simple list of IDs works perfectly.</li>
+                <li><strong>Processing:</strong> Files are processed in the background. You can navigate away while the
+                    "Scanning..." status is active.</li>
+            </ul>
+        </section>
+
+        <section id="broadcasting">
+            <h2>Broadcasting</h2>
+            <p>The core feature of BotFusion is sending mass messages to your aggregated user base.</p>
+
+            <h3>Supported Content Types</h3>
+            <ul>
+                <li><strong>Text:</strong> Plain text or HTML formatted messages.</li>
+                <li><strong>Image:</strong> JPG/PNG files (Max 10MB) + Caption.</li>
+                <li><strong>Video:</strong> MP4 files (Max 10MB) + Caption.</li>
+                <li><strong>PIN Message:</strong> Pin a message to the chat by Bot.</li>
+            </ul>
+
+            <h3>Inline Buttons & Controls</h3>
+            <p>You can add interactive buttons to your messages. These are rendered as Telegram Inline Keyboard buttons.
+                Each button requires a <strong>Label</strong> and a valid <strong>URL</strong>.</p>
+
+            <h3>Stop Broadcast</h3>
+            <p>If you made a mistake, you can click the red <strong>Stop Broadcast</strong> button in the live status
+                panel. Note that messages already sent to the Telegram API cannot be recalled.</p>
+        </section>
+
+        <!-- ================= CORE CONCEPTS ================= -->
+        <section id="concepts-spam-behavior">
+            <h2>Spam Detection vs. Behavior Detection</h2>
+            <p>Many developers confuse spam detection with account automation / behavior anomaly detection. Your
+                integration strategy dictates which method is right for you. BotFusion provides advanced Behavioral
+                Anomaly Detection, which operates very differently from traditional filters.</p>
+
+            <h3>Traditional Spam Detection</h3>
+            <p>Spam filters focus on <strong>message content</strong> (e.g., keyword filtering, link blacklists, regex
+                matching).<br>
+                <em>Example Rule:</em> <code>if message contains "free crypto" -> flag spam</code>
+            </p>
+            <p><strong>Limitation:</strong> Fails entirely when attackers modify spam text slightly, use images instead
+                of text, or coordinate across multiple groups to avoid duplicate detection.</p>
+
+            <h3>Behavioral Anomaly Detection (BotFusion)</h3>
+            <p>Our system analyzes <strong>user activity patterns over time</strong>. Instead of asking "Is this message
+                spam?", it asks: <em>"Is this user behaving like an automated system?"</em></p>
+
+            <div class="table-responsive">
+                <table>
+                    <tr>
+                        <th>Behavior Signal</th>
+                        <th>Example Attack Pattern</th>
+                    </tr>
+                    <tr>
+                        <td><strong>Burst Activity</strong></td>
+                        <td>20 messages sent across chats in 30 seconds.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Cross-group Activity</strong></td>
+                        <td>Same user appearing active in 8 independent groups simultaneously.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Repetition Pattern</strong></td>
+                        <td>Same structural message repeated predictably.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Empty Message Ratio</strong></td>
+                        <td>Heavy media spam with no conversational text.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Time Entropy</strong></td>
+                        <td>Activity occurring at perfectly unnatural, machine-like intervals.</td>
+                    </tr>
+                </table>
+            </div>
+
+            <div class="callout">
+                <span class="callout-title">What This System Does NOT Do</span>
+                This system does not analyze message meaning. It does not detect specific keywords, classify political
+                content, or block specific links. It is designed for moderation tools, anti-raid systems, and community
+                protection bots where automated attackers need to be identified regardless of their payload.
+            </div>
+        </section>
+
+        <!-- ================= API & INTEGRATION ================= -->
+        <section id="api-auth">
+            <h2>Connection Keys & Authentication</h2>
+            <h3 style="color: #0891b2; word-break: break-all;">https://botfusion.onrender.com/&lt;available-endpoint&gt;
+            </h3>
+            <p>To use any BotFusion API (AutoUp, Anomaly Detection, or GenQR), you need a Connection Key. This key maps
+                API requests securely to your account.</p>
+            <ol>
+                <li>Go to the dashboard and navigate to <strong>API Integrations</strong>.</li>
+                <li>Click <strong>Generate Connection Key</strong>.</li>
+                <li>Copy the key (Format: <code>acct_xxxxxxxxxxxxxxxx</code>).</li>
+            </ol>
+
+            <div class="callout warning">
+                <span class="callout-title">Security Warning</span>
+                This key allows write-access to your user lists and access to our AI models. Do not share it publicly.
+                If compromised, revoke it immediately from the dashboard.
+            </div>
+        </section>
+
+        <section id="api-autoup">
+            <h2>AutoUp API</h2>
+            <p><strong>AutoUp</strong> is our proprietary webhook-style system that allows your bots to automatically
+                sync new users to your BotFusion dashboard in real-time. This eliminates the need for manual file
+                uploads.</p>
+
+            <h3>How it Works</h3>
+            <ol>
+                <li>A user starts your bot on Telegram.</li>
+                <li>Your bot code sends a POST request to our <code>/autoup</code> endpoint.</li>
+                <li>We verify the request using your <strong>Connection Key</strong>.</li>
+                <li>The user ID is instantly added to your database.</li>
+            </ol>
+
+            <h3>Sync User Endpoint</h3>
+            <p><span class="badge badge-post">POST</span> <code>/autoup</code></p>
+
+            <h4>Headers Required</h4>
+            <div class="table-responsive">
+                <table>
+                    <tr>
+                        <th>Header</th>
+                        <th>Value</th>
+                        <th>Description</th>
+                    </tr>
+                    <tr>
+                        <td><span class="badge-header">X-CONNECTION-KEY</span></td>
+                        <td><code>acct_...</code></td>
+                        <td>Your unique connection key from the dashboard.</td>
+                    </tr>
+                    <tr>
+                        <td><span class="badge-header">Content-Type</span></td>
+                        <td><code>application/json</code></td>
+                        <td>Required.</td>
+                    </tr>
+                </table>
+            </div>
+
+            <h4>Request & Response</h4>
+            <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
+                <div style="flex: 1; min-width: 300px;">
+                    <strong>Request Body</strong>
+                    <pre><code class="language-json">{
+  "bot_username": "@my_awesome_bot",
+  "user_id": 123456789
+}</code></pre>
+                </div>
+                <div style="flex: 1; min-width: 300px;">
+                    <strong>Success Response (200 OK)</strong>
+                    <pre><code class="language-json">{
+  "status": "ok",
+  "bot": "@my_awesome_bot",
+  "user_id": 123456789
+}</code></pre>
+                </div>
+            </div>
+
+            <h4>Example Implementation (Python)</h4>
+            <pre><code class="language-python">import requests
+
+def sync_user_to_dashboard(user_id, bot_username):
+    url = "https://botfusion.onrender.com/autoup"
+    headers = {
+        "X-CONNECTION-KEY": "Your_Connection_Key_Here",
+        "Content-Type": "application/json"
+    }
+    payload = {
+        "bot_username": bot_username,
+        "user_id": user_id
+    }
+    
+    try:
+        requests.post(url, json=payload, headers=headers, timeout=2)
+    except:
+        pass # Fail silently so bot doesn't crash</code></pre>
+        </section>
+
+        <section id="api-anomaly">
+            <h2>Behavior-Based Anomaly Detection API</h2>
+            <p>This API enables developers to feed user activity logs into our machine learning model to receive a
+                real-time behavioral risk score. It scales perfectly, allowing moderation bots to handle thousands of
+                users without implementing complex ML internally.</p>
+
+            <div id="anomaly-architecture" class="sub-section">
+                <h3>Typical Integration Architecture</h3>
+                <pre><code class="language-text">Telegram Group
+      ↓
+Moderation Bot (Your Code)
+      ↓  (Records activity)
+Local Event Logger / History
+      ↓  (When trigger threshold met)
+Anomaly Detection API (BotFusion)
+      ↓  (Returns Risk Score)
+Admin Alerts / Auto-Ban Logic</code></pre>
+            </div>
+
+            <div id="anomaly-integration" class="sub-section">
+                <h3>Integration Strategy: History & Triggers</h3>
+                <p>Behavioral detection requires multiple messages. A single message cannot reveal patterns like burst
+                    activity or timing regularity. Therefore, the system relies on you to pass a brief history.</p>
+
+                <h4>1. Event Collection</h4>
+                <p>Your bot should record user activity locally. Keep the structure minimal to reduce your database
+                    overhead:</p>
+                <pre><code class="language-json">event = {
+    "chat_id": -100123456,
+    "timestamp": 1769401000,
+    "text": "Hello everyone",
+    "type": "text"
+}</code></pre>
+
+                <div class="callout">
+                    <span class="callout-title">Privacy Considerations</span>
+                    The model works primarily on activity patterns, not meaning. You can safely remove text fields,
+                    anonymize content, or store hashes instead of raw messages if your privacy policy requires it.
+                </div>
+
+                <h4>2. API Trigger Strategy & History Limits</h4>
+                <p>To reduce API usage and respect rate limits, do not call the API on every single message. Call it at
+                    specific checkpoints.</p>
+                <ul>
+                    <li><strong>Checkpoint Example:</strong> Call the API when a user reaches their 20th, 100th, 180th,
+                        and 250th message in your database.</li>
+                    <li><strong>History Limit:</strong> To prevent memory bloat, only keep the most recent ~300 events
+                        per user. Delete older events as they are no longer necessary for immediate behavioral analysis.
+                    </li>
+                </ul>
+            </div>
+
+            <div id="anomaly-reference" class="sub-section">
+
+                <h3>API Reference</h3>
+                <h3 style="color: #0891b2; word-break: break-all;">https://botfusion.onrender.com/score_user</h3>
+                <p><span class="badge badge-post">POST</span> <code>/score_user</code></p>
+                <p><em>Uses the same headers as the AutoUp API (Requires <code>X-CONNECTION-KEY</code>).</em></p>
+
+                <h4>Request Body Format</h4>
+                <pre><code class="language-json">{
+  "user_id": 4021189931,
+  "events": [
+    {
+      "chat_id": -100123456,
+      "timestamp": 1769401000,
+      "text": "Hello",
+      "type": "text"
+    },
+    // ... up to 300 recent events or more
+  ]
+}</code></pre>
+
+                <h4>Response & Interpretation</h4>
+                <pre><code class="language-json">{
+  "user_id": 4021189931,
+  "anomaly_score": 0.67,
+  "risk_level": "HIGH",
+  "confidence_band": "top_5_percent"
+}</code></pre>
+
+                <div class="table-responsive">
+                    <table>
+                        <tr>
+                            <th>Anomaly Score</th>
+                            <th>Meaning</th>
+                            <th>Suggested Action (Developer Choice)</th>
+                        </tr>
+                        <tr>
+                            <td><code>< 0.40</code></td>
+                            <td>Safe</td>
+                            <td>None</td>
+                        </tr>
+                        <tr>
+                            <td><code>0.40 – 0.55</code></td>
+                            <td>Normal</td>
+                            <td>None</td>
+                        </tr>
+                        <tr>
+                            <td><code>0.55 – 0.60</code></td>
+                            <td>Suspicious</td>
+                            <td>Log for review</td>
+                        </tr>
+                        <tr>
+                            <td><code>0.60 – 0.70</code></td>
+                            <td>Very Suspicious</td>
+                            <td>Increase monitoring, restrict media</td>
+                        </tr>
+                        <tr>
+                            <td><code>0.70 – 0.80</code></td>
+                            <td>Risky</td>
+                            <td>Alert Admins, temporary mute</td>
+                        </tr>
+                        <tr>
+                            <td><code>> 0.80</code></td>
+                            <td>Extremely Risky</td>
+                            <td>Auto-ban, flag network</td>
+                        </tr>
+                    </table>
+                </div>
+                <p>The API does not enforce moderation decisions. Your integration layer decides what action to take
+                    based on the returned score.</p>
+            </div>
+        </section>
+
+        <!-- ================= NEW SECTION: QR GENERATION API ================= -->
+        <section id="api-genqr">
+            <h2>QR Generation API</h2>
+            <p>This documentation provides the complete technical reference for using the <strong>BotFusion QR
+                    API</strong>. It covers every customizable key, payload structure, and branding logic required to
+                generate high-performance, stylized QR codes.</p>
+
+            <h3 style="color: #0891b2; word-break: break-all;">https://botfusion.onrender.com/genqr</h3>
+            <p><span class="badge badge-post">POST</span> <code>/genqr</code></p>
+            <p><em>Uses the same headers as our other APIs (Requires <code>X-CONNECTION-KEY</code> in the headers). Rate
+                    Limit: 20 requests per second per key.</em></p>
+
+            <div id="genqr-params" class="sub-section">
+                <h3>Complete Parameter Reference</h3>
+                <p>The API accepts these keys in either a JSON body or as form-data fields.</p>
+
+                <h4>A. Core Configuration</h4>
+                <div class="table-responsive">
+                    <table>
+                        <tr>
+                            <th>Key</th>
+                            <th>Default</th>
+                            <th>Description</th>
+                        </tr>
+                        <tr>
+                            <td><strong><code>data</code></strong></td>
+                            <td><strong>Required</strong></td>
+                            <td>The URL or text to be encoded in the QR.</td>
+                        </tr>
+                        <tr>
+                            <td><strong><code>scale</code></strong></td>
+                            <td><code>12</code></td>
+                            <td>Pixel resolution per module. Values above <code>20</code> are auto-capped for server
+                                safety.</td>
+                        </tr>
+                        <tr>
+                            <td><strong><code>border</code></strong></td>
+                            <td><code>3</code></td>
+                            <td>Width of the quiet zone (white space) modules around the QR.</td>
+                        </tr>
+                    </table>
+                </div>
+
+                <h4>B. Module & Body Styling</h4>
+                <div class="table-responsive">
+                    <table>
+                        <tr>
+                            <th>Key</th>
+                            <th>Default</th>
+                            <th>Options / Values</th>
+                        </tr>
+                        <tr>
+                            <td><strong><code>dot_style</code></strong></td>
+                            <td><code>circle</code></td>
+                            <td><code>square</code>, <code>rounded</code>, <code>circle</code>, <code>diamond</code>,
+                                <code>vertical</code>, <code>horizontal</code></td>
+                        </tr>
+                        <tr>
+                            <td><strong><code>dot_scale</code></strong></td>
+                            <td><code>0.95</code></td>
+                            <td><code>0.1</code> to <code>1.0</code>. Set to <code>1.0</code> for solid modules with no
+                                gaps.</td>
+                        </tr>
+                        <tr>
+                            <td><strong><code>dot_density</code></strong></td>
+                            <td><code>1.0</code></td>
+                            <td><code>0.1</code> to <code>1.0</code>. Set to <code>1.0</code> for 100% data visibility.
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><strong><code>fg_color</code></strong></td>
+                            <td><code>#000000</code></td>
+                            <td>Hex code for the foreground (if <code>gradient</code> is <code>False</code>).</td>
+                        </tr>
+                        <tr>
+                            <td><strong><code>bg_color</code></strong></td>
+                            <td><code>#FFFFFF</code></td>
+                            <td>Hex code for the background.</td>
+                        </tr>
+                    </table>
+                </div>
+
+                <h4>C. Gradients</h4>
+                <div class="table-responsive">
+                    <table>
+                        <tr>
+                            <th>Key</th>
+                            <th>Default</th>
+                            <th>Description</th>
+                        </tr>
+                        <tr>
+                            <td><strong><code>gradient</code></strong></td>
+                            <td><code>False</code></td>
+                            <td>Set <code>True</code> to enable color transitions. Overrides <code>fg_color</code>.</td>
+                        </tr>
+                        <tr>
+                            <td><strong><code>gradient_start</code></strong></td>
+                            <td><code>#160400</code></td>
+                            <td>Starting Hex color.</td>
+                        </tr>
+                        <tr>
+                            <td><strong><code>gradient_end</code></strong></td>
+                            <td><code>#FF3700</code></td>
+                            <td>Ending Hex color.</td>
+                        </tr>
+                        <tr>
+                            <td><strong><code>gradient_direction</code></strong></td>
+                            <td><code>vertical</code></td>
+                            <td>Either <code>vertical</code> or <code>horizontal</code>.</td>
+                        </tr>
+                    </table>
+                </div>
+
+                <h4>D. Finder (Corner) Styling</h4>
+                <div class="table-responsive">
+                    <table>
+                        <tr>
+                            <th>Key</th>
+                            <th>Default</th>
+                            <th>Options / Values</th>
+                        </tr>
+                        <tr>
+                            <td><strong><code>finder_outer_style</code></strong></td>
+                            <td><code>rounded</code></td>
+                            <td><code>square</code>, <code>rounded</code>, <code>circle</code></td>
+                        </tr>
+                        <tr>
+                            <td><strong><code>finder_eye_style</code></strong></td>
+                            <td><code>square</code></td>
+                            <td><code>square</code>, <code>rounded</code>, <code>circle</code>, <code>diamond</code>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><strong><code>finder_outer_color</code></strong></td>
+                            <td><code>None</code></td>
+                            <td>Custom Hex for the outer frame (inherits body if <code>None</code>).</td>
+                        </tr>
+                        <tr>
+                            <td><strong><code>finder_eye_color</code></strong></td>
+                            <td><code>None</code></td>
+                            <td>Custom Hex for the center eye (inherits body if <code>None</code>).</td>
+                        </tr>
+                        <tr>
+                            <td><strong><code>finder_outer_scale</code></strong></td>
+                            <td><code>1.0</code></td>
+                            <td>Size multiplier for the outer frame.</td>
+                        </tr>
+                        <tr>
+                            <td><strong><code>finder_eye_scale</code></strong></td>
+                            <td><code>1.2</code></td>
+                            <td>Size multiplier for the inner eye.</td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+
+            <div class="sub-section">
+                <h3>Logo Integration Logic</h3>
+                <p>The API follows a strict hierarchy for determining the center logo.</p>
+                <ol>
+                    <li><strong>Direct File Upload:</strong> Send a file in a multipart request under the key
+                        <code>logo</code>. This has the highest priority.</li>
+                    <li><strong>Telegram URL:</strong> Provide a direct download link via <code>telegram_url</code>. The
+                        proxy will fetch, rename, and forward the image to the engine.</li>
+                    <li><strong>BotFusion Default:</strong> If neither of the above are provided, the engine embeds the
+                        default <code>logo_transparent.png</code>.</li>
+                    <li><strong>Disabled:</strong> To generate a QR with <strong>no logo</strong>, you must explicitly
+                        set <code>"logo_path": false</code>.</li>
+                </ol>
+
+                <h4>Logo Customization Keys</h4>
+                <ul>
+                    <li><strong><code>logo_size_ratio</code></strong>: Default <code>0.15</code>. Controls logo width
+                        relative to the QR. Max recommended is <code>0.20</code> for scanning safety.</li>
+                    <li><strong><code>logo_padding</code></strong>: Default <code>6</code>. The amount of circular
+                        white-space padding behind the logo.</li>
+                </ul>
+            </div>
+
+            <div id="genqr-scenarios" class="sub-section">
+                <h3>Usage Scenarios</h3>
+
+                <h4>Scenario A: Standard JSON (Telegram Link)</h4>
+                <p>Use this for bot-to-bot communication where you have a file URL.</p>
+                <ul>
+                    <li><strong>Header:</strong> <code>Content-Type: application/json</code></li>
+                </ul>
+                <pre><code class="language-json">{
+  "data": "https://botfusion.wuaze.com",
+  "telegram_url": "https://api.telegram.org/file/bot789/photos/file_1.jpg",
+  "dot_style": "rounded",
+  "gradient": true
+}</code></pre>
+
+                <h4>Scenario B: Multipart Upload (Local File)</h4>
+                <p>Use this if you are uploading a logo directly from a device or script.</p>
+                <ul>
+                    <li><strong>Header:</strong> <code>Content-Type: multipart/form-data</code></li>
+                    <li><strong>Field <code>logo</code></strong>: (Binary file data)</li>
+                    <li><strong>Field <code>data</code></strong>: <code>https://google.com</code></li>
+                    <li><strong>Field <code>dot_scale</code></strong>: <code>1.0</code></li>
+                </ul>
+            </div>
+
+            <div class="callout">
+                <span class="callout-title">Effective Usage Tips</span>
+                <ul>
+                    <li><strong>Max Scannability:</strong> Keep <code>dot_density</code> at <code>1.0</code> and
+                        <code>dot_scale</code> above <code>0.8</code>. QRs with thin or missing dots are much harder for
+                        cameras to read.</li>
+                    <li><strong>Contrast is King:</strong> Ensure your <code>bg_color</code> and <code>fg_color</code>
+                        (or gradient) have high contrast. Dark colors on light backgrounds work best.</li>
+                    <li><strong>Logo Safety:</strong> Because the engine uses <strong>High (H) Error
+                            Correction</strong>, you can safely use a <code>logo_size_ratio</code> of up to
+                        <code>0.20</code> without losing data.</li>
+                    <li><strong>Sub-sampling:</strong> The engine automatically uses an <code>ss_factor=2</code>
+                        (rendering at 2x size then downscaling), so even small <code>scale</code> values will look sharp
+                        and anti-aliased.</li>
+                </ul>
+            </div>
+        </section>
+
+        <section id="api-limits-errors">
+            <h2>Rate Limits & Error Codes</h2>
+            <p>To ensure global stability, our APIs enforce strict rate limiting based on your Connection Key.</p>
+            <ul>
+                <li><strong>Limit:</strong> 20 requests per second (Combined across <code>/autoup</code>,
+                    <code>/score_user</code>, and <code>/genqr</code>).</li>
+                <li><strong>Behavior:</strong> If exceeded, the API returns HTTP <code>429 Too Many Requests</code>. You
+                    should implement a queuing system in your bot to handle backoff.</li>
+            </ul>
+
+            <h3>Standard Error Codes</h3>
+            <div class="table-responsive">
+                <table>
+                    <tr>
+                        <th>HTTP Code</th>
+                        <th>Meaning</th>
+                        <th>Solution</th>
+                    </tr>
+                    <tr>
+                        <td>401</td>
+                        <td>Unauthorized</td>
+                        <td>Missing, expired, or invalid <code>X-CONNECTION-KEY</code>.</td>
+                    </tr>
+                    <tr>
+                        <td>403</td>
+                        <td>Forbidden</td>
+                        <td>The bot username or resource does not belong to your account.</td>
+                    </tr>
+                    <tr>
+                        <td>404</td>
+                        <td>Not Found</td>
+                        <td>Endpoint incorrect or Bot/User validation failed.</td>
+                    </tr>
+                    <tr>
+                        <td>429</td>
+                        <td>Rate Limit</td>
+                        <td>You are sending more than 20 req/sec. Implement a queue in your bot.</td>
+                    </tr>
+                </table>
+            </div>
+        </section>
+
+        <!-- ================= INFO & SUPPORT ================= -->
+        <section id="premium-plans">
+            <h2>Premium Plans</h2>
+            <p>BotFusion offers a "Free Forever" tier and Premium tiers for power users requiring high volume.</p>
+
+            <div class="table-responsive">
+                <table>
+                    <tr>
+                        <th>Feature</th>
+                        <th>Free Plan</th>
+                        <th>Premium Plan</th>
+                    </tr>
+                    <tr>
+                        <td>Max Bots Connected</td>
+                        <td>10</td>
+                        <td><strong>Unlimited</strong></td>
+                    </tr>
+                    <tr>
+                        <td>Users per Bot</td>
+                        <td>2,000</td>
+                        <td><strong>Unlimited</strong></td>
+                    </tr>
+                    <tr>
+                        <td>Anomaly Detection ML</td>
+                        <td>Standard Priority</td>
+                        <td>High-Priority Queue</td>
+                    </tr>
+                    <tr>
+                        <td>Support</td>
+                        <td>Standard</td>
+                        <td>Priority Telegram Support</td>
+                    </tr>
+                </table>
+            </div>
+
+            <h3>How to Upgrade</h3>
+            <p>Navigate to the <strong>Pricing</strong> page from the dashboard footer. Select a plan (1 Month, 3
+                Months, or 1 Year) and click "Request Plan". An administrator will contact you via Telegram for payment
+                verification and issue a <strong>Redeem Code</strong>.</p>
+        </section>
+
+        <section id="faq">
+            <h2>FAQ</h2>
+
+            <h3>Why is my broadcast stuck?</h3>
+            <p>Broadcasts may pause if Telegram returns rate limit errors (429). Our system automatically backs off and
+                retries. If a task is manually "stopped" by the user, it cannot be resumed; you must create a new
+                broadcast.</p>
+
+            <h3>Can I delete a user from my audience?</h3>
+            <p>Currently, the API only supports <strong>adding</strong> users. User deletion must be handled by
+                resetting the bot data in the dashboard (Delete Bot -> Add Bot) and re-importing.</p>
+
+            <h3>Is my data secure?</h3>
+            <p>Yes. All API requests are authenticated via Connection Keys. User IDs are stored in an encrypted MongoDB
+                cluster. We do not store raw Telegram messages from the Anomaly API longer than required for real-time
+                inference.</p>
+        </section>
+
+        <footer>
+            <div>
+                &copy; 2026 BotFusion. All rights reserved.
+            </div>
+            <div>
+                <a href="#overview">Setup</a> &nbsp;|&nbsp;
+                <a href="#api-auth">API Keys</a> &nbsp;|&nbsp;
+                <a href="#api-anomaly">Anomaly ML</a> &nbsp;|&nbsp;
+                <a href="#api-genqr">QR API</a>
+            </div>
+        </footer>
+    </main>
+
+    <!-- JS for automatic Table of Contents highlighting based on scroll -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Mobile Menu Logic
+            const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+            const sidebar = document.querySelector('.sidebar');
+            const overlay = document.getElementById('mobile-overlay');
+            const mainNavLinks = document.querySelectorAll('.sidebar .nav-link');
+
+            function toggleMenu() {
+                sidebar.classList.toggle('open');
+                overlay.classList.toggle('open');
+                // Prevent background scrolling when menu is open
+                document.body.style.overflow = sidebar.classList.contains('open') ? 'hidden' : '';
+            }
+
+            if (mobileMenuBtn && overlay) {
+                mobileMenuBtn.addEventListener('click', toggleMenu);
+                overlay.addEventListener('click', toggleMenu);
+            }
+
+            // Close menu when a nav link is clicked on mobile
+            mainNavLinks.forEach(link => {
+                link.addEventListener('click', () => {
+                    if (window.innerWidth <= 850 && sidebar.classList.contains('open')) {
+                        toggleMenu();
+                    }
+                });
+            });
+
+            // Intersection Observer for TOC
+            const tocLinks = document.querySelectorAll('.toc-link');
+            const sections = document.querySelectorAll('section, .sub-section');
+
+            const observerOptions = {
+                root: null,
+                rootMargin: '0px 0px -60% 0px', // Trigger slightly above middle of screen
+                threshold: 0
+            };
+
+            const observer = new IntersectionObserver(entries => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        const id = entry.target.getAttribute('id');
+
+                        // Remove active class from all links
+                        tocLinks.forEach(link => link.classList.remove('active'));
+
+                        // Add active class to corresponding nav link
+                        const activeLink = document.querySelector(`.toc-link[href="#${id}"]`);
+                        if (activeLink) {
+                            activeLink.classList.add('active');
+
+                            // If it's a sub-link, also highlight the parent section if needed (optional)
+                            if (activeLink.classList.contains('sub')) {
+                                // Find previous non-sub link in the DOM logic could go here
+                                // But simple highlighting of the exact subsection works best
+                            }
+                        }
+                    }
+                });
+            }, observerOptions);
+
+            sections.forEach(section => {
+                if (section.getAttribute('id')) {
+                    observer.observe(section);
+                }
+            });
+        });
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://botfusion.wauze.com/sitemap.xml
