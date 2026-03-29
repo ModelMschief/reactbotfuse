@@ -4,6 +4,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description"
+        content="Access BotFusion's complete documentation with detailed guides, API references, and best practices to help you integrate and optimize our services effectively.">
+
     <title>BotFusion Documentation | Technical Guide</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -1038,7 +1041,8 @@ Admin Alerts / Auto-Ban Logic</code></pre>
                             <td><strong><code>dot_style</code></strong></td>
                             <td><code>circle</code></td>
                             <td><code>square</code>, <code>rounded</code>, <code>circle</code>, <code>diamond</code>,
-                                <code>vertical</code>, <code>horizontal</code></td>
+                                <code>vertical</code>, <code>horizontal</code>
+                            </td>
                         </tr>
                         <tr>
                             <td><strong><code>dot_scale</code></strong></td>
@@ -1144,7 +1148,8 @@ Admin Alerts / Auto-Ban Logic</code></pre>
                 <p>The API follows a strict hierarchy for determining the center logo.</p>
                 <ol>
                     <li><strong>Direct File Upload:</strong> Send a file in a multipart request under the key
-                        <code>logo</code>. This has the highest priority.</li>
+                        <code>logo</code>. This has the highest priority.
+                    </li>
                     <li><strong>Telegram URL:</strong> Provide a direct download link via <code>telegram_url</code>. The
                         proxy will fetch, rename, and forward the image to the engine.</li>
                     <li><strong>BotFusion Default:</strong> If neither of the above are provided, the engine embeds the
@@ -1192,12 +1197,14 @@ Admin Alerts / Auto-Ban Logic</code></pre>
                 <ul>
                     <li><strong>Max Scannability:</strong> Keep <code>dot_density</code> at <code>1.0</code> and
                         <code>dot_scale</code> above <code>0.8</code>. QRs with thin or missing dots are much harder for
-                        cameras to read.</li>
+                        cameras to read.
+                    </li>
                     <li><strong>Contrast is King:</strong> Ensure your <code>bg_color</code> and <code>fg_color</code>
                         (or gradient) have high contrast. Dark colors on light backgrounds work best.</li>
                     <li><strong>Logo Safety:</strong> Because the engine uses <strong>High (H) Error
                             Correction</strong>, you can safely use a <code>logo_size_ratio</code> of up to
-                        <code>0.20</code> without losing data.</li>
+                        <code>0.20</code> without losing data.
+                    </li>
                     <li><strong>Sub-sampling:</strong> The engine automatically uses an <code>ss_factor=2</code>
                         (rendering at 2x size then downscaling), so even small <code>scale</code> values will look sharp
                         and anti-aliased.</li>
@@ -1210,7 +1217,8 @@ Admin Alerts / Auto-Ban Logic</code></pre>
             <p>To ensure global stability, our APIs enforce strict rate limiting based on your Connection Key.</p>
             <ul>
                 <li><strong>Limit:</strong> 20 requests per second (Combined across <code>/autoup</code>,
-                    <code>/score_user</code>, and <code>/genqr</code>).</li>
+                    <code>/score_user</code>, and <code>/genqr</code>).
+                </li>
                 <li><strong>Behavior:</strong> If exceeded, the API returns HTTP <code>429 Too Many Requests</code>. You
                     should implement a queuing system in your bot to handle backoff.</li>
             </ul>
