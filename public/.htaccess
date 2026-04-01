@@ -37,5 +37,5 @@
   AddOutputFilterByType DEFLATE application/json
   AddOutputFilterByType DEFLATE image/svg+xml
 </IfModule>
-
+AddType image/x-icon .ico
 DirectoryIndex index.html
