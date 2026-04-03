@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Key, RefreshCw, AlertTriangle, Terminal, ArrowLeft, Copy, Check, ChevronDown, ChevronUp, Bot, ShieldAlert, QrCode } from "lucide-react";
+import { Key, RefreshCw, AlertTriangle, Terminal, ArrowLeft, Copy, Check, ChevronDown, ChevronUp, Bot, ShieldAlert, QrCode, Link2 } from "lucide-react";
 import { Link } from "react-router-dom";
 import { api } from "@/lib/api";
 import { motion, AnimatePresence } from "framer-motion";
@@ -15,6 +15,7 @@ export default function Autoup() {
     const [showAutoUpDetails, setShowAutoUpDetails] = useState(false);
     const [showAnomalyDetails, setShowAnomalyDetails] = useState(false);
     const [showQrDetails, setShowQrDetails] = useState(false);
+    const [showTrackingDetails, setShowTrackingDetails] = useState(false);
 
     useEffect(() => {
         loadKey();
@@ -396,6 +397,85 @@ Content-Type: application/json`}
                                         target="_blank"
                                         rel="noopener noreferrer"
                                         className="text-orange-400 hover:text-orange-300 text-sm font-semibold flex items-center gap-1 transition-colors"
+                                    >
+                                        View Full Documentation
+                                    </a>
+                                </div>
+                            </div>
+                        </motion.div>
+                    )}
+                </AnimatePresence>
+            </div>
+
+            {/* URL Tracking API Section */}
+            <div className="card bg-[var(--bg-surface)] border-[var(--border-color)]">
+                <div
+                    className="flex justify-between items-center cursor-pointer group"
+                    onClick={() => setShowTrackingDetails(!showTrackingDetails)}
+                >
+                    <div className="flex items-center gap-3">
+                        <Link2 className="text-pink-400" size={24} />
+                        <div>
+                            <h2 className="text-xl font-bold group-hover:text-pink-400 transition-colors">URL Tracking API</h2>
+                            <p className="text-sm text-[var(--text-muted)] font-normal mt-1">
+                                Generate smart, trackable short links that notify your bot's user (who created the track link) via Your Bot when someone clicked on it.
+                            </p>
+                        </div>
+                    </div>
+                    <button className="p-2 rounded-full hover:bg-[var(--bg-app)] text-[var(--text-muted)]">
+                        {showTrackingDetails ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
+                    </button>
+                </div>
+
+                <AnimatePresence>
+                    {showTrackingDetails && (
+                        <motion.div
+                            initial={{ height: 0, opacity: 0 }}
+                            animate={{ height: "auto", opacity: 1 }}
+                            exit={{ height: 0, opacity: 0 }}
+                            className="overflow-hidden"
+                        >
+                            <div className="pt-8 space-y-6">
+                                <p className="text-[var(--text-muted)]">
+                                    The <code>/gen_link</code> endpoint allows developers to generate trackable short links dynamically. When someone clicked on the generated link, BotFusion automatically alerts the owner of original url via Your Telegram Bot .
+                                </p>
+
+                                <div className="space-y-2">
+                                    <div className="flex items-center gap-2">
+                                        <span className="bg-green-500/10 text-green-500 px-2 py-1 rounded text-xs font-bold">POST</span>
+                                        <code className="bg-[var(--bg-app)] px-3 py-1 rounded text-sm flex-1">{API_BASE_URL}/gen_link</code>
+                                    </div>
+                                    <p className="text-xs text-[var(--text-muted)] flex items-center gap-1 mt-2">
+                                        Uses the exact same <b>X-CONNECTION-KEY</b> header. Rate limit: 20 req/sec.
+                                    </p>
+                                </div>
+
+                                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                                    <div>
+                                        <h3 className="font-bold text-sm mb-2 text-[var(--text-muted)]">Headers</h3>
+                                        <pre className="bg-[var(--bg-app)] p-4 rounded-lg border border-[var(--border-color)] text-xs font-mono text-pink-400 overflow-x-auto h-[250px]">
+                                            {`X-CONNECTION-KEY: \n${connectionKey || 'YOUR_KEY'}
+Content-Type: application/json`}
+                                        </pre>
+                                    </div>
+                                    <div>
+                                        <h3 className="font-bold text-sm mb-2 text-[var(--text-muted)]">Request Body</h3>
+                                        <pre className="bg-[var(--bg-app)] p-4 rounded-lg border border-[var(--border-color)] text-xs font-mono text-pink-400 overflow-x-auto h-[250px]">
+                                            {`{
+  "link": "https://example.com",
+  "user_id": "123456789",
+  "username": "@MyAwesomeBot"
+}`}
+                                        </pre>
+                                    </div>
+                                </div>
+
+                                <div className="pt-4 border-t border-[var(--border-color)] mt-4">
+                                    <a
+                                        href="/docs.html#api-tracking"
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="text-pink-400 hover:text-pink-300 text-sm font-semibold flex items-center gap-1 transition-colors"
                                     >
                                         View Full Documentation
                                     </a>

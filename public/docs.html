@@ -589,6 +589,7 @@
             <a href="#api-autoup" class="nav-link">AutoUp API</a>
             <a href="#api-anomaly" class="nav-link">Anomaly Detection API</a>
             <a href="#api-genqr" class="nav-link">QR Generation API</a>
+            <a href="#api-tracking" class="nav-link">URL Tracking API</a>
             <a href="#api-limits-errors" class="nav-link">Limits & Errors</a>
         </div>
 
@@ -622,6 +623,7 @@
         <a href="#api-genqr" class="toc-link">QR Generation API</a>
         <a href="#genqr-params" class="toc-link sub">QR Parameters</a>
         <a href="#genqr-scenarios" class="toc-link sub">QR Scenarios</a>
+        <a href="#api-tracking" class="toc-link">URL Tracking API</a>
         <a href="#api-limits-errors" class="toc-link">Limits & Errors</a>
 
         <!-- Info -->
@@ -1218,6 +1220,142 @@ Admin Alerts / Auto-Ban Logic</code></pre>
             </div>
         </section>
 
+        <!-- ================= NEW SECTION: URL TRACKING API ================= -->
+        <section id="api-tracking">
+            <h2>URL Tracking API</h2>
+            <p>The <code>/gen_link</code> endpoint allows developers to generate smart, trackable short links. When a
+                user clicks a generated link, BotFusion automatically sends a notification directly to the user who
+                created the link via Your Telegram Bot.</p>
+
+            <h3 style="color: #0891b2; word-break: break-all;">https://botfusion.onrender.com/gen_link</h3>
+            <p><span class="badge badge-post">POST</span> <code>/gen_link</code></p>
+            <p><em>Uses the same headers as our other APIs (Requires <code>X-CONNECTION-KEY</code> in the headers). Rate
+                    Limit: 20 requests per second per key.</em></p>
+
+            <div class="sub-section">
+                <h3>Request Body (JSON)</h3>
+                <p>The payload must be a JSON object containing the following fields:</p>
+                <div class="table-responsive">
+                    <table>
+                        <tr>
+                            <th>Field</th>
+                            <th>Type</th>
+                            <th>Required</th>
+                            <th>Description</th>
+                        </tr>
+                        <tr>
+                            <td><strong><code>link</code></strong></td>
+                            <td>String</td>
+                            <td>Yes</td>
+                            <td>The original destination URL you want to shorten and track.</td>
+                        </tr>
+                        <tr>
+                            <td><strong><code>user_id</code></strong></td>
+                            <td>String</td>
+                            <td>Yes</td>
+                            <td>The Telegram User ID of the recipient. This allows tracking system who created a
+                                specific tracking link</td>
+                        </tr>
+                        <tr>
+                            <td><strong><code>username</code></strong></td>
+                            <td>String</td>
+                            <td>Yes</td>
+                            <td>The username of your bot (e.g., <code>@MyAwesomeBot</code>).</td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+
+            <div class="sub-section">
+                <h3>Security & Constraints</h3>
+                <p>To prevent abuse and ensure system stability, the following rules apply:</p>
+                <ul>
+                    <li><strong>Same Links:</strong> If a user send same link to shorten again, the system send the same
+                        short link previosly generated to avoid duplication</li>
+                    <li><strong>Avoid short link Loop</strong> If user send a shortened url of our service
+                        <i>https://golink.free.nf</i> the api returns error to avoid redirection looping</li>
+                    <li><strong>Ownership Verification:</strong> The username provided must be a bot that you have
+                        already added to your account on the BotFusion website. If the bot is not linked to your
+                        account, the request will be rejected.</li>
+                    <li><strong>Rate Limiting:</strong> Each connection key is limited to 20 requests per second.</li>
+                    <li><strong>IP Protection:</strong> Standard DoS protection is active; excessive pings from a single
+                        IP will result in a temporary block.</li>
+                </ul>
+            </div>
+
+            <div class="sub-section">
+                <h3>How the Notification Works</h3>
+                <p>BotFusion handles the notification logic entirely. You do not need to set up webhooks on your end.
+                </p>
+                <ol>
+                    <li><strong>The Click:</strong> A user clicks the short_link.</li>
+                    <li><strong>Detection:</strong> BotFusion identifies the specific user_id and the bot_token
+                        associated with that link.</li>
+                    <li><strong>Direct Alert:</strong> BotFusion uses the bot's token to send a notification to the bot
+                        owner.</li>
+                    <li><strong>Message Content:</strong> Notification includes the original
+                        link, and the short link used, and also the total count of click for tracking link</li>
+                </ol>
+            </div>
+
+            <div class="sub-section">
+                <h3>Responses</h3>
+
+                <h4>✅ Success (200 OK)</h4>
+                <pre><code class="language-json">{
+  "short_link": "https://golink.free.nf/XYZ123"
+}</code></pre>
+
+                <h4>❌ Error: Missing Key (401 Unauthorized)</h4>
+                <pre><code class="language-json">{
+  "error": "Missing connection key"
+}</code></pre>
+
+                <h4>❌ Error: Unauthorized Bot (403 Forbidden)</h4>
+                <pre><code class="language-json">{
+  "error": "Unauthorized: This bot does not belong to your account"
+}</code></pre>
+
+                <h4>❌ Error: Rate Limit (429 Too Many Requests)</h4>
+                <pre><code class="language-json">{
+  "error": "Rate limit exceeded"
+}</code></pre>
+            </div>
+
+            <div class="sub-section">
+                <h3>Python Implementation Example</h3>
+                <pre><code class="language-python">import requests
+import json
+
+# Configuration
+API_URL = "https://botfusion.onrender.com/gen_link"
+CONN_KEY = "acct_your_secure_key_here"
+
+headers = {
+    "X-CONNECTION-KEY": CONN_KEY,
+    "Content-Type": "application/json"
+}
+
+payload = {
+    "link": "https://example.com/target-page",
+    "user_id": "123456789", # ID of the person you are sending this to
+    "username": "@Your_bot"
+}
+
+try:
+    response = requests.post(API_URL, json=payload, headers=headers)
+    
+    if response.status_code == 200:
+        result = response.json()
+        print(f"Tracking Link Created: {result['short_link']}")
+    else:
+        print(f"Failed: {response.json().get('error')}")
+
+except Exception as e:
+    print(f"Network Error: {e}")</code></pre>
+            </div>
+        </section>
+
         <section id="api-limits-errors">
             <h2>Rate Limits & Error Codes</h2>
             <p>To ensure global stability, our APIs enforce strict rate limiting based on your Connection Key.</p>
@@ -1332,7 +1470,8 @@ Admin Alerts / Auto-Ban Logic</code></pre>
                 <a href="#overview">Setup</a> &nbsp;|&nbsp;
                 <a href="#api-auth">API Keys</a> &nbsp;|&nbsp;
                 <a href="#api-anomaly">Anomaly ML</a> &nbsp;|&nbsp;
-                <a href="#api-genqr">QR API</a>
+                <a href="#api-genqr">QR API</a> &nbsp;|&nbsp;
+                <a href="#api-tracking">Tracking API</a>
             </div>
         </footer>
     </main>
