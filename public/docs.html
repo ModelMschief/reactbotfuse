@@ -322,6 +322,11 @@
             color: #166534;
         }
 
+        .badge-delete {
+            background: #ffe4e6;
+            color: #be123c;
+        }
+
         .badge-header {
             background: #f3f4f6;
             color: #374151;
@@ -1222,137 +1227,136 @@ Admin Alerts / Auto-Ban Logic</code></pre>
 
         <!-- ================= NEW SECTION: URL TRACKING API ================= -->
         <section id="api-tracking">
-            <h2>URL Tracking API</h2>
-            <p>The <code>/gen_link</code> endpoint allows developers to generate smart, trackable short links. When a
-                user clicks a generated link, BotFusion automatically sends a notification directly to the user who
-                created the link via Your Telegram Bot.</p>
-
-            <h3 style="color: #0891b2; word-break: break-all;">https://botfusion.onrender.com/gen_link</h3>
-            <p><span class="badge badge-post">POST</span> <code>/gen_link</code></p>
-            <p><em>Uses the same headers as our other APIs (Requires <code>X-CONNECTION-KEY</code> in the headers). Rate
-                    Limit: 20 requests per second per key.</em></p>
+            <h2>Link Tracker API</h2>
+            <p>The BotFusion Link Tracker API enables developers to generate, monitor, and manage tracked short links
+                programmatically for their Telegram bots. All traffic must be routed securely through the main gateway:
+                <strong><code>https://botfusion.onrender.com</code></strong>
+            </p>
 
             <div class="sub-section">
-                <h3>Request Body (JSON)</h3>
-                <p>The payload must be a JSON object containing the following fields:</p>
-                <div class="table-responsive">
-                    <table>
-                        <tr>
-                            <th>Field</th>
-                            <th>Type</th>
-                            <th>Required</th>
-                            <th>Description</th>
-                        </tr>
-                        <tr>
-                            <td><strong><code>link</code></strong></td>
-                            <td>String</td>
-                            <td>Yes</td>
-                            <td>The original destination URL you want to shorten and track.</td>
-                        </tr>
-                        <tr>
-                            <td><strong><code>user_id</code></strong></td>
-                            <td>String</td>
-                            <td>Yes</td>
-                            <td>The Telegram User ID of the recipient. This allows tracking system who created a
-                                specific tracking link</td>
-                        </tr>
-                        <tr>
-                            <td><strong><code>username</code></strong></td>
-                            <td>String</td>
-                            <td>Yes</td>
-                            <td>The username of your bot (e.g., <code>@MyAwesomeBot</code>).</td>
-                        </tr>
-                    </table>
-                </div>
-            </div>
-
-            <div class="sub-section">
-                <h3>Security & Constraints</h3>
-                <p>To prevent abuse and ensure system stability, the following rules apply:</p>
+                <h3>Global Constraints & Requirements</h3>
+                <p>Before using the API, note the following system rules:</p>
                 <ul>
-                    <li><strong>Same Links:</strong> If a user send same link to shorten again, the system send the same
-                        short link previosly generated to avoid duplication</li>
-                    <li><strong>Avoid short link Loop</strong> If user send a shortened url of our service
-                        <i>https://golink.free.nf</i> the api returns error to avoid redirection looping</li>
-                    <li><strong>Ownership Verification:</strong> The username provided must be a bot that you have
-                        already added to your account on the BotFusion website. If the bot is not linked to your
-                        account, the request will be rejected.</li>
-                    <li><strong>Rate Limiting:</strong> Each connection key is limited to 20 requests per second.</li>
-                    <li><strong>IP Protection:</strong> Standard DoS protection is active; excessive pings from a single
-                        IP will result in a temporary block.</li>
+                    <li><strong>Authentication:</strong> Every request requires your developer
+                        <code>X-CONNECTION-KEY</code> header.
+                    </li>
+                    <li><strong>Bot Ownership:</strong> The <code>username</code> payload must exactly match a bot you
+                        have registered in the BotFusion dashboard. If you attempt to operate on an unauthorized bot,
+                        you will receive a <code>403</code> error.</li>
+                    <li><strong>Rate Limits:</strong> The API enforces a strict limit of <strong>20 requests per
+                            second</strong> per Connection Key to prevent abuse.</li>
+                    <li><strong>End-User ID:</strong> The <code>user_id</code> field expects the <strong>Telegram
+                            ID</strong> of the end-user (your bot's user). This ensures the correct person receives
+                        click notifications via your bot.</li>
                 </ul>
             </div>
 
             <div class="sub-section">
-                <h3>How the Notification Works</h3>
-                <p>BotFusion handles the notification logic entirely. You do not need to set up webhooks on your end.
+                <h3>1. Create a Link or Toggle Notifications</h3>
+                <p><span class="badge badge-post">POST</span> <code>/gen_link</code></p>
+                <p>Use this endpoint to generate a new short link, or to retrieve/update an existing one. If the
+                    <code>link</code> already exists for this user/bot, it acts idempotently (returns the existing short
+                    link) but will <strong>update</strong> the <code>notify</code> toggle status.
                 </p>
-                <ol>
-                    <li><strong>The Click:</strong> A user clicks the short_link.</li>
-                    <li><strong>Detection:</strong> BotFusion identifies the specific user_id and the bot_token
-                        associated with that link.</li>
-                    <li><strong>Direct Alert:</strong> BotFusion uses the bot's token to send a notification to the bot
-                        owner.</li>
-                    <li><strong>Message Content:</strong> Notification includes the original
-                        link, and the short link used, and also the total count of click for tracking link</li>
-                </ol>
-            </div>
 
-            <div class="sub-section">
-                <h3>Responses</h3>
+                <h4>Headers</h4>
+                <pre><code class="language-text">X-CONNECTION-KEY: acct_your_secret_key
+Content-Type: application/json</code></pre>
 
-                <h4>✅ Success (200 OK)</h4>
+                <h4>Request Payload</h4>
                 <pre><code class="language-json">{
-  "short_link": "https://golink.free.nf/XYZ123"
+  "username": "@MyAwesomeBot",
+  "user_id": 123456789,
+  "link": "https://example.com/checkout",
+  "notify": true 
 }</code></pre>
+                <ul>
+                    <li><strong><code>username</code>:</strong> (String) Your officially added Bot username.</li>
+                    <li><strong><code>user_id</code>:</strong> (Integer or String) The Telegram ID of the user creating
+                        the link.</li>
+                    <li><strong><code>link</code>:</strong> (String) The original long URL.</li>
+                    <li><strong><code>notify</code>:</strong> (Boolean) Whether the bot should DM the
+                        <code>user_id</code> when the link is clicked. You can send that same link payload with diffrent
+                        notify : True /false to update current link to nitificaton On/Off
+                    </li>
+                </ul>
 
-                <h4>❌ Error: Missing Key (401 Unauthorized)</h4>
+                <h4>Successful Return (<code>200 OK</code>)</h4>
                 <pre><code class="language-json">{
-  "error": "Missing connection key"
-}</code></pre>
-
-                <h4>❌ Error: Unauthorized Bot (403 Forbidden)</h4>
-                <pre><code class="language-json">{
-  "error": "Unauthorized: This bot does not belong to your account"
-}</code></pre>
-
-                <h4>❌ Error: Rate Limit (429 Too Many Requests)</h4>
-                <pre><code class="language-json">{
-  "error": "Rate limit exceeded"
+  "status": "success",
+  "short_url": "https://golink.free.nf/aBcDeF1",
+  "short_code": "aBcDeF1",
+  "notify": true
 }</code></pre>
             </div>
 
             <div class="sub-section">
-                <h3>Python Implementation Example</h3>
-                <pre><code class="language-python">import requests
-import json
+                <h3>2. Bulk Fetch Link Statistics</h3>
+                <p><span class="badge badge-get">GET</span> <code>/gen_link</code></p>
+                <p>Use this endpoint to retrieve analytics (total clicks, configured settings) for multiple links
+                    simultaneously. This allows rapid dashboard rendering for your end-users.</p>
 
-# Configuration
-API_URL = "https://botfusion.onrender.com/gen_link"
-CONN_KEY = "acct_your_secure_key_here"
+                <h4>Headers</h4>
+                <pre><code class="language-text">X-CONNECTION-KEY: acct_your_secret_key
+Content-Type: application/json</code></pre>
 
-headers = {
-    "X-CONNECTION-KEY": CONN_KEY,
-    "Content-Type": "application/json"
-}
+                <h4>Request Payload</h4>
+                <p>Pass the original long URLs as an array to <code>link</code>.Can pass 1 or More link as array to
+                    check status of multiple links at once (developer choice)</p>
+                <pre><code class="language-json">{
+  "username": "@MyAwesomeBot",
+  "user_id": 123456789,
+  "link": [
+    "https://example.com/checkout",
+    "https://example.com/dashboard"
+  ]
+}</code></pre>
 
-payload = {
-    "link": "https://example.com/target-page",
-    "user_id": "123456789", # ID of the person you are sending this to
-    "username": "@Your_bot"
-}
+                <h4>Successful Return (<code>200 OK</code>)</h4>
+                <p>The data array maps directly to the order you requested.</p>
+                <pre><code class="language-json">{
+  "status": "success",
+  "data": [
+    {
+      "original_url": "https://example.com/checkout",
+      "short_url": "https://golink.free.nf/aBcDeF1",
+      "clicks": 42,
+      "notify": true
+    },
+    {
+      "original_url": "https://example.com/dashboard",
+      "short_url": "https://golink.free.nf/zXyWq2p",
+      "clicks": 0,
+      "notify": false
+    }
+  ]
+}</code></pre>
+            </div>
 
-try:
-    response = requests.post(API_URL, json=payload, headers=headers)
-    
-    if response.status_code == 200:
-        result = response.json()
-        print(f"Tracking Link Created: {result['short_link']}")
-    else:
-        print(f"Failed: {response.json().get('error')}")
+            <div class="sub-section">
+                <h3>3. Delete a Short Link</h3>
+                <p><span class="badge badge-delete">DELETE</span> <code>/gen_link</code></p>
+                <p>Allows the developer or end-user to wipe the short link and stop all traffic/tracking permanently.
+                    This purges the stats from both MongoDB and the high-speed Redis cache.</p>
 
-except Exception as e:
-    print(f"Network Error: {e}")</code></pre>
+                <h4>Headers</h4>
+                <pre><code class="language-text">X-CONNECTION-KEY: acct_your_secret_key
+Content-Type: application/json</code></pre>
+
+                <h4>Request Payload</h4>
+                <p>Provide the original URL you wish to unlink.</p>
+                <pre><code class="language-json">{
+  "username": "@MyAwesomeBot",
+  "user_id": 123456789,
+  "link": "https://example.com/checkout"
+}</code></pre>
+
+                <h4>Successful Return (<code>200 OK</code>)</h4>
+                <pre><code class="language-json">{
+  "status": "success",
+  "message": "Link deleted successfully",
+  "deleted_link": "https://example.com/checkout"
+}</code></pre>
             </div>
         </section>
 

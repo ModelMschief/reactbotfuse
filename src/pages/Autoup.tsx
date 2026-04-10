@@ -418,7 +418,7 @@ Content-Type: application/json`}
                         <div>
                             <h2 className="text-xl font-bold group-hover:text-pink-400 transition-colors">URL Tracking API</h2>
                             <p className="text-sm text-[var(--text-muted)] font-normal mt-1">
-                                Generate smart, trackable short links that notify your bot's user (who created the track link) via Your Bot when someone clicked on it.
+                                Generate, monitor, and manage tracked short links programmatically for your Telegram bots.
                             </p>
                         </div>
                     </div>
@@ -437,13 +437,17 @@ Content-Type: application/json`}
                         >
                             <div className="pt-8 space-y-6">
                                 <p className="text-[var(--text-muted)]">
-                                    The <code>/gen_link</code> endpoint allows developers to generate trackable short links dynamically. When someone clicked on the generated link, BotFusion automatically alerts the owner of original url via Your Telegram Bot .
+                                    The <code>/gen_link</code> endpoint has been upgraded to allow URL generation, statistics bulk fetching, and tracking link deletion.
                                 </p>
 
-                                <div className="space-y-2">
+                                <div className="space-y-4">
+                                    <div className="flex flex-wrap items-center gap-2">
+                                        <span className="bg-green-500/10 text-green-500 px-2 py-1 rounded text-xs font-bold w-16 text-center">POST</span>
+                                        <span className="bg-blue-500/10 text-blue-500 px-2 py-1 rounded text-xs font-bold w-16 text-center">GET</span>
+                                        <span className="bg-red-500/10 text-red-500 px-2 py-1 rounded text-xs font-bold w-16 text-center">DELETE</span>
+                                    </div>
                                     <div className="flex items-center gap-2">
-                                        <span className="bg-green-500/10 text-green-500 px-2 py-1 rounded text-xs font-bold">POST</span>
-                                        <code className="bg-[var(--bg-app)] px-3 py-1 rounded text-sm flex-1">{API_BASE_URL}/gen_link</code>
+                                        <code className="bg-[var(--bg-app)] px-3 py-1 rounded text-sm w-full">{API_BASE_URL}/gen_link</code>
                                     </div>
                                     <p className="text-xs text-[var(--text-muted)] flex items-center gap-1 mt-2">
                                         Uses the exact same <b>X-CONNECTION-KEY</b> header. Rate limit: 20 req/sec.
@@ -462,9 +466,10 @@ Content-Type: application/json`}
                                         <h3 className="font-bold text-sm mb-2 text-[var(--text-muted)]">Request Body</h3>
                                         <pre className="bg-[var(--bg-app)] p-4 rounded-lg border border-[var(--border-color)] text-xs font-mono text-pink-400 overflow-x-auto h-[250px]">
                                             {`{
-  "link": "https://example.com",
-  "user_id": "123456789",
-  "username": "@MyAwesomeBot"
+  "username": "@MyAwesomeBot",
+  "user_id": 123456789,
+  "link": "https://example.com/checkout",
+  "notify": true 
 }`}
                                         </pre>
                                     </div>
