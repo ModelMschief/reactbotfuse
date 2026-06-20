@@ -81,7 +81,7 @@ export default function Premium() {
         try {
             // Sending simple code as requested: 1m, 1y, 3m
             await api.post("/request-premium", { package: pkgCode });
-            setFeedback({ type: 'success', message: `Request sent! Check your Telegram/Email.` });
+            setFeedback({ type: 'success', message: `Request sent! Check your Telegram Account.` });
         } catch (err: unknown) {
             const axiosErr = err as AxiosError<{ error?: string }>;
             setFeedback({ type: 'error', message: axiosErr.response?.data?.error || "Error requesting plan" });

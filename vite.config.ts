@@ -21,10 +21,11 @@ export default defineConfig({
         rollupOptions: {
             output: {
                 // Bundle all vendor dependencies into single file
-                manualChunks: (id) => {
-                    if (id.includes('node_modules')) {
-                        return 'vendor';
-                    }
+                // Break vendor into granular chunks to prevent a massive blocking file
+                manualChunks: {
+                    'react-core': ['react', 'react-dom', 'react-router-dom'],
+                    'motion': ['framer-motion'],
+                    'icons': ['lucide-react']
                 },
                 // Consistent file naming
                 entryFileNames: 'assets/index.js',

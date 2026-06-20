@@ -22,15 +22,15 @@
     <meta name="robots" content="index, follow" />
     <meta name="author" content="BotFusion" />
     <meta name="googlebot" content="index, follow" />
-    <link rel="canonical" href="https://botfusion.wuaze.com/" />
+    <link rel="canonical" href="https://botfusion.kesug.com/" />
     <meta name="google-site-verification" content="google6f3aada47e203a33" />
     <!-- Open Graph (Facebook, Telegram, WhatsApp, Discord, etc.) -->
     <meta property="og:type" content="website" />
-    <meta property="og:url" content="https://botfusion.wuaze.com/" />
+    <meta property="og:url" content="https://botfusion.kesug.com/" />
     <meta property="og:title" content="BotFusion | Telegram Bot Developer Platform" />
     <meta property="og:description"
         content="APIs and tools for Telegram bot developers: broadcast system, auto user sync, anomaly detection, QR code generator, link tracking, and analytics." />
-    <meta property="og:image" content="https://botfusion.wuaze.com/android-chrome-512x512.png" />
+    <meta property="og:image" content="https://botfusion.kesug.com/android-chrome-512x512.png" />
     <meta property="og:image:width" content="512" />
     <meta property="og:image:height" content="512" />
     <meta property="og:site_name" content="BotFusion" />
@@ -40,7 +40,7 @@
     <meta name="twitter:title" content="BotFusion | Telegram Bot Developer Platform" />
     <meta name="twitter:description"
         content="Telegram bot developer APIs for broadcast, analytics, anomaly detection, QR codes, and automation." />
-    <meta name="twitter:image" content="https://botfusion.wuaze.com/android-chrome-512x512.png" />
+    <meta name="twitter:image" content="https://botfusion.kesug.com/android-chrome-512x512.png" />
 
     <!-- Favicon -->
     <link rel="icon" type="image/png" sizes="32x32" href="./favicon-32x32.png" />
@@ -71,8 +71,8 @@
   "@context": "https://schema.org",
   "@type": "Organization",
   "name": "BotFusion",
-  "url": "https://botfusion.wuaze.com/",
-  "logo": "https://botfusion.wuaze.com/android-chrome-512x512.png",
+  "url": "https://botfusion.kesug.com/",
+  "logo": "https://botfusion.kesug.com/android-chrome-512x512.png",
   "description": "Telegram bot developer platform providing broadcast, analytics, anomaly detection, QR code API and automation tools."
 }
 </script>
@@ -84,7 +84,7 @@
   "name": "BotFusion",
   "applicationCategory": "DeveloperApplication",
   "operatingSystem": "Web",
-  "url": "https://botfusion.wuaze.com/",
+  "url": "https://botfusion.kesug.com/",
   "description": "Telegram bot developer platform providing broadcast, analytics, anomaly detection, QR code API and automation tools."
 }
 </script>
@@ -107,20 +107,47 @@
             /* your site background color */
         }
 
-        #root:empty::before {
-            content: "Loading...";
-            color: #888;
-            font-family: sans-serif;
+        .initial-loader {
             position: fixed;
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 16px;
+            font-family: 'Inter', sans-serif;
+            color: #888;
+        }
+
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 3px solid rgba(255, 255, 255, 0.1);
+            border-left-color: #3b82f6;
+            border-top-color: #ec4899;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
         }
     </style>
 </head>
 
 <body class="antialiased min-h-screen bg-[var(--bg-app)] text-[var(--text-primary)]">
-    <div id="root"></div>
+    <div id="root">
+        <div class="initial-loader">
+            <div class="spinner"></div>
+        </div>
+    </div>
     <script type="module" src="/src/main.tsx"></script>
     <!-- SEO crawlable links -->
     <noscript>

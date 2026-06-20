@@ -49,7 +49,8 @@ export default function ForgotPassword() {
                             If your email and Telegram ID match an account, we've sent a reset link to <a href="https://t.me/authentcastbot" style={{ color: "blue" }}>BotFusion Bot</a>. Check the Bot
                         </p>
                         <p className="text-sm text-yellow-500/80 bg-yellow-500/10 p-3 rounded-lg mb-6">
-                            ⚠️ The link expires in 5 minutes
+                            <b>⚠️ The link expires in 5 minutes...</b>
+                            <p><i>If you didn't get any reset link, Please Check you entered the correct details!</i></p>
                         </p>
                         <Link
                             to="/login"
