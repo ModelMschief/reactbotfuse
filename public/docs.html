@@ -600,6 +600,20 @@
         </div>
 
         <div class="nav-group">
+            <div class="nav-header">BotFusion Pay</div>
+            <a href="#bfpay-overview" class="nav-link">Overview</a>
+            <a href="#bfpay-lifecycle" class="nav-link">Payment Lifecycle</a>
+            <a href="#bfpay-invoices" class="nav-link">Create Invoice</a>
+            <a href="#bfpay-claims" class="nav-link">Claim Invoice</a>
+            <a href="#bfpay-manual-verify" class="nav-link">Manual Verify</a>
+            <a href="#bfpay-list" class="nav-link">List Invoices</a>
+            <a href="#bfpay-cancel" class="nav-link">Cancel Invoice</a>
+            <a href="#bfpay-transfer" class="nav-link">Direct Transfer</a>
+            <a href="#bfpay-wallets" class="nav-link">Wallet Monitoring</a>
+            <a href="#bfpay-statuses" class="nav-link">Status Enums</a>
+        </div>
+
+        <div class="nav-group">
             <div class="nav-header">Platform Info</div>
             <a href="#premium-plans" class="nav-link">Premium Plans</a>
             <a href="#faq" class="nav-link">FAQ</a>
@@ -632,6 +646,12 @@
         <a href="#api-tracking" class="toc-link">URL Tracking API</a>
         <a href="#api-profanity" class="toc-link">Profanity Filter API</a>
         <a href="#api-limits-errors" class="toc-link">Limits & Errors</a>
+
+        <!-- BotFusion Pay -->
+        <a href="#bfpay-overview" class="toc-link">BotFusion Pay</a>
+        <a href="#bfpay-invoices" class="toc-link sub">Create Invoice</a>
+        <a href="#bfpay-claims" class="toc-link sub">Claim Invoice</a>
+        <a href="#bfpay-wallets" class="toc-link sub">Wallet Monitoring</a>
 
         <!-- Info -->
         <a href="#premium-plans" class="toc-link">Premium Plans</a>
@@ -1436,6 +1456,303 @@ Content-Type: application/json</code></pre>
                         <td>Rate Limit</td>
                         <td>You are sending more than 20 req/sec. Implement a queue in your bot.</td>
                     </tr>
+                </table>
+            </div>
+        </section>
+
+        <!-- ================= BOTFUSION PAY ================= -->
+        <section id="bfpay-overview">
+            <h2>BotFusion Pay — Crypto Payment Gateway</h2>
+            <p>BotFusion Pay is a <strong>non-custodial, automated crypto payment gateway</strong> built into the BotFusion platform. It allows you to seamlessly integrate crypto payments into your applications without running blockchain nodes, handling gas estimations, or writing webhooks from scratch.</p>
+
+            <div class="info-box">
+                <strong>🔥 How It Works:</strong> The system generates unique temporary deposit addresses for each invoice, monitors them for deposits, notifies your users when payment arrives, and automatically sweeps the collected funds to your final cold wallet — all while you maintain 100% custody of your private keys.
+            </div>
+
+            <h3>Getting Started</h3>
+            <ol>
+                <li>Log in to BotFusion and navigate to the <a href="/index.html#/pay"><strong>Payment Gateway Dashboard</strong></a>.</li>
+                <li>Complete the <strong>Store Setup Form</strong> (Store Name, Telegram Bot Token for alerts, your Telegram Chat ID).</li>
+                <li>Your isolated HD Wallet and API Key are generated instantly.</li>
+                <li><strong>Deposit a small amount of BNB</strong> into your Master Funding Wallet (<code>index 0</code>). This BNB is used exclusively to pay tiny blockchain gas fees for automated sweeps.</li>
+            </ol>
+
+            <h3>Base URL</h3>
+            <p>All BotFusion Pay API requests should be made to:</p>
+            <pre><code class="language-http">https://botfusion.onrender.com/bfpay/</code></pre>
+
+            <h3>Authentication</h3>
+            <p>Every request must include your API Key in the header:</p>
+            <pre><code class="language-http">x-api-key: your_botfusion_pay_api_key</code></pre>
+            <p>Your API key maps to your isolated HD Wallet. <strong>Never expose this key on the client side.</strong></p>
+        </section>
+
+        <section id="bfpay-lifecycle">
+            <h2>Payment Lifecycle</h2>
+            <p>The system handles the entire lifecycle automatically in 6 steps:</p>
+            <ol>
+                <li><strong>Invoice Created:</strong> You call <code>POST /bfpay/invoices</code>. A unique deposit address is generated.</li>
+                <li><strong>Monitoring:</strong> The system registers the address and listens for real-time blockchain deposits.</li>
+                <li><strong>Verification:</strong> User sends crypto. The system verifies the transaction, logs the payment, and marks it <code>verified</code>.</li>
+                <li><strong>Notification:</strong> The system sends a Telegram message (using the <code>tempBotToken</code>) to the customer with an "Activate" button.</li>
+                <li><strong>Collection (Sweep):</strong> In the background, BNB gas is sent to the deposit address, then USDT is swept to your <code>receivingAddress</code>.</li>
+                <li><strong>Claim:</strong> The user clicks "Activate". Your bot receives the callback. You call <code>POST /bfpay/claims</code> to finalize delivery.</li>
+            </ol>
+        </section>
+
+        <section id="bfpay-invoices">
+            <h2>Create an Invoice</h2>
+            <p>Generates a new invoice and a unique temporary deposit address.</p>
+
+            <div class="info-box">
+                <strong>Important:</strong>
+                <ul>
+                    <li><code>customerId</code> — Usually a Telegram Chat ID. The system sends the success notification to this ID.</li>
+                    <li><code>receivingAddress</code> — Your final cold wallet. The API auto-sweeps collected USDT here.</li>
+                    <li><code>callbackData</code> — Attached to the Telegram "Activate" button so your bot knows what product to deliver.</li>
+                    <li><code>tempBotToken</code> <em>(Optional)</em> — An invoice-specific bot token for messaging the customer.</li>
+                    <li><code>webhookUrl</code> <em>(Optional)</em> — If provided, the system POSTs payment status to this URL.</li>
+                    <li>You must provide <strong>at least one</strong> of <code>tempBotToken</code> or <code>webhookUrl</code>.</li>
+                </ul>
+            </div>
+
+            <h4>Endpoint</h4>
+            <pre><code class="language-http">POST /bfpay/invoices</code></pre>
+
+            <h4>Request Payload</h4>
+            <pre><code class="language-json">{
+  "customerId": "123456789",
+  "amount": "10.50",
+  "receivingAddress": "0xYourFinalColdWalletAddress...",
+  "callbackData": "activate_premium_user_123",
+  "tempBotToken": "1234:ABCDEF...",
+  "botMessage": "Thanks for paying {amountPaid} USDT for {invoiceId}!",
+  "buttonText": "Get Premium",
+  "webhookUrl": "https://your-backend.com/webhook/bsc"
+}</code></pre>
+
+            <h4>Response (<code>200 OK</code>)</h4>
+            <pre><code class="language-json">{
+  "invoice": {
+    "invoiceId": "inv_1234abc...",
+    "developerId": "dev_xyz...",
+    "customerId": "123456789",
+    "amount": "10.50",
+    "paymentStatus": "pending",
+    "collectionStatus": "not_started"
+  },
+  "tempWallet": {
+    "address": "0xTemporaryDepositAddress..."
+  },
+  "webhookAdded": true
+}</code></pre>
+        </section>
+
+        <section id="bfpay-claims">
+            <h2>Claim an Invoice</h2>
+            <p>Marks an invoice as fulfilled. Calling this endpoint multiple times is safe — it ensures the invoice is only claimed once, protecting you from double-delivery.</p>
+
+            <div class="info-box">
+                <strong>💡 Website Integration:</strong> If you're building a website (not a Telegram bot), your frontend can <strong>poll</strong> <code>GET /bfpay/invoices/:invoiceId</code> every few seconds. Once <code>paymentStatus</code> changes to <code>verified</code>, call this endpoint to finalize.
+            </div>
+
+            <h4>Endpoint</h4>
+            <pre><code class="language-http">POST /bfpay/claims</code></pre>
+
+            <h4>Request Payload</h4>
+            <pre><code class="language-json">{
+  "invoiceId": "inv_1234abc..."
+}
+// OR
+{
+  "tempAddress": "0xTemporaryDepositAddress..."
+}</code></pre>
+
+            <h4>Response (<code>200 OK</code>)</h4>
+            <pre><code class="language-json">{
+  "claimed": true,
+  "invoice": {
+    "invoiceId": "inv_1234abc...",
+    "paymentStatus": "verified",
+    "claimStatus": "claimed",
+    "payment": {
+      "paidAmount": "10.50",
+      "txHash": "0x..."
+    }
+  }
+}</code></pre>
+        </section>
+
+        <section id="bfpay-manual-verify">
+            <h2>Manual Payment Verification</h2>
+            <p>Forces the system to manually check the blockchain balance for a specific temporary address. Use this if the real-time webhook missed an event.</p>
+
+            <h4>Endpoint</h4>
+            <pre><code class="language-http">POST /bfpay/invoices/manual-verify</code></pre>
+
+            <h4>Request Payload</h4>
+            <pre><code class="language-json">{
+  "tempAddress": "0xTemporaryDepositAddress..."
+}</code></pre>
+
+            <h4>Response (<code>200 OK</code>)</h4>
+            <pre><code class="language-json">{
+  "result": {
+    "verified": true,
+    "paid": "10.50",
+    "source": "manual"
+  },
+  "invoice": { ... }
+}</code></pre>
+        </section>
+
+        <section id="bfpay-list">
+            <h2>List Invoices</h2>
+            <p>Retrieve a list of your existing invoices.</p>
+
+            <h4>Endpoint</h4>
+            <pre><code class="language-http">GET /bfpay/invoices</code></pre>
+
+            <h4>Query Parameters</h4>
+            <ul>
+                <li><code>limit</code> (optional) — Maximum number of invoices to return (default: 50).</li>
+                <li><code>paymentStatus</code> (optional) — Filter by status: <code>pending</code>, <code>verified</code>, <code>expired</code>.</li>
+            </ul>
+
+            <h4>Response (<code>200 OK</code>)</h4>
+            <pre><code class="language-json">{
+  "invoices": [
+    {
+      "invoiceId": "inv_1234abc...",
+      "customerId": "123456789",
+      "amount": "10.50",
+      "paymentStatus": "pending",
+      "collectionStatus": "not_started"
+    }
+  ]
+}</code></pre>
+        </section>
+
+        <section id="bfpay-cancel">
+            <h2>Cancel an Invoice</h2>
+            <p>Forcefully cancels an unpaid invoice and permanently halts background monitoring. <strong>Always call this</strong> when a user clicks "Cancel" to free up server resources.</p>
+
+            <h4>Endpoint</h4>
+            <pre><code class="language-http">POST /bfpay/invoices/:invoiceId/cancel</code></pre>
+
+            <h4>Response (<code>200 OK</code>)</h4>
+            <pre><code class="language-json">{
+  "success": true,
+  "invoice": {
+    "invoiceId": "inv_1234abc...",
+    "paymentStatus": "expired",
+    "recordStatus": "archived"
+  }
+}</code></pre>
+        </section>
+
+        <section id="bfpay-transfer">
+            <h2>Direct Wallet Transfer</h2>
+            <p>Directly send BNB or USDT from your <code>index 0</code> Master Funding Wallet to any address. Your wallet must hold the amount you're sending, plus enough BNB for gas.</p>
+
+            <h4>Endpoint</h4>
+            <pre><code class="language-http">POST /bfpay/transfer</code></pre>
+
+            <h4>Request Payload</h4>
+            <pre><code class="language-json">{
+  "toAddress": "0xRecipientAddress...",
+  "amount": "50.00",
+  "token": "USDT"
+}</code></pre>
+
+            <h4>Response (<code>200 OK</code>)</h4>
+            <pre><code class="language-json">{
+  "success": true,
+  "txHash": "0xTransactionHash...",
+  "token": "USDT",
+  "amount": "50.00",
+  "toAddress": "0xRecipientAddress..."
+}</code></pre>
+        </section>
+
+        <section id="bfpay-wallets">
+            <h2>Wallet &amp; Network Monitoring</h2>
+
+            <h3>Check Funding Wallet Balance</h3>
+            <p>Your Master Funding Wallet (<code>index 0</code>) holds the BNB used to pay gas fees. <strong>If it runs out of BNB, all fund sweeping will halt.</strong></p>
+            <pre><code class="language-http">GET /bfpay/wallets/index0</code></pre>
+            <pre><code class="language-json">{
+  "wallet": {
+    "index": 0,
+    "address": "0x373A1C...",
+    "balances": {
+      "bnb": { "bnb": "0.00049" },
+      "usdt": { "amount": "0.0" }
+    }
+  }
+}</code></pre>
+
+            <h3>Check Any Address Balance</h3>
+            <pre><code class="language-http">GET /bfpay/wallets/address/:address/balance</code></pre>
+
+            <h3>Network Health &amp; Gas</h3>
+            <pre><code class="language-http">GET /bfpay/network</code></pre>
+            <pre><code class="language-json">{
+  "network": {
+    "chainId": 56,
+    "latestBlock": 39582103,
+    "gasPriceGwei": "1.02"
+  }
+}</code></pre>
+        </section>
+
+        <section id="bfpay-statuses">
+            <h2>Status Enums</h2>
+            <p>Understanding the states of an invoice:</p>
+
+            <h3><code>paymentStatus</code></h3>
+            <div class="table-responsive">
+                <table>
+                    <tr><th>Value</th><th>Meaning</th></tr>
+                    <tr><td><code>pending</code></td><td>Awaiting deposit.</td></tr>
+                    <tr><td><code>verified</code></td><td>Exact or overpayment received.</td></tr>
+                    <tr><td><code>underpaid</code></td><td>Partial payment — user needs to send the rest.</td></tr>
+                    <tr><td><code>expired</code></td><td>Invoice TTL elapsed without payment.</td></tr>
+                    <tr><td><code>late_payment</code></td><td>Paid after expiration.</td></tr>
+                </table>
+            </div>
+
+            <h3><code>collectionStatus</code></h3>
+            <div class="table-responsive">
+                <table>
+                    <tr><th>Value</th><th>Meaning</th></tr>
+                    <tr><td><code>not_started</code></td><td>Waiting for sweep worker.</td></tr>
+                    <tr><td><code>needs_bnb</code></td><td>Calculating gas, preparing BNB transfer.</td></tr>
+                    <tr><td><code>bnb_sent</code></td><td>BNB broadcasted, waiting for confirmation.</td></tr>
+                    <tr><td><code>sweeping</code></td><td>USDT sweep broadcasted.</td></tr>
+                    <tr><td><code>swept</code></td><td>USDT arrived at your <code>receivingAddress</code>.</td></tr>
+                    <tr><td><code>failed</code></td><td>Sweep failed permanently.</td></tr>
+                </table>
+            </div>
+
+            <h3><code>claimStatus</code></h3>
+            <div class="table-responsive">
+                <table>
+                    <tr><th>Value</th><th>Meaning</th></tr>
+                    <tr><td><code>unclaimed</code></td><td>Not activated yet.</td></tr>
+                    <tr><td><code>claimed</code></td><td>Finalized.</td></tr>
+                </table>
+            </div>
+
+            <h3>Common Error Codes</h3>
+            <div class="table-responsive">
+                <table>
+                    <tr><th>Code</th><th>Meaning</th></tr>
+                    <tr><td><code>INVALID_API_KEY</code></td><td>Verify your <code>x-api-key</code> header.</td></tr>
+                    <tr><td><code>MISSING_REQUIRED_FIELDS</code></td><td>A required payload key is missing.</td></tr>
+                    <tr><td><code>ALREADY_CLAIMED</code></td><td>Invoice was already claimed.</td></tr>
+                    <tr><td><code>PAYMENT_NOT_VERIFIED</code></td><td>Funds not yet received.</td></tr>
+                    <tr><td><code>MISSING_NOTIFICATION_METHOD</code></td><td>Neither <code>tempBotToken</code> nor <code>webhookUrl</code> was provided.</td></tr>
                 </table>
             </div>
         </section>

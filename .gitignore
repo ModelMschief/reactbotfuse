@@ -39,7 +39,6 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
-main.py
-ttest.py
+
 deploy.txt
 deploy.bat

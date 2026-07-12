@@ -14,6 +14,7 @@ const Premium = lazy(() => import('@/pages/Premium'));
 const ForgotPassword = lazy(() => import('@/pages/ForgotPassword'));
 const ResetPassword = lazy(() => import('@/pages/ResetPassword'));
 const Settings = lazy(() => import('@/pages/Settings'));
+const CryptoDashboard = lazy(() => import('@/pages/CryptoDashboard'));
 
 function App() {
     return (
@@ -37,6 +38,7 @@ function App() {
                             <Route path="/settings" element={<Settings />} />
                             <Route path="/forgot-password" element={<ForgotPassword />} />
                             <Route path="/reset-password" element={<ResetPassword />} />
+                            <Route path="/pay" element={<CryptoDashboard />} />
                         </Routes>
                     </Suspense>
                 </div>

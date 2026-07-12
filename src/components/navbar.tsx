@@ -65,6 +65,13 @@ export function Navbar() {
                                         {link.label}
                                     </Link>
                                 ))}
+                                <a
+                                    href="/pay.html"
+                                    className="flex items-center gap-2 text-sm font-medium transition-colors hover:text-[var(--primary-color)] text-[var(--text-secondary)]"
+                                >
+                                    <Shield size={20} />
+                                    Payment Gateway
+                                </a>
                                 <Link
                                     to="/premium"
                                     className={`flex items-center gap-2 text-sm font-medium transition-colors hover:opacity-80 ${pathname === "/premium" ? "underline underline-offset-4" : ""}`}
@@ -162,6 +169,15 @@ export function Navbar() {
                                 <Bot size={20} />
                                 <span>Manage & Broadcast (Bot)</span>
                             </Link>
+
+                            <a
+                                href="/pay.html"
+                                onClick={() => setSidebarOpen(false)}
+                                className="flex items-center gap-3 px-4 py-3 rounded-lg transition-colors text-[var(--text-secondary)] hover:bg-[var(--bg-surface-hover)]"
+                            >
+                                <Shield size={20} />
+                                <span>Payment Gateway</span>
+                            </a>
 
                             <Link
                                 to="/premium"

@@ -194,6 +194,26 @@ export default function Dashboard() {
                                 )
                             })}
                         </div>
+
+                        {/* Payment Gateway — Featured Card */}
+                        <a
+                            href="/pay.html"
+                            className="block mt-6 card bg-[var(--bg-surface)] border-[var(--border-color)] hover:border-[var(--primary-color)] transition-all group relative overflow-hidden"
+                        >
+                            <div className="absolute inset-0 bg-gradient-to-r from-[var(--fire-red,#dc2626)]/5 to-[var(--fire-orange,#f97316)]/5 pointer-events-none" />
+                            <div className="relative flex flex-col md:flex-row md:items-center gap-4">
+                                <div className="p-3 bg-gradient-to-br from-[#dc2626]/10 to-[#f97316]/10 border border-[var(--border-color)] rounded-lg w-fit">
+                                    <Key size={28} className="text-[var(--primary-color)]" />
+                                </div>
+                                <div className="flex-1">
+                                    <h3 className="text-xl font-bold text-[var(--text-primary)] mb-1">BotFusion Pay — Crypto Payment Gateway</h3>
+                                    <p className="text-[var(--text-muted)] text-sm">Non-custodial crypto payments. Create invoices, auto-sweep to cold wallet, live analytics & Telegram alerts.</p>
+                                </div>
+                                <div className="flex items-center gap-2 text-sm font-semibold text-[var(--primary-color)] group-hover:text-[var(--primary-hover)] transition-colors whitespace-nowrap">
+                                    Open Gateway <ExternalLink size={14} />
+                                </div>
+                            </div>
+                        </a>
                     </motion.div>
                 ) : (
                     <motion.div
