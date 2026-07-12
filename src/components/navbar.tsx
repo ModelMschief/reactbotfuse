@@ -1,7 +1,7 @@
 import { Link, useLocation } from "react-router-dom";
 import { useAuth } from "@/store/auth-context";
 import { ThemeToggle } from "./theme-toggle";
-import { Shield, Key, Crown, Menu, X, LogOut } from "lucide-react";
+import { Shield, Key, Crown, Menu, X, LogOut, Bot } from "lucide-react";
 import { useState } from "react";
 
 // Import logo image
@@ -24,8 +24,8 @@ export function Navbar() {
     if (pathname === "/login" || pathname === "/forgot-password" || pathname === "/reset-password") return null;
 
     const links = [
-        { href: "/dashboard", label: "Dashboard", icon: <Shield size={20} /> },
-        { href: "/autoup", label: "AutoUp", icon: <Key size={20} /> },
+        { href: "/dashboard", label: "Dashboard (API)", icon: <Key size={20} /> },
+        { href: "/manage-bots", label: "Manage & Broadcast (Bot)", icon: <Bot size={20} /> },
     ];
 
     return (
@@ -52,17 +52,32 @@ export function Navbar() {
 
                     {/* Desktop Nav */}
                     <nav className="hidden md:flex items-center gap-6">
-                        {user && pathname !== "/" && links.map((link) => (
-                            <Link
-                                key={link.href}
-                                to={link.href}
-                                className={`flex items-center gap-2 text-sm font-medium transition-colors hover:text-[var(--primary-color)] ${pathname === link.href ? "text-[var(--primary-color)]" : "text-[var(--text-secondary)]"
-                                    }`}
-                            >
-                                {link.icon}
-                                {link.label}
-                            </Link>
-                        ))}
+                        {user && pathname !== "/" && (
+                            <>
+                                {links.map((link) => (
+                                    <Link
+                                        key={link.href}
+                                        to={link.href}
+                                        className={`flex items-center gap-2 text-sm font-medium transition-colors hover:text-[var(--primary-color)] ${pathname === link.href ? "text-[var(--primary-color)]" : "text-[var(--text-secondary)]"
+                                            }`}
+                                    >
+                                        {link.icon}
+                                        {link.label}
+                                    </Link>
+                                ))}
+                                <Link
+                                    to="/premium"
+                                    className={`flex items-center gap-2 text-sm font-medium transition-colors hover:opacity-80 ${pathname === "/premium" ? "underline underline-offset-4" : ""}`}
+                                    style={{
+                                        color: "#f59e0b",
+                                        textShadow: "0 0 10px rgba(245, 158, 11, 0.5)",
+                                    }}
+                                >
+                                    <Crown size={20} style={{ filter: "drop-shadow(0 0 6px rgba(245, 158, 11, 0.6))" }} />
+                                    Get Premium
+                                </Link>
+                            </>
+                        )}
                     </nav>
 
                     {/* Desktop Actions */}
@@ -132,20 +147,20 @@ export function Navbar() {
                                     : "text-[var(--text-secondary)] hover:bg-[var(--bg-surface-hover)]"
                                     }`}
                             >
-                                <Shield size={20} />
-                                <span>Dashboard</span>
+                                <Key size={20} />
+                                <span>Dashboard (API)</span>
                             </Link>
 
                             <Link
-                                to="/autoup"
+                                to="/manage-bots"
                                 onClick={() => setSidebarOpen(false)}
-                                className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${pathname === "/autoup"
-                                    ? "bg-blue-500/10 text-blue-500 font-semibold"
+                                className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${pathname === "/manage-bots"
+                                    ? "bg-[var(--primary-color)]/10 text-[var(--primary-color)] font-semibold"
                                     : "text-[var(--text-secondary)] hover:bg-[var(--bg-surface-hover)]"
                                     }`}
                             >
-                                <Key size={20} />
-                                <span>API Key</span>
+                                <Bot size={20} />
+                                <span>Manage & Broadcast (Bot)</span>
                             </Link>
 
                             <Link

@@ -595,6 +595,7 @@
             <a href="#api-anomaly" class="nav-link">Anomaly Detection API</a>
             <a href="#api-genqr" class="nav-link">QR Generation API</a>
             <a href="#api-tracking" class="nav-link">URL Tracking API</a>
+            <a href="#api-profanity" class="nav-link">Profanity Filter API</a>
             <a href="#api-limits-errors" class="nav-link">Limits & Errors</a>
         </div>
 
@@ -629,6 +630,7 @@
         <a href="#genqr-params" class="toc-link sub">QR Parameters</a>
         <a href="#genqr-scenarios" class="toc-link sub">QR Scenarios</a>
         <a href="#api-tracking" class="toc-link">URL Tracking API</a>
+        <a href="#api-profanity" class="toc-link">Profanity Filter API</a>
         <a href="#api-limits-errors" class="toc-link">Limits & Errors</a>
 
         <!-- Info -->
@@ -1357,6 +1359,40 @@ Content-Type: application/json</code></pre>
   "status": "success",
   "message": "Link deleted successfully",
   "deleted_link": "https://example.com/checkout"
+}</code></pre>
+            </div>
+        </section>
+
+        <!-- ================= NEW SECTION: PROFANITY FILTER API ================= -->
+        <section id="api-profanity">
+            <h2>Profanity Filter API</h2>
+            <p>The BotFusion Profanity Filter API enables developers to programmatically check messages for banned words or inappropriate content using our centralized filtering engine.</p>
+            <p>This ensures your bot's community stays clean from the moment a message is processed.</p>
+
+            <div class="sub-section">
+                <h3>1. Check a Message for Profanity</h3>
+                <p><span class="badge badge-post">POST</span> <code>/profanity_check</code></p>
+                <p>Pass the message payload. The system returns whether it flagged any profanity in the text.</p>
+
+                <h4>Headers</h4>
+                <pre><code class="language-text">X-CONNECTION-KEY: acct_your_secret_key
+Content-Type: application/json</code></pre>
+
+                <h4>Request Payload</h4>
+                <pre><code class="language-json">{
+  "message": "This is the string of text you want to check."
+}</code></pre>
+
+                <h4>Response - Profanity Detected (<code>200 OK</code>)</h4>
+                <pre><code class="language-json">{
+  "profanity": true,
+  "message": "Message contains blocked content."
+}</code></pre>
+
+                <h4>Response - Clean (<code>200 OK</code>)</h4>
+                <pre><code class="language-json">{
+  "profanity": false,
+  "message": "Message is clean!"
 }</code></pre>
             </div>
         </section>

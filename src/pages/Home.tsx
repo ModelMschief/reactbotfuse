@@ -42,61 +42,85 @@ export default function Home() {
                         scale: { duration: 1.5 },
                         y: { duration: 6, repeat: Infinity, ease: "easeInOut" }
                     }}
-                    className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-0 opacity-30 pointer-events-none mix-blend-screen"
+                    className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-0 opacity-10 pointer-events-none mix-blend-screen"
                 >
                     <img
                         src={appleTouchIcon}
                         alt="Background Logo"
                         width={400}
                         height={400}
-                        className="blur-[80px]"
+                        className="blur-[60px]"
                     />
                 </motion.div>
 
-                <div className="container relative z-10 text-center px-4 mx-auto max-w-5xl">
-                    <motion.div
-                        initial={{ opacity: 0, scale: 0.9 }}
-                        animate={{ opacity: 1, scale: 1 }}
-                        transition={{ duration: 0.8 }}
-                        className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[var(--primary-color)]/10 text-[var(--primary-color)] text-xs font-bold uppercase tracking-wider mb-6 border border-[var(--primary-color)]/20 backdrop-blur-sm shadow-[0_0_15px_rgba(220,38,38,0.2)]"
-                    >
-                        <Zap size={12} fill="currentColor" /> Enterprise Telegram Tools
-                    </motion.div>
+                <div className="container relative z-10 px-4 mx-auto max-w-6xl">
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+                        {/* Left Column: Copy */}
+                        <div className="text-left">
+                            <motion.div
+                                initial={{ opacity: 0, y: 20 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                transition={{ duration: 0.5 }}
+                                className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[var(--primary-color)]/10 text-[var(--primary-color)] text-xs font-bold uppercase tracking-wider mb-6 border border-[var(--primary-color)]/20"
+                            >
+                                <Zap size={12} fill="currentColor" /> Enterprise Telegram Infrastructure
+                            </motion.div>
 
-                    <motion.h1
-                        initial={{ opacity: 0, y: 30 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.8, delay: 0.1 }}
-                        className="text-5xl md:text-7xl font-bold tracking-tight mb-6 leading-[1.1] drop-shadow-2xl"
-                    >
-                        Unify Your Bots & <br className="hidden md:block" />
-                        <span className="text-transparent bg-clip-text bg-gradient-to-br from-[var(--primary-color)] via-orange-500 to-yellow-500 animate-gradient-x">
-                            Deploy Powerful APIs
-                        </span>
-                    </motion.h1>
+                            <motion.h1
+                                initial={{ opacity: 0, y: 20 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                transition={{ duration: 0.5, delay: 0.1 }}
+                                className="text-5xl md:text-6xl lg:text-7xl font-extrabold tracking-tight mb-6 leading-[1.1] text-[var(--text-primary)]"
+                            >
+                                Deploy Powerful APIs & <br className="hidden lg:block" />
+                                <span className="text-transparent bg-clip-text bg-gradient-to-r from-[var(--primary-color)] to-orange-500">
+                                    Unify Your Bots
+                                </span>
+                            </motion.h1>
 
-                    <motion.p
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.8, delay: 0.2 }}
-                        className="text-lg md:text-xl text-[var(--text-muted)] max-w-2xl mx-auto mb-10 leading-relaxed font-light drop-shadow-md"
-                    >
-                        Centralize bot management, integrate advanced behavioral APIs, generate custom QR codes, and broadcast to millions. Engineered for technical bot owners who demand flexibility and scale.
-                    </motion.p>
+                            <motion.p
+                                initial={{ opacity: 0, y: 20 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                transition={{ duration: 0.5, delay: 0.2 }}
+                                className="text-lg md:text-xl text-[var(--text-muted)] mb-10 leading-relaxed font-light max-w-xl"
+                            >
+                                Stop wrestling with Telegram rate limits and scattered Python scripts. BotFusion is the all-in-one developer platform that provides enterprise-grade APIs for realtime user syncing, ML-powered spam detection, and a centralized hub to broadcast to millions across your entire bot fleet safely.
+                            </motion.p>
+                        </div>
 
-                    <motion.div
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.8, delay: 0.3 }}
-                        className="flex flex-col sm:flex-row items-center justify-center gap-4"
-                    >
-                        <Link to={user ? "/dashboard" : "/login"} className="btn btn-primary h-12 px-8 text-base font-bold shadow-[0_0_30px_rgba(220,38,38,0.4)] hover:shadow-[0_0_50px_rgba(220,38,38,0.6)] hover:scale-105 transition-all">
-                            Get Started
-                        </Link>
-                        <a href="/docs.html" target="_blank" rel="noopener noreferrer" className="btn bg-white/5 border border-white/10 hover:bg-white/10 hover:border-[var(--primary-color)] hover:text-[var(--primary-color)] h-12 px-8 text-base backdrop-blur-md transition-all">
-                            Documentation <ExternalLink size={16} className="ml-2" />
-                        </a>
-                    </motion.div>
+                        {/* Right Column: Graphic & Buttons */}
+                        <motion.div
+                            initial={{ opacity: 0, x: 20 }}
+                            animate={{ opacity: 1, x: 0 }}
+                            transition={{ duration: 0.5, delay: 0.3 }}
+                            className="flex flex-col gap-8"
+                        >
+                            {/* Mock Terminal Graphic */}
+                            <div className="bg-[#09090b] border border-gray-800 rounded-xl p-6 font-mono text-sm relative shadow-xl overflow-hidden text-left">
+                                <div className="flex gap-2 mb-4">
+                                    <div className="w-3 h-3 rounded-full bg-red-500/80" />
+                                    <div className="w-3 h-3 rounded-full bg-yellow-500/80" />
+                                    <div className="w-3 h-3 rounded-full bg-green-500/80" />
+                                </div>
+                                <div className="space-y-2">
+                                    <div className="text-gray-400">curl -X POST https://botfusion.api/autoup \</div>
+                                    <div className="text-gray-400 pl-4">-H "X-CONNECTION-KEY: <span className="text-[var(--primary-color)]">secret_key</span>" \</div>
+                                    <div className="text-gray-400 pl-4">-d '&#123;"user_id": 123456789, "bot": "@my_bot"&#125;'</div>
+                                    <div className="text-green-400 mt-4">&gt; {"{"}"status": "success", "synced": true{"}"}</div>
+                                </div>
+                            </div>
+
+                            {/* Buttons */}
+                            <div className="flex flex-col sm:flex-row gap-4">
+                                <Link to={user ? "/dashboard" : "/login"} className="btn btn-primary h-12 px-8 text-base font-bold transition-all w-full sm:w-auto shadow-sm hover:shadow-md">
+                                    Start Building
+                                </Link>
+                                <a href="/docs.html" target="_blank" rel="noopener noreferrer" className="btn bg-[var(--bg-surface)] border border-[var(--border-color)] hover:bg-[var(--bg-surface-hover)] text-[var(--text-primary)] h-12 px-8 text-base transition-all w-full sm:w-auto shadow-sm">
+                                    Read Docs <ExternalLink size={16} className="ml-2" />
+                                </a>
+                            </div>
+                        </motion.div>
+                    </div>
                 </div>
             </section>
 
@@ -217,8 +241,8 @@ export default function Home() {
                         {[
                             { step: "01", title: "Authenticate", desc: "Secure login via Telegram OTP. We verify identity to prevent abuse." },
                             { step: "02", title: "Connect Bots", desc: "Add Bot Tokens. We validate ownership via Telegram's getMe method." },
-                            { step: "03", title: "Ingest Users", desc: "Upload legacy files or integrate AutoUp for realtime sync." },
-                            { step: "04", title: "Broadcast", desc: "Compose content, select bot subset, and fire. We handle queues." }
+                            { step: "03", title: "Integrate APIs", desc: "Use your Connection Key to plug AutoUp user syncing seamlessly into your bot." },
+                            { step: "04", title: "Scale & Broadcast", desc: "Compose content, select bot subset, and fire. We handle rate-limit queues for you." }
                         ].map((item, idx) => (
                             <motion.div
                                 key={idx}

@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://botfusion.wauze.com/sitemap.xml
+Sitemap: https://botfusion.kesug.com/sitemap.xml

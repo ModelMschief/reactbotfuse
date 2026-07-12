@@ -1,409 +1,540 @@
 import { useState, useEffect } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
-import {
-    Users,
-    Send,
-    Plus,
-    FileUp,
-    Activity,
-    Zap,
-    Trash2,
-    Bot as BotIcon,
-    Loader2,
-    UploadCloud,
-    X,
-    BarChart3,
-    Gift
-} from "lucide-react";
+import { Key, RefreshCw, AlertTriangle, Terminal, ArrowLeft, Copy, Check, Bot, ShieldAlert, QrCode, Link2, MessageSquareWarning, ExternalLink } from "lucide-react";
+import { Link } from "react-router-dom";
+import { api } from "@/lib/api";
 import { motion, AnimatePresence } from "framer-motion";
-import { useDashboard } from "@/hooks/use-dashboard";
-import { BroadcastWizard } from "@/components/broadcast-wizard";
+
+// Use environment variable or fallback for API documentation
+const API_BASE_URL = import.meta.env.VITE_API_URL || "https://botfusion.onrender.com";
 
 export default function Dashboard() {
-    const { bots, tasks, loading, refresh, addBot, deleteBot, uploadUsers } = useDashboard();
-    const location = useLocation();
-    const navigate = useNavigate();
+    const [connectionKey, setConnectionKey] = useState<string | null>(null);
+    const [loading, setLoading] = useState(true);
+    const [generating, setGenerating] = useState(false);
+    const [copied, setCopied] = useState(false);
+    const [activeApi, setActiveApi] = useState<'autoup' | 'anomaly' | 'qr' | 'tracking' | 'profanity' | null>(null);
 
-    // Local UI State
-    const [isAddBotOpen, setIsAddBotOpen] = useState(false);
-    const [newBotToken, setNewBotToken] = useState("");
-    const [isAdding, setIsAdding] = useState(false);
-
-    // Upload State
-    const [uploadModalOpen, setUploadModalOpen] = useState(false);
-    const [selectedBotForUpload, setSelectedBotForUpload] = useState<string | null>(null);
-    const [fileToUpload, setFileToUpload] = useState<File | null>(null);
-    const [isUploading, setIsUploading] = useState(false);
-
-    // Broadcast State
-    const [isBroadcastOpen, setIsBroadcastOpen] = useState(false);
-
-    // Listen for hash changes
     useEffect(() => {
-        if (location.hash === "#broadcast") {
-            setIsBroadcastOpen(true);
-        } else if (location.hash === "#mybots") {
-            const element = document.getElementById("my-bots-section");
-            if (element) {
-                element.scrollIntoView({ behavior: "smooth" });
+        loadKey();
+    }, []);
+
+    const loadKey = async () => {
+        try {
+            const res = await api.get("/integration-info");
+            if (res.data.connection_key) {
+                setConnectionKey(res.data.connection_key);
             }
-        }
-    }, [location, loading]);
-
-    // Stats Calculation
-    const totalUsers = bots.reduce((acc, bot) => acc + bot.user_count, 0);
-    const activeBroadcasts = tasks.filter(t => t.status === 'running').length;
-
-    const handleAddBot = async (e: React.FormEvent) => {
-        e.preventDefault();
-        setIsAdding(true);
-
-        const result = await addBot(newBotToken);
-
-        setIsAdding(false);
-        if (result.success) {
-            setIsAddBotOpen(false);
-            setNewBotToken("");
-        } else {
-            alert(result.message); // Simple alert for now, can be Toast later
+        } catch (err) {
+            console.error("Failed to load key", err);
+        } finally {
+            setLoading(false);
         }
     };
 
-    const handleTaskStarted = () => {
-        refresh(); // Reload tasks list
+    const generateKey = async () => {
+        if (connectionKey && !confirm("This will revoke your old key. All bots using the old key will stop updating until you update them. Continue?")) {
+            return;
+        }
+
+        setGenerating(true);
+        try {
+            const res = await api.post("/generate-connection-key", {});
+            setConnectionKey(res.data.connection_key);
+        } catch (err) {
+            alert("Failed to generate key");
+        } finally {
+            setGenerating(false);
+        }
     };
 
-    if (loading) {
-        return (
-            <div className="flex items-center justify-center h-[calc(100vh-80px)]">
-                <Loader2 className="animate-spin text-[var(--primary-color)]" size={48} />
-            </div>
-        );
+    const copyKey = () => {
+        if (connectionKey) {
+            navigator.clipboard.writeText(connectionKey);
+            setCopied(true);
+            setTimeout(() => setCopied(false), 2000);
+        }
     }
 
-    return (
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 pb-12">
+    const ConnectionKeySnippet = () => (
+        <div className="card bg-[var(--bg-surface)] border-[var(--border-color)] mb-8">
+            <h2 className="text-xl font-bold mb-2">Your Connection Key</h2>
+            <p className="text-[var(--text-muted)] mb-6 text-sm">
+                This key authenticates your requests. It must be included in the header of every API call.
+            </p>
 
-            {/* 1. Premium CTA (Top on all) */}
-            <div className="lg:col-span-3 order-1 flex justify-center">
+            {!connectionKey && !loading && (
                 <button
-                    onClick={() => navigate("/premium")}
-                    className="w-full md:w-auto bg-gradient-to-r from-purple-600 to-pink-600 text-white font-bold py-3 px-8 rounded-full shadow-lg hover:shadow-purple-500/50 transform hover:scale-105 transition-all flex items-center justify-center gap-2"
+                    onClick={generateKey}
+                    disabled={generating}
+                    className="btn btn-primary text-sm font-bold flex items-center gap-2"
                 >
-                    <Gift size={24} />
-                    Get Premium Now
+                    <RefreshCw size={16} className={generating ? "animate-spin" : ""} />
+                    Generate Key
                 </button>
-            </div>
+            )}
 
-            {/* 2. Stats Cards (Desktop: 2nd, Mobile: 3rd) */}
-            <div className="lg:col-span-3 order-3 lg:order-2 grid grid-cols-1 md:grid-cols-3 gap-6">
-                <StatsCard
-                    title="Total Audience"
-                    value={totalUsers.toLocaleString()}
-                    icon={<Users className="text-blue-400" />}
-                />
-                <StatsCard
-                    title="Active Bots"
-                    value={bots.length.toString()}
-                    icon={<BotIcon className="text-purple-400" />}
-                />
-                <StatsCard
-                    title="Broadcasts"
-                    value={tasks.length.toString()}
-                    icon={<Activity className="text-green-400" />}
-                    trend={`${activeBroadcasts} running`}
-                />
-            </div>
-
-            {/* 3. Your Fleet (Desktop: 3rd-left, Mobile: 2nd) */}
-            <div className="lg:col-span-2 order-2 lg:order-3 space-y-6" id="my-bots-section">
-                <div className="flex items-center justify-between">
-                    <h2 className="text-xl font-bold flex items-center gap-2">
-                        <Zap className="text-[var(--primary-color)]" size={20} />
-                        Your Fleet
-                    </h2>
-                    <div className="flex gap-2">
+            {connectionKey && (
+                <div className="space-y-4">
+                    <div className="relative group">
+                        <div className="p-4 bg-[#020617] border border-dashed border-gray-600 rounded-lg font-mono text-base text-gray-300 break-all pr-12">
+                            {connectionKey}
+                        </div>
                         <button
-                            onClick={() => setIsBroadcastOpen(true)}
-                            disabled={bots.length === 0}
-                            className="btn bg-[var(--bg-surface)] border border-[var(--border-color)] hover:bg-[var(--bg-surface-hover)] flex items-center gap-2 disabled:opacity-50"
+                            onClick={copyKey}
+                            className="absolute right-3 top-1/2 -translate-y-1/2 p-2 text-gray-400 hover:text-white bg-[#020617]/50 rounded-md transition-colors"
                         >
-                            <Send size={16} /> Broadcast
-                        </button>
-                        <button
-                            onClick={() => setIsAddBotOpen(true)}
-                            className="btn btn-primary flex items-center gap-2 text-sm"
-                        >
-                            <Plus size={16} /> Add Bot
+                            {copied ? <Check size={18} className="text-green-500" /> : <Copy size={18} />}
                         </button>
                     </div>
-                </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <AnimatePresence>
-                        {bots.map((bot) => (
-                            <motion.div
-                                key={bot.token}
-                                layout
-                                initial={{ opacity: 0, scale: 0.9 }}
-                                animate={{ opacity: 1, scale: 1 }}
-                                exit={{ opacity: 0, scale: 0.9 }}
-                                className="card group hover:border-[var(--primary-color)]/50 transition-colors relative"
-                            >
-                                <div className="flex items-start justify-between mb-4">
-                                    <div className="flex items-center gap-3">
-                                        <div className="w-10 h-10 rounded-full bg-[var(--bg-app)] border border-[var(--border-color)] flex items-center justify-center">
-                                            <BotIcon size={20} className="text-[var(--text-muted)]" />
+                    <div className="flex gap-4 items-center">
+                        <button
+                            onClick={generateKey}
+                            disabled={generating}
+                            className="text-red-500 hover:text-red-400 text-xs flex items-center gap-1 font-semibold transition-colors"
+                        >
+                            <RefreshCw size={12} className={generating ? "animate-spin" : ""} /> Revoke & Generate New
+                        </button>
+                        <p className="text-xs text-[var(--text-muted)] bg-[var(--bg-app)] px-2 py-1 rounded">
+                            <AlertTriangle size={12} className="inline mr-1 text-yellow-500" /> Keep this secret.
+                        </p>
+                    </div>
+                </div>
+            )}
+        </div>
+    );
+
+    const apis = [
+        {
+            id: 'autoup',
+            title: 'AutoUp Integration API',
+            desc: 'Instantly sync new Telegram users to your bot audience dynamically. No manual CSV uploads needed.',
+            icon: Bot,
+            color: 'text-cyan-500',
+        },
+        {
+            id: 'anomaly',
+            title: 'Automated Account Detection API',
+            desc: 'Real-time behavioral risk scoring. Protect your bot from userbots and automated spam directly via API.',
+            icon: ShieldAlert,
+            color: 'text-purple-500',
+        },
+        {
+            id: 'qr',
+            title: 'QR Code Generation API',
+            desc: 'Generate high-performance, stylized QR codes with deep customization and logo integration.',
+            icon: QrCode,
+            color: 'text-orange-500',
+        },
+        {
+            id: 'tracking',
+            title: 'URL Tracking API',
+            desc: 'Generate, monitor, and manage tracked short links programmatically for your Telegram bots.',
+            icon: Link2,
+            color: 'text-pink-500',
+        },
+        {
+            id: 'profanity',
+            title: 'Profanity Filter API',
+            desc: 'Detect blocked content and profanity in user messages using a fast, centralized filtering model.',
+            icon: MessageSquareWarning,
+            color: 'text-red-500',
+        }
+    ];
+
+    return (
+        <div className="container max-w-5xl py-12 space-y-12">
+
+            {/* Header */}
+            <div className="flex flex-col gap-2">
+                <h1 className="text-3xl md:text-4xl font-bold flex items-center gap-3 text-[var(--text-primary)]">
+                    <Key size={32} className="text-[var(--primary-color)]" /> API Integrations
+                </h1>
+                <p className="text-[var(--text-muted)] text-lg max-w-2xl">
+                    Discover and integrate our enterprise APIs into your bot infrastructure.
+                </p>
+            </div>
+
+            <AnimatePresence mode="wait">
+                {!activeApi ? (
+                    <motion.div
+                        key="grid"
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -20 }}
+                        transition={{ duration: 0.3 }}
+                    >
+                        {/* Global Key Management (When Grid is shown) */}
+                        <ConnectionKeySnippet />
+
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            {apis.map((apiItem) => {
+                                const Icon = apiItem.icon;
+                                return (
+                                    <div key={apiItem.id} className="card bg-[var(--bg-surface)] border-[var(--border-color)] flex flex-col hover:border-gray-400 dark:hover:border-gray-500 transition-all cursor-pointer" onClick={() => setActiveApi(apiItem.id as any)}>
+                                        <div className="flex items-center gap-3 mb-4">
+                                            <div className="p-2 bg-[var(--bg-app)] border border-[var(--border-color)] rounded-lg">
+                                                <Icon size={24} className={apiItem.color} />
+                                            </div>
+                                            <h3 className="text-xl font-bold text-[var(--text-primary)]">{apiItem.title}</h3>
+                                        </div>
+                                        <p className="text-[var(--text-muted)] text-sm mb-6 flex-1">
+                                            {apiItem.desc}
+                                        </p>
+                                        <div className="pt-4 border-t border-[var(--border-color)] flex items-center justify-between">
+                                            <span className="text-xs font-mono text-[var(--text-muted)] bg-[var(--bg-app)] px-2 py-1 rounded">REST API</span>
+                                            <button 
+                                                className="text-sm font-semibold text-[var(--primary-color)] hover:text-[var(--primary-hover)] transition-colors flex items-center gap-1"
+                                                onClick={(e) => { e.stopPropagation(); setActiveApi(apiItem.id as any); }}
+                                            >
+                                                Get API <ArrowLeft size={14} className="rotate-180" />
+                                            </button>
+                                        </div>
+                                    </div>
+                                )
+                            })}
+                        </div>
+                    </motion.div>
+                ) : (
+                    <motion.div
+                        key="detail"
+                        initial={{ opacity: 0, x: 20 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        exit={{ opacity: 0, x: -20 }}
+                        transition={{ duration: 0.3 }}
+                        className="space-y-8"
+                    >
+                        <button
+                            onClick={() => setActiveApi(null)}
+                            className="flex items-center gap-2 text-[var(--text-muted)] hover:text-[var(--text-primary)] transition-colors font-medium mb-4"
+                        >
+                            <ArrowLeft size={18} /> Back to APIs
+                        </button>
+
+                        <ConnectionKeySnippet />
+
+                        <div className="card bg-[var(--bg-surface)] border-[var(--border-color)]">
+                            {/* Detailed Views */}
+                            {activeApi === 'autoup' && (
+                                <div className="space-y-6">
+                                    <div className="flex items-center gap-3 border-b border-[var(--border-color)] pb-6">
+                                        <div className="p-2 bg-[var(--bg-app)] border border-[var(--border-color)] rounded-lg">
+                                            <Bot size={32} className="text-cyan-500" />
                                         </div>
                                         <div>
-                                            <h3 className="font-semibold">{bot.username}</h3>
-                                            <p className="text-xs text-[var(--text-muted)] font-mono">
-                                                {bot.token.substring(0, 10)}...
-                                            </p>
+                                            <h2 className="text-2xl font-bold text-[var(--text-primary)]">AutoUp Integration API</h2>
+                                            <p className="text-sm text-[var(--text-muted)] mt-1">Instantly sync new Telegram users to your bot audience.</p>
+                                            <a href="/docs.html#api-autoup" target="_blank" rel="noopener noreferrer" className="text-xs font-semibold text-[var(--primary-color)] hover:underline flex items-center gap-1 mt-2 w-fit">
+                                                Read full documentation <ExternalLink size={12} />
+                                            </a>
                                         </div>
                                     </div>
-                                    <button
-                                        onClick={() => deleteBot(bot.token)}
-                                        className="text-red-500/0 group-hover:text-red-500 opacity-0 group-hover:opacity-100 transition-all p-1 hover:bg-red-500/10 rounded"
-                                        title="Delete Bot"
-                                    >
-                                        <Trash2 size={16} />
-                                    </button>
-                                </div>
+                                    
+                                    <h3 className="font-bold text-sm text-[var(--text-secondary)]">How It Works</h3>
+                                    <ol className="space-y-3 text-sm text-[var(--text-muted)] list-decimal list-inside marker:text-cyan-500 mb-6 bg-[var(--bg-app)] p-4 rounded-lg border border-[var(--border-color)]">
+                                        <li>A user sends <code className="bg-[#020617] px-1 py-0.5 rounded text-cyan-400">/start</code> to your Telegram bot.</li>
+                                        <li>Your bot sends the user ID to the AutoUp API.</li>
+                                        <li>Backend verifies ownership using your Connection Key.</li>
+                                        <li>User ID is stored under the correct bot automatically.</li>
+                                        <li>Broadcast system detects the new user instantly.</li>
+                                    </ol>
 
-                                <div className="flex items-center justify-between text-sm">
-                                    <span className="text-[var(--text-muted)]">Subscribers</span>
-                                    <span className="font-bold">{bot.user_count.toLocaleString()}</span>
-                                </div>
-
-                                <div className="mt-4 pt-4 border-t border-[var(--border-color)] flex gap-2">
-                                    <button
-                                        className="flex-1 py-1.5 text-xs bg-[var(--bg-app)] hover:bg-[var(--primary-color)]/10 hover:text-[var(--primary-color)] rounded transition-colors"
-                                        onClick={() => { setSelectedBotForUpload(bot.token); setUploadModalOpen(true); }}
-                                    >
-                                        Upload Users
-                                    </button>
-                                    <button
-                                        onClick={() => setIsBroadcastOpen(true)}
-                                        className="flex-1 py-1.5 text-xs bg-[var(--bg-app)] hover:bg-blue-500/10 hover:text-blue-400 rounded transition-colors"
-                                    >
-                                        Broadcast
-                                    </button>
-                                </div>
-                            </motion.div>
-                        ))}
-                    </AnimatePresence>
-
-                    {bots.length === 0 && (
-                        <div className="col-span-full py-12 text-center text-[var(--text-muted)] border border-dashed border-[var(--border-color)] rounded-xl">
-                            <BotIcon size={48} className="mx-auto mb-4 opacity-20" />
-                            <p>No bots connected yet.</p>
-                            <button onClick={() => setIsAddBotOpen(true)} className="text-[var(--primary-color)] hover:underline mt-2">Add your first bot</button>
-                        </div>
-                    )}
-                </div>
-            </div>
-
-            {/* 4. Recent Tasks (Desktop: 3rd-right, Mobile: 4th) */}
-            <div className="lg:col-span-1 order-4 lg:order-4 space-y-6">
-                <h2 className="text-xl font-bold flex items-center gap-2">
-                    <Activity className="text-blue-400" size={20} />
-                    Recent Tasks
-                </h2>
-
-                <div className="card space-y-4 max-h-[600px] overflow-y-auto">
-                    {tasks.length === 0 ? (
-                        <p className="text-center text-[var(--text-muted)] py-4">No recent activity.</p>
-                    ) : (
-                        tasks.slice(0, 10).map((task) => (
-                            <div key={task._id} className="p-3 bg-[var(--bg-app)] rounded-lg border border-[var(--border-color)]">
-                                <div className="flex justify-between items-start mb-2">
-                                    <span className={`text-xs font-bold uppercase px-2 py-0.5 rounded ${task.status === 'complete' ? 'bg-green-500/10 text-green-500' :
-                                        task.status === 'failed' ? 'bg-red-500/10 text-red-500' :
-                                            'bg-blue-500/10 text-blue-500 animate-pulse'
-                                        }`}>
-                                        {task.status}
-                                    </span>
-                                    <span className="text-[10px] text-[var(--text-muted)]">
-                                        {new Date(task.created_at).toLocaleTimeString()}
-                                    </span>
-                                </div>
-                                <p className="text-sm font-medium mb-1">
-                                    {task.type === 'broadcast' ? '📢 Broadcast' : '📂 File Parse'}
-                                </p>
-                                {task.type === 'broadcast' && task.progress && (
-                                    <div className="text-xs text-[var(--text-muted)]">
-                                        Sent: {task.progress.sent} / {task.progress.total}
-                                        {task.progress.failed ? <span className="text-red-400 ml-2">({task.progress.failed} failed)</span> : null}
+                                    <div className="space-y-2 mb-6">
+                                        <div className="flex items-center gap-2">
+                                            <span className="bg-green-500/10 text-green-600 px-2 py-1 rounded text-xs font-bold">POST</span>
+                                            <code className="bg-[var(--bg-app)] border border-[var(--border-color)] px-3 py-1 rounded text-sm flex-1 font-mono">{API_BASE_URL}/autoup</code>
+                                        </div>
                                     </div>
-                                )}
-                                {task.type === 'file_parse' && task.progress && (
-                                    <div className="text-xs text-[var(--text-muted)]">
-                                        Found: {task.progress.found} | Added: {task.progress.added}
+
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                                        <div>
+                                            <h3 className="font-bold text-sm mb-2 text-[var(--text-muted)]">Headers</h3>
+                                            <pre className="bg-[#020617] p-4 rounded-lg border border-gray-800 text-xs font-mono text-cyan-400 overflow-x-auto h-[250px]">
+                                                {`X-CONNECTION-KEY: \n${connectionKey || 'YOUR_KEY'}
+Content-Type: application/json`}
+                                            </pre>
+                                        </div>
+                                        <div>
+                                            <h3 className="font-bold text-sm mb-2 text-[var(--text-muted)]">Body</h3>
+                                            <pre className="bg-[#020617] p-4 rounded-lg border border-gray-800 text-xs font-mono text-cyan-400 overflow-x-auto h-[250px]">
+                                                {`{
+  "bot_username": "@yourbot",
+  "user_id": 123456789
+}`}
+                                            </pre>
+                                        </div>
                                     </div>
-                                )}
-                            </div>
-                        ))
-                    )}
-                </div>
-            </div>
 
-            {/* Broadcast Wizard */}
-            <BroadcastWizard
-                isOpen={isBroadcastOpen}
-                onClose={() => setIsBroadcastOpen(false)}
-                bots={bots}
-                onTaskStarted={handleTaskStarted}
-            />
+                                    <h3 className="font-bold text-sm mb-2 flex items-center gap-2 text-[var(--text-primary)]">
+                                        <Terminal size={16} className="text-cyan-500" />
+                                        AutoUp Example (Python)
+                                    </h3>
+                                    <pre className="bg-[#020617] p-4 rounded-lg border border-gray-800 text-xs font-mono text-gray-300 overflow-x-auto">
+                                        {`import requests
 
-            {/* Add Bot Modal */}
-            <AnimatePresence>
-                {isAddBotOpen && (
-                    <motion.div
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        exit={{ opacity: 0 }}
-                        className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4"
-                    >
-                        <motion.div
-                            initial={{ scale: 0.95 }}
-                            animate={{ scale: 1 }}
-                            exit={{ scale: 0.95 }}
-                            className="card w-full max-w-md bg-[var(--bg-surface)] border-[var(--border-color)]"
-                        >
-                            <h2 className="text-xl font-bold mb-4">Connect New Bot</h2>
-                            <form onSubmit={handleAddBot}>
-                                <div className="mb-6">
-                                    <label className="block text-sm font-medium mb-2">Bot Token</label>
-                                    <input
-                                        type="text"
-                                        value={newBotToken}
-                                        onChange={(e) => setNewBotToken(e.target.value)}
-                                        className="input-field font-mono text-sm"
-                                        placeholder="123456:ABC-DEF1234ghIkl-zyx57W2v1u123ew11"
-                                        required
-                                    />
-                                    <p className="text-xs text-[var(--text-muted)] mt-2">
-                                        Paste the token from BotFather. We'll automatically fetch the username.
+def update_user(user_id, bot_username):
+    response = requests.post(
+        "${API_BASE_URL}/autoup",
+        headers={
+            "X-CONNECTION-KEY": "${connectionKey || 'YOUR_KEY'}",
+            "Content-Type": "application/json"
+        },
+        json={
+            "bot_username": bot_username,
+            "user_id": user_id
+        }
+    )
+    return response.json()
+# Call 'update_user' inside /start handler`}
+                                    </pre>
+                                </div>
+                            )}
+
+                            {activeApi === 'anomaly' && (
+                                <div className="space-y-6">
+                                    <div className="flex items-center gap-3 border-b border-[var(--border-color)] pb-6">
+                                        <div className="p-2 bg-[var(--bg-app)] border border-[var(--border-color)] rounded-lg">
+                                            <ShieldAlert size={32} className="text-purple-500" />
+                                        </div>
+                                        <div>
+                                            <h2 className="text-2xl font-bold text-[var(--text-primary)]">Automated Account Detection API</h2>
+                                            <p className="text-sm text-[var(--text-muted)] mt-1">Real-time behavioral risk scoring.</p>
+                                            <a href="/docs.html#api-anomaly" target="_blank" rel="noopener noreferrer" className="text-xs font-semibold text-[var(--primary-color)] hover:underline flex items-center gap-1 mt-2 w-fit">
+                                                Read full documentation <ExternalLink size={12} />
+                                            </a>
+                                        </div>
+                                    </div>
+
+                                    <p className="text-[var(--text-muted)] text-sm">
+                                        Feed user activity logs into our machine learning model to receive a real-time behavioral risk score. Ideal for moderation bots handling thousands of users.
                                     </p>
-                                </div>
-                                <div className="flex justify-end gap-3">
-                                    <button
-                                        type="button"
-                                        onClick={() => setIsAddBotOpen(false)}
-                                        className="px-4 py-2 rounded-lg hover:bg-[var(--bg-app)] transition-colors"
-                                    >
-                                        Cancel
-                                    </button>
-                                    <button
-                                        type="submit"
-                                        className="btn btn-primary flex items-center gap-2"
-                                        disabled={isAdding}
-                                    >
-                                        {isAdding ? <Loader2 className="animate-spin" size={16} /> : <Plus size={16} />}
-                                        Connect Bot
-                                    </button>
-                                </div>
-                            </form>
-                        </motion.div>
-                    </motion.div>
-                )}
-            </AnimatePresence>
 
-            {/* Upload Users Modal */}
-            <AnimatePresence>
-                {uploadModalOpen && (
-                    <motion.div
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        exit={{ opacity: 0 }}
-                        className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4"
-                    >
-                        <motion.div
-                            initial={{ scale: 0.95 }}
-                            animate={{ scale: 1 }}
-                            exit={{ scale: 0.95 }}
-                            className="card w-full max-w-lg bg-[var(--bg-surface)] border-[var(--border-color)]"
-                        >
-                            <div className="flex justify-between items-center mb-6">
-                                <h2 className="text-xl font-bold flex items-center gap-2">
-                                    <UploadCloud className="text-[var(--primary-color)]" /> Upload Users
-                                </h2>
-                                <button onClick={() => { setUploadModalOpen(false); setFileToUpload(null); }}>
-                                    <X size={20} />
-                                </button>
-                            </div>
+                                    <div className="bg-[var(--bg-app)] p-4 rounded-lg border border-[var(--border-color)]">
+                                        <h3 className="font-bold mb-3 text-sm text-[var(--text-secondary)]">Integration Strategy</h3>
+                                        <ul className="space-y-3 text-sm text-[var(--text-muted)]">
+                                            <li><strong className="text-purple-500">1. Event Collection:</strong> Log user activity structurally locally (chat_id, timestamp, text, type). You can safely anonymize text.</li>
+                                            <li><strong className="text-purple-500">2. API Triggers:</strong> Do not call the API on every single message to respect rate limits. Call it at specific checkpoints.</li>
+                                            <li><strong className="text-purple-500">3. History Limit:</strong> Pass a brief history of the most recent ~300 events per user to prevent memory bloat.</li>
+                                        </ul>
+                                    </div>
 
-                            <div className="space-y-6">
-                                <div className="border-2 border-dashed border-[var(--border-color)] rounded-xl p-8 text-center hover:border-[var(--primary-color)]/50 transition-colors cursor-pointer"
-                                    onClick={() => document.getElementById('user-file-upload')?.click()}
-                                >
-                                    <input
-                                        id="user-file-upload"
-                                        type="file"
-                                        className="hidden"
-                                        accept=".txt,.csv,.xml,.json"
-                                        onChange={(e) => setFileToUpload(e.target.files?.[0] || null)}
-                                    />
-                                    {fileToUpload ? (
-                                        <div className="text-green-500 font-bold flex flex-col items-center gap-2">
-                                            <FileUp size={32} />
-                                            {fileToUpload.name}
-                                            <span className="text-xs text-[var(--text-muted)] font-normal">{(fileToUpload.size / 1024).toFixed(1)} KB</span>
+                                    <div className="space-y-2">
+                                        <div className="flex items-center gap-2">
+                                            <span className="bg-green-500/10 text-green-600 px-2 py-1 rounded text-xs font-bold">POST</span>
+                                            <code className="bg-[var(--bg-app)] border border-[var(--border-color)] px-3 py-1 rounded text-sm flex-1 font-mono">{API_BASE_URL}/score_user</code>
                                         </div>
-                                    ) : (
-                                        <div className="text-[var(--text-muted)]">
-                                            <UploadCloud size={32} className="mx-auto mb-3 opacity-50" />
-                                            <p className="font-medium">Click to select file</p>
-                                            <p className="text-xs mt-1">Supported: .txt, .csv, .xml, .json (One ID per line)</p>
+                                    </div>
+
+                                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-6">
+                                        <div>
+                                            <h3 className="font-bold text-sm mb-2 text-[var(--text-muted)]">Request Body</h3>
+                                            <pre className="bg-[#020617] p-4 rounded-lg border border-gray-800 text-xs font-mono text-purple-400 overflow-x-auto h-[250px]">
+                                                {`{
+  "user_id": 4021189931,
+  "events": [
+    {
+      "chat_id": -100123456,
+      "timestamp": 1769401000,
+      "text": "Hello",
+      "type": "text"
+    }
+    // ... recent events (max ~300)
+  ]
+}`}
+                                            </pre>
                                         </div>
-                                    )}
+                                        <div>
+                                            <h3 className="font-bold text-sm mb-2 text-[var(--text-muted)]">Response</h3>
+                                            <pre className="bg-[#020617] p-4 rounded-lg border border-gray-800 text-xs font-mono text-green-400 overflow-x-auto h-[250px]">
+                                                {`{
+  "user_id": 4021189931,
+  "anomaly_score": 0.67,
+  "risk_level": "HIGH",
+  "confidence_band": "top_5_percent"
+}`}
+                                            </pre>
+                                        </div>
+                                    </div>
                                 </div>
+                            )}
 
-                                <div className="flex justify-end gap-3">
-                                    <button
-                                        className="btn btn-primary w-full flex justify-center items-center gap-2"
-                                        disabled={!fileToUpload || isUploading}
-                                        onClick={async () => {
-                                            if (!fileToUpload || !selectedBotForUpload) return;
-                                            setIsUploading(true);
-                                            const res = await uploadUsers(selectedBotForUpload, fileToUpload);
-                                            setIsUploading(false);
+                            {activeApi === 'qr' && (
+                                <div className="space-y-6">
+                                    <div className="flex items-center gap-3 border-b border-[var(--border-color)] pb-6">
+                                        <div className="p-2 bg-[var(--bg-app)] border border-[var(--border-color)] rounded-lg">
+                                            <QrCode size={32} className="text-orange-500" />
+                                        </div>
+                                        <div>
+                                            <h2 className="text-2xl font-bold text-[var(--text-primary)]">QR Code Generation API</h2>
+                                            <p className="text-sm text-[var(--text-muted)] mt-1">High-performance, stylized QR codes.</p>
+                                            <a href="/docs.html#api-genqr" target="_blank" rel="noopener noreferrer" className="text-xs font-semibold text-[var(--primary-color)] hover:underline flex items-center gap-1 mt-2 w-fit">
+                                                Read full documentation <ExternalLink size={12} />
+                                            </a>
+                                        </div>
+                                    </div>
 
-                                            if (res.success) {
-                                                alert(res.message);
-                                                setUploadModalOpen(false);
-                                                setFileToUpload(null);
-                                                refresh();
-                                            } else {
-                                                alert("Upload Error: " + res.message);
-                                            }
-                                        }}
-                                    >
-                                        {isUploading ? <Loader2 className="animate-spin" /> : <UploadCloud size={18} />}
-                                        Start Upload
-                                    </button>
+                                    <p className="text-[var(--text-muted)] text-sm">
+                                        Embed Telegram links, profiles, or custom data into generated QRs. Supports extensive customization including gradients, custom finder shapes, and central logo embedding.
+                                    </p>
+
+                                    <div className="space-y-2">
+                                        <div className="flex items-center gap-2">
+                                            <span className="bg-green-500/10 text-green-600 px-2 py-1 rounded text-xs font-bold">POST</span>
+                                            <code className="bg-[var(--bg-app)] border border-[var(--border-color)] px-3 py-1 rounded text-sm flex-1 font-mono">{API_BASE_URL}/genqr</code>
+                                        </div>
+                                        <p className="text-xs text-[var(--text-muted)] mt-2">Rate limit: 20 req/sec.</p>
+                                    </div>
+
+                                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-6">
+                                        <div>
+                                            <h3 className="font-bold text-sm mb-2 text-[var(--text-muted)]">Headers</h3>
+                                            <pre className="bg-[#020617] p-4 rounded-lg border border-gray-800 text-xs font-mono text-orange-400 overflow-x-auto h-[250px]">
+                                                {`X-CONNECTION-KEY: \n${connectionKey || 'YOUR_KEY'}
+Content-Type: application/json`}
+                                            </pre>
+                                        </div>
+                                        <div>
+                                            <h3 className="font-bold text-sm mb-2 text-[var(--text-muted)]">Body (Example)</h3>
+                                            <pre className="bg-[#020617] p-4 rounded-lg border border-gray-800 text-xs font-mono text-orange-400 overflow-x-auto h-[250px]">
+                                                {`{
+  "data": "https://botfusion.wuaze.com",
+  "telegram_url": "https://api.telegram.org/file/bot789/photos/file_1.jpg",
+  "dot_style": "rounded",
+  "gradient": true
+}`}
+                                            </pre>
+                                        </div>
+                                    </div>
                                 </div>
-                            </div>
-                        </motion.div>
-                    </motion.div>
-                )}
-            </AnimatePresence>
-        </div>
-    );
+                            )}
+
+                            {activeApi === 'tracking' && (
+                                <div className="space-y-6">
+                                    <div className="flex items-center gap-3 border-b border-[var(--border-color)] pb-6">
+                                        <div className="p-2 bg-[var(--bg-app)] border border-[var(--border-color)] rounded-lg">
+                                            <Link2 size={32} className="text-pink-500" />
+                                        </div>
+                                        <div>
+                                            <h2 className="text-2xl font-bold text-[var(--text-primary)]">URL Tracking API</h2>
+                                            <p className="text-sm text-[var(--text-muted)] mt-1">Generate, monitor, and manage tracked short links.</p>
+                                            <a href="/docs.html#api-tracking" target="_blank" rel="noopener noreferrer" className="text-xs font-semibold text-[var(--primary-color)] hover:underline flex items-center gap-1 mt-2 w-fit">
+                                                Read full documentation <ExternalLink size={12} />
+                                            </a>
+                                        </div>
+                                    </div>
+
+                                    <p className="text-[var(--text-muted)] text-sm">
+                                        The <code>/gen_link</code> endpoint allows URL generation, statistics bulk fetching, and tracking link deletion.
+                                    </p>
+
+                                    <div className="space-y-4">
+                                        <div className="flex flex-wrap items-center gap-2">
+                                            <span className="bg-green-500/10 text-green-600 px-2 py-1 rounded text-xs font-bold w-16 text-center">POST</span>
+                                            <span className="bg-blue-500/10 text-blue-600 px-2 py-1 rounded text-xs font-bold w-16 text-center">GET</span>
+                                            <span className="bg-red-500/10 text-red-600 px-2 py-1 rounded text-xs font-bold w-16 text-center">DELETE</span>
+                                        </div>
+                                        <div className="flex items-center gap-2">
+                                            <code className="bg-[var(--bg-app)] border border-[var(--border-color)] px-3 py-1 rounded text-sm flex-1 font-mono">{API_BASE_URL}/gen_link</code>
+                                        </div>
+                                        <p className="text-xs text-[var(--text-muted)] mt-2">Rate limit: 20 req/sec.</p>
+                                    </div>
+
+                                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-6">
+                                        <div>
+                                            <h3 className="font-bold text-sm mb-2 text-[var(--text-muted)]">Headers</h3>
+                                            <pre className="bg-[#020617] p-4 rounded-lg border border-gray-800 text-xs font-mono text-pink-400 overflow-x-auto h-[250px]">
+                                                {`X-CONNECTION-KEY: \n\${connectionKey || 'YOUR_KEY'}
+Content-Type: application/json`}
+                                            </pre>
+                                        </div>
+                                        <div>
+                                            <h3 className="font-bold text-sm mb-2 text-[var(--text-muted)]">Request Body</h3>
+                                            <pre className="bg-[#020617] p-4 rounded-lg border border-gray-800 text-xs font-mono text-pink-400 overflow-x-auto h-[250px]">
+                                                {`{
+  "username": "@MyAwesomeBot",
+  "user_id": 123456789,
+  "link": "https://example.com/checkout",
+  "notify": true 
+}`}
+                                            </pre>
+                                        </div>
+                                    </div>
+                                </div>
+                            )}
+
+                            {activeApi === 'profanity' && (
+                                <div className="space-y-6">
+                                    <div className="flex items-center gap-3 border-b border-[var(--border-color)] pb-6">
+                                        <div className="p-2 bg-[var(--bg-app)] border border-[var(--border-color)] rounded-lg">
+                                            <MessageSquareWarning size={32} className="text-red-500" />
+                                        </div>
+                                        <div>
+                                            <h2 className="text-2xl font-bold text-[var(--text-primary)]">Profanity Filter API</h2>
+                                            <p className="text-sm text-[var(--text-muted)] mt-1">Check messages for banned content programmatically.</p>
+                                            <a href="/docs.html#api-profanity" target="_blank" rel="noopener noreferrer" className="text-xs font-semibold text-[var(--primary-color)] hover:underline flex items-center gap-1 mt-2 w-fit">
+                                                Read full documentation <ExternalLink size={12} />
+                                            </a>
+                                        </div>
+                                    </div>
+
+                                    <p className="text-[var(--text-muted)] text-sm">
+                                        Checks if a given string contains any banned words or phrases using a centralized filter. Keep your bot communities clean and safe.
+                                    </p>
+
+                                    <div className="space-y-2">
+                                        <div className="flex items-center gap-2">
+                                            <span className="bg-green-500/10 text-green-600 px-2 py-1 rounded text-xs font-bold">POST</span>
+                                            <code className="bg-[var(--bg-app)] border border-[var(--border-color)] px-3 py-1 rounded text-sm flex-1 font-mono">{API_BASE_URL}/profanity_check</code>
+                                        </div>
+                                        <p className="text-xs text-[var(--text-muted)] mt-2">Rate limit: 20 req/sec.</p>
+                                    </div>
+
+                                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-6">
+                                        <div>
+                                            <h3 className="font-bold text-sm mb-2 text-[var(--text-muted)]">Request</h3>
+                                            <pre className="bg-[#020617] p-4 rounded-lg border border-gray-800 text-xs font-mono text-red-400 overflow-x-auto h-[250px]">
+                                                {`POST /profanity_check
+                                                
+Headers:
+X-CONNECTION-KEY: \n\${connectionKey || 'YOUR_KEY'}
+Content-Type: application/json
+
+Body:
+{
+  "message": "The string of text to check."
+}`}
+                                            </pre>
+                                        </div>
+                                        <div>
+                                            <h3 className="font-bold text-sm mb-2 text-[var(--text-muted)]">Response</h3>
+                                            <pre className="bg-[#020617] p-4 rounded-lg border border-gray-800 text-xs font-mono text-green-400 overflow-x-auto h-[250px]">
+                                                {`{
+  "profanity": true,
+  "message": "Message contains blocked content."
 }
 
-function StatsCard({ title, value, icon, trend }: { title: string, value: string, icon: React.ReactNode, trend?: string }) {
-    return (
-        <div className="card hover:border-[var(--primary-color)]/30 transition-colors">
-            <div className="flex items-start justify-between mb-2">
-                <span className="text-[var(--text-muted)] text-sm font-medium">{title}</span>
-                <div className="p-2 bg-[var(--bg-app)] rounded-lg border border-[var(--border-color)]">
-                    {icon}
-                </div>
+// Or if clean:
+{
+  "profanity": false,
+  "message": "Message is clean!"
+}`}
+                                            </pre>
+                                        </div>
+                                    </div>
+                                </div>
+                            )}
+
+                        </div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
+
+            {/* Footer */}
+            <div className="text-center py-10 mt-12 mb-4 border-t border-[var(--border-color)]">
+                <p className="text-[var(--text-secondary)] font-medium text-lg">Built by developers, for developers.</p>
+                <p className="text-[var(--text-muted)] text-sm mt-2">Integrate seamlessly and scale your Telegram presence securely with BotFusion APIs.</p>
             </div>
-            <div className="text-3xl font-bold mb-1">{value}</div>
-            {trend && <div className="text-xs text-[var(--primary-color)] font-medium">{trend}</div>}
+
         </div>
-    );
+    )
 }

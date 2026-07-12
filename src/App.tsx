@@ -9,7 +9,7 @@ import { Loader2 } from 'lucide-react';
 const Home = lazy(() => import('@/pages/Home'));
 const Login = lazy(() => import('@/pages/Login'));
 const Dashboard = lazy(() => import('@/pages/Dashboard'));
-const Autoup = lazy(() => import('@/pages/Autoup'));
+const BotManagement = lazy(() => import('@/pages/BotManagement'));
 const Premium = lazy(() => import('@/pages/Premium'));
 const ForgotPassword = lazy(() => import('@/pages/ForgotPassword'));
 const ResetPassword = lazy(() => import('@/pages/ResetPassword'));
@@ -32,7 +32,7 @@ function App() {
                             <Route path="/" element={<Home />} />
                             <Route path="/login" element={<Login />} />
                             <Route path="/dashboard" element={<Dashboard />} />
-                            <Route path="/autoup" element={<Autoup />} />
+                            <Route path="/manage-bots" element={<BotManagement />} />
                             <Route path="/premium" element={<Premium />} />
                             <Route path="/settings" element={<Settings />} />
                             <Route path="/forgot-password" element={<ForgotPassword />} />
