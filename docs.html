@@ -4,6 +4,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description"
+        content="Access BotFusion's complete documentation with detailed guides, API references, and best practices to help you integrate and optimize our services effectively.">
+    <link rel="canonical" href="https://botfusion.wuaze.com/docs.html">
+
+    <meta property="og:title" content="BotFusion Documentation">
+    <meta property="og:description"
+        content="BotFusion's complete documentation with detailed guides, API references, and best practices to help you integrate and optimize our services effectively.">
+    <meta property="og:url" content="https://botfusion.wuaze.com/docs.html">
+    <meta property="og:type" content="website">
     <title>BotFusion Documentation | Technical Guide</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -16,516 +25,336 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/toolbar/prism-toolbar.min.css"
         rel="stylesheet" />
 
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/fuse.js/dist/fuse.min.js"></script>
+
+    
     <style>
         :root {
-            --primary: #06b6d4;
-            /* Cyan */
-            --primary-dark: #0891b2;
-            --text-main: #111827;
-            --text-muted: #4b5563;
-            --text-light: #9ca3af;
-            --bg-body: #ffffff;
-            --bg-sidebar: #f9fafb;
-            --border: #e5e7eb;
-            --code-bg: #f3f4f6;
-            --code-text: #1f2937;
+            --color-primary: #f97316;
+            --color-primary-dark: #ea580c;
         }
-
-        * {
-            box-sizing: border-box;
-        }
-
-        html {
-            scroll-behavior: smooth;
-            scroll-padding-top: 2rem;
-        }
-
         body {
+            background-color: #09090b;
+            color: #d1d5db;
             font-family: 'Inter', sans-serif;
-            color: var(--text-main);
-            background: var(--bg-body);
-            margin: 0;
+            -webkit-font-smoothing: antialiased;
             display: flex;
             min-height: 100vh;
-            line-height: 1.6;
+            margin: 0;
+            padding: 0;
         }
-
-        /* --- Left Sidebar Navigation --- */
         .sidebar {
-            width: 260px;
-            background: var(--bg-sidebar);
-            border-right: 1px solid var(--border);
+            width: 18rem;
+            background-color: #18181b;
+            border-right: 1px solid rgba(39, 39, 42, 0.5);
             height: 100vh;
             position: fixed;
             overflow-y: auto;
-            padding: 2rem 1.5rem;
-            top: 0;
-            left: 0;
+            padding: 1.5rem;
             z-index: 10;
         }
-
+        .content {
+            margin-left: 18rem;
+            margin-right: 16rem;
+            padding: 3rem;
+            max-width: 56rem;
+            width: 100%;
+        }
+        .toc-sidebar {
+            width: 16rem;
+            position: fixed;
+            right: 0;
+            top: 0;
+            height: 100vh;
+            padding: 1.5rem;
+            border-left: 1px solid rgba(39, 39, 42, 0.5);
+            background-color: #09090b;
+            overflow-y: auto;
+            z-index: 10;
+        }
         .brand {
-            font-weight: 700;
             font-size: 1.25rem;
-            color: var(--text-main);
+            font-weight: 700;
+            color: white;
             margin-bottom: 2rem;
             display: block;
             text-decoration: none;
         }
-
         .brand span {
-            color: var(--primary);
+            color: #f97316;
         }
-
-        .nav-group {
-            margin-bottom: 1.75rem;
+        h1 { 
+            font-size: 2.25rem; 
+            font-weight: 800; 
+            margin-bottom: 1.5rem; 
+            letter-spacing: -0.025em; 
+            background: linear-gradient(to right, #fb923c, #eab308); 
+            -webkit-background-clip: text; 
+            color: transparent; 
         }
-
-        .nav-header {
-            font-size: 0.75rem;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-            color: var(--text-light);
-            font-weight: 700;
-            margin-bottom: 0.75rem;
+        h2 { 
+            font-size: 1.5rem; 
+            font-weight: 700; 
+            margin-top: 4rem; 
+            margin-bottom: 1.5rem; 
+            color: white; 
+            border-bottom: 1px solid #27272a; 
+            padding-bottom: 0.5rem; 
         }
-
-        .nav-link {
-            display: block;
-            color: var(--text-muted);
-            text-decoration: none;
-            padding: 0.4rem 0;
-            font-size: 0.95rem;
-            transition: color 0.2s;
+        h3 { 
+            font-size: 1.25rem; 
+            font-weight: 600; 
+            margin-top: 2.5rem; 
+            margin-bottom: 1rem; 
+            color: #f3f4f6; 
         }
-
-        .nav-link:hover,
-        .nav-link.active {
-            color: var(--primary-dark);
-            font-weight: 500;
+        p { 
+            margin-bottom: 1.5rem; 
+            line-height: 1.625; 
+            color: #9ca3af; 
         }
-
-        /* --- Right TOC Sidebar --- */
-        .toc-sidebar {
-            width: 240px;
-            position: fixed;
-            right: 0;
-            top: 0;
-            height: 100vh;
-            padding: 2rem 1.5rem;
-            border-left: 1px solid var(--border);
-            background: var(--bg-body);
-            overflow-y: auto;
-            z-index: 10;
+        ul, ol { 
+            margin-bottom: 1.5rem; 
+            padding-left: 1.5rem; 
+            color: #9ca3af; 
         }
-
-        .toc-title {
-            font-size: 0.75rem;
-            text-transform: uppercase;
-            font-weight: 700;
-            color: var(--text-main);
-            margin-bottom: 1rem;
-            letter-spacing: 0.05em;
+        li { margin-bottom: 0.5rem; }
+        li::marker { color: #f97316; }
+        code:not([class*="language-"]) { 
+            background-color: #18181b; 
+            color: #fb923c; 
+            padding: 0.125rem 0.375rem; 
+            border-radius: 0.25rem; 
+            font-size: 0.875rem; 
+            font-family: 'JetBrains Mono', monospace; 
+            border: 1px solid rgba(39, 39, 42, 0.5); 
         }
-
-        .toc-link {
-            display: block;
-            font-size: 0.85rem;
-            color: var(--text-muted);
-            text-decoration: none;
-            margin-bottom: 0.5rem;
-            border-left: 2px solid transparent;
-            padding-left: 10px;
-            transition: all 0.2s;
-            line-height: 1.4;
+        
+        /* Modern Code Snippets */
+        pre[class*="language-"] { 
+            border-radius: 0.75rem; 
+            border: 1px solid #27272a; 
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5); 
+            margin: 1.5rem 0; 
+            background-color: #09090b !important; 
+            padding-top: 3rem !important;
+            position: relative;
         }
-
-        .toc-link:hover {
-            color: var(--primary-dark);
-            border-left-color: var(--border);
+        pre[class*="language-"]::before {
+            content: '';
+            position: absolute;
+            top: 1rem;
+            left: 1rem;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #ef4444; 
+            box-shadow: 20px 0 0 #eab308, 40px 0 0 #22c55e;
         }
-
-        .toc-link.active {
-            color: var(--primary-dark);
-            border-left-color: var(--primary);
-            font-weight: 500;
+        
+        table { 
+            width: 100%; 
+            text-align: left; 
+            border-collapse: collapse; 
+            margin: 2rem 0; 
+            background-color: #18181b; 
+            border-radius: 0.75rem; 
+            overflow: hidden; 
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1); 
         }
-
-        .toc-link.sub {
-            padding-left: 20px;
-            font-size: 0.8rem;
-            margin-top: -0.25rem;
+        th { 
+            background-color: #27272a; 
+            color: #e5e7eb; 
+            font-weight: 600; 
+            padding: 1rem; 
+            border-bottom: 1px solid rgba(63, 63, 70, 0.5); 
         }
-
-        .toc-link.sub:hover {
-            border-left-color: transparent;
+        td { 
+            padding: 1rem; 
+            border-bottom: 1px solid rgba(39, 39, 42, 0.5); 
+            color: #9ca3af; 
         }
-
-        .toc-link.sub.active {
-            border-left-color: transparent;
-            color: var(--primary-dark);
+        a { 
+            color: #f97316; 
+            text-decoration: underline; 
+            text-decoration-color: rgba(249, 115, 22, 0.3); 
+            transition: color 0.2s, text-decoration-color 0.2s; 
         }
-
-        /* --- Main Content --- */
-        .content {
-            margin-left: 260px;
-            margin-right: 240px;
-            padding: 3rem 4rem;
-            max-width: 900px;
-            width: 100%;
+        a:hover { 
+            color: #fb923c; 
+            text-decoration-color: #fb923c; 
         }
-
-        section {
-            margin-bottom: 4rem;
-            scroll-margin-top: 2rem;
+        a.nav-link, a.toc-link, a.brand { 
+            text-decoration: none; 
         }
-
-        .sub-section {
-            margin-top: 2.5rem;
-            scroll-margin-top: 2rem;
+        
+        .nav-group { margin-bottom: 2rem; }
+        .nav-header { 
+            font-size: 0.75rem; 
+            text-transform: uppercase; 
+            letter-spacing: 0.1em; 
+            color: #6b7280; 
+            font-weight: 700; 
+            margin-bottom: 0.75rem; 
         }
-
-        h1 {
-            font-size: 2.5rem;
-            font-weight: 700;
-            letter-spacing: -0.025em;
-            margin-bottom: 1rem;
-            color: var(--text-main);
+        .nav-link { 
+            display: block; 
+            font-size: 0.875rem; 
+            color: #9ca3af; 
+            padding: 0.5rem 0.5rem; 
+            margin: 0 -0.5rem; 
+            border-radius: 0.25rem; 
+            transition: background-color 0.2s, color 0.2s; 
         }
-
-        h2 {
-            font-size: 1.75rem;
-            font-weight: 600;
-            margin-bottom: 1rem;
-            border-bottom: 1px solid var(--border);
-            padding-bottom: 0.5rem;
-            color: var(--text-main);
+        .nav-link:hover { 
+            color: #fb923c; 
+            background-color: rgba(255, 255, 255, 0.05); 
         }
-
-        h3 {
-            font-size: 1.25rem;
-            font-weight: 600;
-            margin-top: 2rem;
-            margin-bottom: 0.75rem;
-            color: var(--text-main);
+        .nav-link.active { 
+            color: #f97316; 
+            font-weight: 600; 
+            background-color: rgba(249, 115, 22, 0.1); 
         }
-
-        h4 {
-            font-size: 1rem;
-            font-weight: 600;
-            margin-top: 1.5rem;
-            margin-bottom: 0.5rem;
-            color: var(--text-main);
+        
+        .toc-title { 
+            font-size: 0.75rem; 
+            text-transform: uppercase; 
+            letter-spacing: 0.1em; 
+            color: #6b7280; 
+            font-weight: 700; 
+            margin-bottom: 1rem; 
         }
-
-        p {
-            margin-bottom: 1.25rem;
-            color: var(--text-muted);
+        .toc-link { 
+            display: block; 
+            font-size: 0.875rem; 
+            color: #9ca3af; 
+            padding: 0.375rem 0 0.375rem 0.75rem; 
+            border-left: 2px solid transparent; 
+            transition: all 0.2s; 
         }
-
-        ul,
-        ol {
-            margin-bottom: 1.5rem;
-            color: var(--text-muted);
-            padding-left: 1.5rem;
+        .toc-link:hover { 
+            color: #fb923c; 
+            border-left-color: #3f3f46; 
         }
-
-        li {
-            margin-bottom: 0.5rem;
+        .toc-link.active { 
+            color: #f97316; 
+            border-left-color: #f97316; 
+            font-weight: 600; 
         }
-
-        strong {
-            color: var(--text-main);
+        .toc-link.sub { 
+            padding-left: 1.5rem; 
+            font-size: 0.75rem; 
+            padding-top: 0.25rem; 
+            padding-bottom: 0.25rem; 
         }
+        
+        .table-responsive { overflow-x: auto; }
 
-        /* --- Code Blocks --- */
-        pre {
-            background: #1e1e1e !important;
-            color: #e5e7eb !important;
-            padding: 1.25rem !important;
-            border-radius: 8px;
-            overflow-x: auto;
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 0.3rem;
-            margin: 1.5rem 0 !important;
-            border: 1px solid var(--border);
-            line-height: 1.2;
+        .search-result-item { 
+            padding: 0.75rem; 
+            border-bottom: 1px solid #27272a; 
+            cursor: pointer; 
+            display: block; 
+            text-decoration: none; 
         }
-
-        code {
-            background: var(--code-bg);
-            color: var(--primary-dark);
-            padding: 0.2rem 0.4rem;
-            border-radius: 4px;
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 0.85em;
-            word-break: break-all;
+        .search-result-item:hover { 
+            background-color: rgba(255, 255, 255, 0.05); 
         }
-
-        pre code {
-            background: transparent;
-            color: inherit;
-            padding: 0;
-            word-break: normal;
+        .search-result-title { 
+            font-size: 0.875rem; 
+            font-weight: 600; 
+            color: #fb923c; 
+            margin-bottom: 0.25rem; 
         }
-
-        /* --- Components --- */
-        .callout {
-            background: #ecfeff;
-            border-left: 4px solid var(--primary);
-            padding: 1.25rem;
-            margin: 1.5rem 0;
-            border-radius: 0 8px 8px 0;
+        .search-result-snippet { 
+            font-size: 0.75rem; 
+            color: #9ca3af; 
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
         }
-
-        .callout.warning {
-            background: #fffbeb;
-            border-left-color: #f59e0b;
-        }
-
-        .callout-title {
-            font-weight: 600;
-            color: var(--primary-dark);
-            margin-bottom: 0.5rem;
-            display: block;
-        }
-
-        .callout.warning .callout-title {
-            color: #b45309;
-        }
-
-        .badge {
-            display: inline-block;
-            padding: 0.25rem 0.5rem;
-            border-radius: 4px;
-            font-size: 0.75rem;
-            font-weight: 600;
-            text-transform: uppercase;
-        }
-
-        .badge-get {
-            background: #dbeafe;
-            color: #1e40af;
-        }
-
-        .badge-post {
-            background: #dcfce7;
-            color: #166534;
-        }
-
-        .badge-header {
-            background: #f3f4f6;
-            color: #374151;
-            border: 1px solid #d1d5db;
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 0.7rem;
-        }
-
-        /* Wraps tables for mobile scrolling */
-        .table-responsive {
-            overflow-x: auto;
-            -webkit-overflow-scrolling: touch;
-            margin: 1.5rem 0;
-            width: 100%;
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 0.95rem;
-            min-width: 500px;
-        }
-
-        th,
-        td {
-            border: 1px solid var(--border);
-            padding: 0.75rem 1rem;
-            text-align: left;
-            vertical-align: top;
-        }
-
-        th {
-            background: var(--bg-sidebar);
-            font-weight: 600;
-            color: var(--text-main);
-        }
-
-        tr:nth-child(even) {
-            background: #fafafa;
-        }
-
-        footer {
-            margin-top: 5rem;
-            padding-top: 2rem;
-            border-top: 1px solid var(--border);
-            color: var(--text-muted);
-            font-size: 0.875rem;
-            display: flex;
-            justify-content: space-between;
-            flex-wrap: wrap;
-            gap: 1rem;
-        }
-
-        footer a {
-            color: var(--primary-dark);
-            text-decoration: none;
-        }
-
-        /* --- Mobile Navigation --- */
+    
+        /* Mobile Responsiveness */
         .mobile-header {
             display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 60px;
-            background: var(--bg-body);
-            border-bottom: 1px solid var(--border);
-            z-index: 20;
+            background-color: #09090b;
+            border-bottom: 1px solid rgba(39, 39, 42, 0.5);
+            padding: 1rem 1.5rem;
             align-items: center;
-            padding: 0 1.5rem;
+            position: fixed;
+            top: 0; left: 0; right: 0;
+            z-index: 50;
         }
-
         .hamburger-btn {
             background: none;
             border: none;
+            color: #d1d5db;
             cursor: pointer;
-            color: var(--text-main);
             padding: 0;
             margin-right: 1rem;
-            display: flex;
-            align-items: center;
-            justify-content: center;
         }
-
         .mobile-brand {
             margin-bottom: 0;
-            font-size: 1.2rem;
+            font-size: 1.25rem;
         }
-
         .mobile-overlay {
             display: none;
             position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0, 0, 0, 0.5);
-            z-index: 15;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 40;
+            backdrop-filter: blur(2px);
         }
-
-        /* --- PrismJS Copy Button Positioning & Styling --- */
-        .code-toolbar {
-            position: relative;
-            /* Prism wrapper */
+        .mobile-overlay.open {
+            display: block;
         }
-
-        /* Copy button - matches your theme */
-        div.code-toolbar>.toolbar {
-            position: absolute !important;
-            top: 0.75rem !important;
-            right: 0.75rem !important;
-            opacity: 1 !important;
-        }
-
-        div.code-toolbar>.toolbar button.copy-to-clipboard-button {
-            background: var(--text-main) !important;
-            /* #111827 */
-            color: white !important;
-            border: 1px solid var(--border) !important;
-            border-radius: 6px !important;
-            padding: 0.4rem 0.75rem !important;
-            font-size: 0.8rem !important;
-            font-family: 'Inter', sans-serif !important;
-            cursor: pointer !important;
-            font-weight: 500 !important;
-            opacity: 0.9 !important;
-            transition: all 0.2s ease !important;
-            box-shadow: none !important;
-        }
-
-        div.code-toolbar>.toolbar button.copy-to-clipboard-button:hover {
-            background: var(--primary-dark) !important;
-            /* #0891b2 */
-            opacity: 1 !important;
-            transform: translateY(-1px) !important;
-        }
-
-        div.code-toolbar>.toolbar button.copy-to-clipboard-button:active {
-            transform: translateY(0) !important;
-        }
-
-        /* Hide default button text, show icon */
-        div.code-toolbar>.toolbar button.copy-to-clipboard-button span {
-            display: none !important;
-        }
-
-        div.code-toolbar>.toolbar button.copy-to-clipboard-button::after {
-            content: "📋" !important;
-            font-size: 0.9rem !important;
-        }
-
-        /* Copied State Icon Update */
-        div.code-toolbar>.toolbar button.copy-to-clipboard-button[data-copy-state="copy-success"]::after {
-            content: "✅" !important;
-        }
-
-        /* --- Responsive --- */
-        @media (max-width: 1200px) {
+        
+        @media (max-width: 1024px) {
             .toc-sidebar {
                 display: none;
             }
-
             .content {
                 margin-right: 0;
+                padding-right: 1.5rem;
             }
         }
-
+        
         @media (max-width: 850px) {
             body {
-                padding-top: 60px;
+                flex-direction: column;
             }
-
             .mobile-header {
                 display: flex;
             }
-
             .sidebar {
-                display: block;
                 transform: translateX(-100%);
                 transition: transform 0.3s ease;
-                z-index: 30;
-                width: 260px;
+                z-index: 60;
+                width: 16rem;
+                padding-top: 5rem;
             }
-
             .sidebar.open {
                 transform: translateX(0);
             }
-
-            .mobile-overlay.open {
-                display: block;
-            }
-
             .content {
                 margin-left: 0;
-                padding: 2rem;
-            }
-        }
-
-        @media (max-width: 500px) {
-            .content {
                 padding: 1.5rem;
+                padding-top: 5rem; /* For mobile header */
+                max-width: 100%;
             }
-
-            h1 {
-                font-size: 2rem;
-            }
-
-            h2 {
-                font-size: 1.5rem;
-            }
+            h1 { font-size: 1.75rem; }
+            h2 { font-size: 1.25rem; margin-top: 2rem; }
+            h3 { font-size: 1.1rem; }
+            pre[class*="language-"] { padding-top: 2.5rem !important; }
+            table { font-size: 0.875rem; }
         }
     </style>
+
+
+
 </head>
 
 <body>
@@ -555,7 +384,17 @@
 
     <!-- Left Sidebar Navigation -->
     <nav class="sidebar">
+        
         <a href="#" class="brand"><span>Bot</span>Fusion Docs</a>
+        
+        <div id="search-container" style="position: relative; margin-bottom: 2rem; margin-top: 1.5rem;">
+            <svg id="search-icon" style="position: absolute; left: 0.75rem; top: 0.75rem; color: #9ca3af; width: 1rem; height: 1rem;" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+            </svg>
+            <input type="text" id="search-input" style="width: 100%; background-color: #09090b; border: 1px solid #3f3f46; color: white; font-size: 0.875rem; border-radius: 0.5rem; padding: 0.625rem; padding-left: 2.5rem; outline: none;" placeholder="Search documentation..." autocomplete="off">
+            <div id="search-results" style="position: absolute; top: 100%; left: 0; right: 0; margin-top: 0.5rem; background-color: #18181b; border: 1px solid #3f3f46; border-radius: 0.5rem; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5); overflow: hidden; z-index: 50; max-height: 24rem; overflow-y: auto; display: none;"></div>
+        </div>
+
 
         <div class="nav-group">
             <div class="nav-header">Introduction</div>
@@ -580,7 +419,23 @@
             <a href="#api-autoup" class="nav-link">AutoUp API</a>
             <a href="#api-anomaly" class="nav-link">Anomaly Detection API</a>
             <a href="#api-genqr" class="nav-link">QR Generation API</a>
+            <a href="#api-tracking" class="nav-link">URL Tracking API</a>
+            <a href="#api-profanity" class="nav-link">Profanity Filter API</a>
             <a href="#api-limits-errors" class="nav-link">Limits & Errors</a>
+        </div>
+
+        <div class="nav-group">
+            <div class="nav-header">BotFusion Pay</div>
+            <a href="#bfpay-overview" class="nav-link">Overview</a>
+            <a href="#bfpay-lifecycle" class="nav-link">Payment Lifecycle</a>
+            <a href="#bfpay-invoices" class="nav-link">Create Invoice</a>
+            <a href="#bfpay-claims" class="nav-link">Claim Invoice</a>
+            <a href="#bfpay-manual-verify" class="nav-link">Manual Verify</a>
+            <a href="#bfpay-list" class="nav-link">List Invoices</a>
+            <a href="#bfpay-cancel" class="nav-link">Cancel Invoice</a>
+            <a href="#bfpay-transfer" class="nav-link">Direct Transfer</a>
+            <a href="#bfpay-wallets" class="nav-link">Wallet Monitoring</a>
+            <a href="#bfpay-statuses" class="nav-link">Status Enums</a>
         </div>
 
         <div class="nav-group">
@@ -613,7 +468,15 @@
         <a href="#api-genqr" class="toc-link">QR Generation API</a>
         <a href="#genqr-params" class="toc-link sub">QR Parameters</a>
         <a href="#genqr-scenarios" class="toc-link sub">QR Scenarios</a>
+        <a href="#api-tracking" class="toc-link">URL Tracking API</a>
+        <a href="#api-profanity" class="toc-link">Profanity Filter API</a>
         <a href="#api-limits-errors" class="toc-link">Limits & Errors</a>
+
+        <!-- BotFusion Pay -->
+        <a href="#bfpay-overview" class="toc-link">BotFusion Pay</a>
+        <a href="#bfpay-invoices" class="toc-link sub">Create Invoice</a>
+        <a href="#bfpay-claims" class="toc-link sub">Claim Invoice</a>
+        <a href="#bfpay-wallets" class="toc-link sub">Wallet Monitoring</a>
 
         <!-- Info -->
         <a href="#premium-plans" class="toc-link">Premium Plans</a>
@@ -638,7 +501,7 @@
 
                 <h4>1. Sign Up</h4>
                 <ol>
-                    <li>Navigate to the <a href="https://botfusion.wuaze.com">signup page</a>.</li>
+                    <li>Navigate to the <a href="/index.html">signup page</a>.</li>
                     <li>Enter your email, desired password, and your <strong>Telegram User ID</strong>.</li>
                     <li>You can find your Telegram ID by messaging our <a href="https://t.me/authentcastbot"
                             target="_blank">Auth Bot</a> (<code>/start</code>) You must start the bot first.</li>
@@ -1038,7 +901,8 @@ Admin Alerts / Auto-Ban Logic</code></pre>
                             <td><strong><code>dot_style</code></strong></td>
                             <td><code>circle</code></td>
                             <td><code>square</code>, <code>rounded</code>, <code>circle</code>, <code>diamond</code>,
-                                <code>vertical</code>, <code>horizontal</code></td>
+                                <code>vertical</code>, <code>horizontal</code>
+                            </td>
                         </tr>
                         <tr>
                             <td><strong><code>dot_scale</code></strong></td>
@@ -1144,7 +1008,8 @@ Admin Alerts / Auto-Ban Logic</code></pre>
                 <p>The API follows a strict hierarchy for determining the center logo.</p>
                 <ol>
                     <li><strong>Direct File Upload:</strong> Send a file in a multipart request under the key
-                        <code>logo</code>. This has the highest priority.</li>
+                        <code>logo</code>. This has the highest priority.
+                    </li>
                     <li><strong>Telegram URL:</strong> Provide a direct download link via <code>telegram_url</code>. The
                         proxy will fetch, rename, and forward the image to the engine.</li>
                     <li><strong>BotFusion Default:</strong> If neither of the above are provided, the engine embeds the
@@ -1192,16 +1057,188 @@ Admin Alerts / Auto-Ban Logic</code></pre>
                 <ul>
                     <li><strong>Max Scannability:</strong> Keep <code>dot_density</code> at <code>1.0</code> and
                         <code>dot_scale</code> above <code>0.8</code>. QRs with thin or missing dots are much harder for
-                        cameras to read.</li>
+                        cameras to read.
+                    </li>
                     <li><strong>Contrast is King:</strong> Ensure your <code>bg_color</code> and <code>fg_color</code>
                         (or gradient) have high contrast. Dark colors on light backgrounds work best.</li>
                     <li><strong>Logo Safety:</strong> Because the engine uses <strong>High (H) Error
                             Correction</strong>, you can safely use a <code>logo_size_ratio</code> of up to
-                        <code>0.20</code> without losing data.</li>
+                        <code>0.20</code> without losing data.
+                    </li>
                     <li><strong>Sub-sampling:</strong> The engine automatically uses an <code>ss_factor=2</code>
                         (rendering at 2x size then downscaling), so even small <code>scale</code> values will look sharp
                         and anti-aliased.</li>
                 </ul>
+            </div>
+        </section>
+
+        <!-- ================= NEW SECTION: URL TRACKING API ================= -->
+        <section id="api-tracking">
+            <h2>Link Tracker API</h2>
+            <p>The <a href="/index.html">BotFusion</a> Link Tracker API enables developers to generate, monitor, and
+                manage tracked short links
+                programmatically for their Telegram bots. All traffic must be routed securely through the main gateway:
+                <strong><code>https://botfusion.onrender.com</code></strong>
+            </p>
+
+            <div class="sub-section">
+                <h3>Global Constraints & Requirements</h3>
+                <p>Before using the API, note the following system rules:</p>
+                <ul>
+                    <li><strong>Authentication:</strong> Every request requires your developer
+                        <code>X-CONNECTION-KEY</code> header.
+                    </li>
+                    <li><strong>Bot Ownership:</strong> The <code>username</code> payload must exactly match a bot you
+                        have registered in the BotFusion dashboard. If you attempt to operate on an unauthorized bot,
+                        you will receive a <code>403</code> error.</li>
+                    <li><strong>Rate Limits:</strong> The API enforces a strict limit of <strong>20 requests per
+                            second</strong> per Connection Key to prevent abuse.</li>
+                    <li><strong>End-User ID:</strong> The <code>user_id</code> field expects the <strong>Telegram
+                            ID</strong> of the end-user (your bot's user). This ensures the correct person receives
+                        click notifications via your bot.</li>
+                </ul>
+            </div>
+
+            <div class="sub-section">
+                <h3>1. Create a Link or Toggle Notifications</h3>
+                <p><span class="badge badge-post">POST</span> <code>/gen_link</code></p>
+                <p>Use this endpoint to generate a new short link, or to retrieve/update an existing one. If the
+                    <code>link</code> already exists for this user/bot, it acts idempotently (returns the existing short
+                    link) but will <strong>update</strong> the <code>notify</code> toggle status.
+                </p>
+
+                <h4>Headers</h4>
+                <pre><code class="language-text">X-CONNECTION-KEY: acct_your_secret_key
+Content-Type: application/json</code></pre>
+
+                <h4>Request Payload</h4>
+                <pre><code class="language-json">{
+  "username": "@MyAwesomeBot",
+  "user_id": 123456789,
+  "link": "https://example.com/checkout",
+  "notify": true 
+}</code></pre>
+                <ul>
+                    <li><strong><code>username</code>:</strong> (String) Your officially added Bot username.</li>
+                    <li><strong><code>user_id</code>:</strong> (Integer or String) The Telegram ID of the user creating
+                        the link.</li>
+                    <li><strong><code>link</code>:</strong> (String) The original long URL.</li>
+                    <li><strong><code>notify</code>:</strong> (Boolean) Whether the bot should DM the
+                        <code>user_id</code> when the link is clicked. You can send that same link payload with diffrent
+                        notify : True /false to update current link to nitificaton On/Off
+                    </li>
+                </ul>
+
+                <h4>Successful Return (<code>200 OK</code>)</h4>
+                <pre><code class="language-json">{
+  "status": "success",
+  "short_url": "https://golink.free.nf/aBcDeF1",
+  "short_code": "aBcDeF1",
+  "notify": true
+}</code></pre>
+            </div>
+
+            <div class="sub-section">
+                <h3>2. Bulk Fetch Link Statistics</h3>
+                <p><span class="badge badge-get">GET</span> <code>/gen_link</code></p>
+                <p>Use this endpoint to retrieve analytics (total clicks, configured settings) for multiple links
+                    simultaneously. This allows rapid dashboard rendering for your end-users.</p>
+
+                <h4>Headers</h4>
+                <pre><code class="language-text">X-CONNECTION-KEY: acct_your_secret_key
+Content-Type: application/json</code></pre>
+
+                <h4>Request Payload</h4>
+                <p>Pass the original long URLs as an array to <code>link</code>.Can pass 1 or More link as array to
+                    check status of multiple links at once (developer choice)</p>
+                <pre><code class="language-json">{
+  "username": "@MyAwesomeBot",
+  "user_id": 123456789,
+  "link": [
+    "https://example.com/checkout",
+    "https://example.com/dashboard"
+  ]
+}</code></pre>
+
+                <h4>Successful Return (<code>200 OK</code>)</h4>
+                <p>The data array maps directly to the order you requested.</p>
+                <pre><code class="language-json">{
+  "status": "success",
+  "data": [
+    {
+      "original_url": "https://example.com/checkout",
+      "short_url": "https://golink.free.nf/aBcDeF1",
+      "clicks": 42,
+      "notify": true
+    },
+    {
+      "original_url": "https://example.com/dashboard",
+      "short_url": "https://golink.free.nf/zXyWq2p",
+      "clicks": 0,
+      "notify": false
+    }
+  ]
+}</code></pre>
+            </div>
+
+            <div class="sub-section">
+                <h3>3. Delete a Short Link</h3>
+                <p><span class="badge badge-delete">DELETE</span> <code>/gen_link</code></p>
+                <p>Allows the developer or end-user to wipe the short link and stop all traffic/tracking permanently.
+                    This purges the stats from both MongoDB and the high-speed Redis cache.</p>
+
+                <h4>Headers</h4>
+                <pre><code class="language-text">X-CONNECTION-KEY: acct_your_secret_key
+Content-Type: application/json</code></pre>
+
+                <h4>Request Payload</h4>
+                <p>Provide the original URL you wish to unlink.</p>
+                <pre><code class="language-json">{
+  "username": "@MyAwesomeBot",
+  "user_id": 123456789,
+  "link": "https://example.com/checkout"
+}</code></pre>
+
+                <h4>Successful Return (<code>200 OK</code>)</h4>
+                <pre><code class="language-json">{
+  "status": "success",
+  "message": "Link deleted successfully",
+  "deleted_link": "https://example.com/checkout"
+}</code></pre>
+            </div>
+        </section>
+
+        <!-- ================= NEW SECTION: PROFANITY FILTER API ================= -->
+        <section id="api-profanity">
+            <h2>Profanity Filter API</h2>
+            <p>The BotFusion Profanity Filter API enables developers to programmatically check messages for banned words or inappropriate content using our centralized filtering engine.</p>
+            <p>This ensures your bot's community stays clean from the moment a message is processed.</p>
+
+            <div class="sub-section">
+                <h3>1. Check a Message for Profanity</h3>
+                <p><span class="badge badge-post">POST</span> <code>/profanity_check</code></p>
+                <p>Pass the message payload. The system returns whether it flagged any profanity in the text.</p>
+
+                <h4>Headers</h4>
+                <pre><code class="language-text">X-CONNECTION-KEY: acct_your_secret_key
+Content-Type: application/json</code></pre>
+
+                <h4>Request Payload</h4>
+                <pre><code class="language-json">{
+  "message": "This is the string of text you want to check."
+}</code></pre>
+
+                <h4>Response - Profanity Detected (<code>200 OK</code>)</h4>
+                <pre><code class="language-json">{
+  "profanity": true,
+  "message": "Message contains blocked content."
+}</code></pre>
+
+                <h4>Response - Clean (<code>200 OK</code>)</h4>
+                <pre><code class="language-json">{
+  "profanity": false,
+  "message": "Message is clean!"
+}</code></pre>
             </div>
         </section>
 
@@ -1210,7 +1247,8 @@ Admin Alerts / Auto-Ban Logic</code></pre>
             <p>To ensure global stability, our APIs enforce strict rate limiting based on your Connection Key.</p>
             <ul>
                 <li><strong>Limit:</strong> 20 requests per second (Combined across <code>/autoup</code>,
-                    <code>/score_user</code>, and <code>/genqr</code>).</li>
+                    <code>/score_user</code>, and <code>/genqr</code>).
+                </li>
                 <li><strong>Behavior:</strong> If exceeded, the API returns HTTP <code>429 Too Many Requests</code>. You
                     should implement a queuing system in your bot to handle backoff.</li>
             </ul>
@@ -1243,6 +1281,303 @@ Admin Alerts / Auto-Ban Logic</code></pre>
                         <td>Rate Limit</td>
                         <td>You are sending more than 20 req/sec. Implement a queue in your bot.</td>
                     </tr>
+                </table>
+            </div>
+        </section>
+
+        <!-- ================= BOTFUSION PAY ================= -->
+        <section id="bfpay-overview">
+            <h2>BotFusion Pay — Crypto Payment Gateway</h2>
+            <p>BotFusion Pay is a <strong>non-custodial, automated crypto payment gateway</strong> built into the BotFusion platform. It allows you to seamlessly integrate crypto payments into your applications without running blockchain nodes, handling gas estimations, or writing webhooks from scratch.</p>
+
+            <div class="info-box">
+                <strong>🔥 How It Works:</strong> The system generates unique temporary deposit addresses for each invoice, monitors them for deposits, notifies your users when payment arrives, and automatically sweeps the collected funds to your final cold wallet — all while you maintain 100% custody of your private keys.
+            </div>
+
+            <h3>Getting Started</h3>
+            <ol>
+                <li>Log in to BotFusion and navigate to the <a href="/index.html#/pay"><strong>Payment Gateway Dashboard</strong></a>.</li>
+                <li>Complete the <strong>Store Setup Form</strong> (Store Name, Telegram Bot Token for alerts, your Telegram Chat ID).</li>
+                <li>Your isolated HD Wallet and API Key are generated instantly.</li>
+                <li><strong>Deposit a small amount of BNB</strong> into your Master Funding Wallet (<code>index 0</code>). This BNB is used exclusively to pay tiny blockchain gas fees for automated sweeps.</li>
+            </ol>
+
+            <h3>Base URL</h3>
+            <p>All BotFusion Pay API requests should be made to:</p>
+            <pre><code class="language-http">https://botfusion.onrender.com/bfpay/</code></pre>
+
+            <h3>Authentication</h3>
+            <p>Every request must include your API Key in the header:</p>
+            <pre><code class="language-http">x-api-key: your_botfusion_pay_api_key</code></pre>
+            <p>Your API key maps to your isolated HD Wallet. <strong>Never expose this key on the client side.</strong></p>
+        </section>
+
+        <section id="bfpay-lifecycle">
+            <h2>Payment Lifecycle</h2>
+            <p>The system handles the entire lifecycle automatically in 6 steps:</p>
+            <ol>
+                <li><strong>Invoice Created:</strong> You call <code>POST /bfpay/invoices</code>. A unique deposit address is generated.</li>
+                <li><strong>Monitoring:</strong> The system registers the address and listens for real-time blockchain deposits.</li>
+                <li><strong>Verification:</strong> User sends crypto. The system verifies the transaction, logs the payment, and marks it <code>verified</code>.</li>
+                <li><strong>Notification:</strong> The system sends a Telegram message (using the <code>tempBotToken</code>) to the customer with an "Activate" button.</li>
+                <li><strong>Collection (Sweep):</strong> In the background, BNB gas is sent to the deposit address, then USDT is swept to your <code>receivingAddress</code>.</li>
+                <li><strong>Claim:</strong> The user clicks "Activate". Your bot receives the callback. You call <code>POST /bfpay/claims</code> to finalize delivery.</li>
+            </ol>
+        </section>
+
+        <section id="bfpay-invoices">
+            <h2>Create an Invoice</h2>
+            <p>Generates a new invoice and a unique temporary deposit address.</p>
+
+            <div class="info-box">
+                <strong>Important:</strong>
+                <ul>
+                    <li><code>customerId</code> — Usually a Telegram Chat ID. The system sends the success notification to this ID.</li>
+                    <li><code>receivingAddress</code> — Your final cold wallet. The API auto-sweeps collected USDT here.</li>
+                    <li><code>callbackData</code> — Attached to the Telegram "Activate" button so your bot knows what product to deliver.</li>
+                    <li><code>tempBotToken</code> <em>(Optional)</em> — An invoice-specific bot token for messaging the customer.</li>
+                    <li><code>webhookUrl</code> <em>(Optional)</em> — If provided, the system POSTs payment status to this URL.</li>
+                    <li>You must provide <strong>at least one</strong> of <code>tempBotToken</code> or <code>webhookUrl</code>.</li>
+                </ul>
+            </div>
+
+            <h4>Endpoint</h4>
+            <pre><code class="language-http">POST /bfpay/invoices</code></pre>
+
+            <h4>Request Payload</h4>
+            <pre><code class="language-json">{
+  "customerId": "123456789",
+  "amount": "10.50",
+  "receivingAddress": "0xYourFinalColdWalletAddress...",
+  "callbackData": "activate_premium_user_123",
+  "tempBotToken": "1234:ABCDEF...",
+  "botMessage": "Thanks for paying {amountPaid} USDT for {invoiceId}!",
+  "buttonText": "Get Premium",
+  "webhookUrl": "https://your-backend.com/webhook/bsc"
+}</code></pre>
+
+            <h4>Response (<code>200 OK</code>)</h4>
+            <pre><code class="language-json">{
+  "invoice": {
+    "invoiceId": "inv_1234abc...",
+    "developerId": "dev_xyz...",
+    "customerId": "123456789",
+    "amount": "10.50",
+    "paymentStatus": "pending",
+    "collectionStatus": "not_started"
+  },
+  "tempWallet": {
+    "address": "0xTemporaryDepositAddress..."
+  },
+  "webhookAdded": true
+}</code></pre>
+        </section>
+
+        <section id="bfpay-claims">
+            <h2>Claim an Invoice</h2>
+            <p>Marks an invoice as fulfilled. Calling this endpoint multiple times is safe — it ensures the invoice is only claimed once, protecting you from double-delivery.</p>
+
+            <div class="info-box">
+                <strong>💡 Website Integration:</strong> If you're building a website (not a Telegram bot), your frontend can <strong>poll</strong> <code>GET /bfpay/invoices/:invoiceId</code> every few seconds. Once <code>paymentStatus</code> changes to <code>verified</code>, call this endpoint to finalize.
+            </div>
+
+            <h4>Endpoint</h4>
+            <pre><code class="language-http">POST /bfpay/claims</code></pre>
+
+            <h4>Request Payload</h4>
+            <pre><code class="language-json">{
+  "invoiceId": "inv_1234abc..."
+}
+// OR
+{
+  "tempAddress": "0xTemporaryDepositAddress..."
+}</code></pre>
+
+            <h4>Response (<code>200 OK</code>)</h4>
+            <pre><code class="language-json">{
+  "claimed": true,
+  "invoice": {
+    "invoiceId": "inv_1234abc...",
+    "paymentStatus": "verified",
+    "claimStatus": "claimed",
+    "payment": {
+      "paidAmount": "10.50",
+      "txHash": "0x..."
+    }
+  }
+}</code></pre>
+        </section>
+
+        <section id="bfpay-manual-verify">
+            <h2>Manual Payment Verification</h2>
+            <p>Forces the system to manually check the blockchain balance for a specific temporary address. Use this if the real-time webhook missed an event.</p>
+
+            <h4>Endpoint</h4>
+            <pre><code class="language-http">POST /bfpay/invoices/manual-verify</code></pre>
+
+            <h4>Request Payload</h4>
+            <pre><code class="language-json">{
+  "tempAddress": "0xTemporaryDepositAddress..."
+}</code></pre>
+
+            <h4>Response (<code>200 OK</code>)</h4>
+            <pre><code class="language-json">{
+  "result": {
+    "verified": true,
+    "paid": "10.50",
+    "source": "manual"
+  },
+  "invoice": { ... }
+}</code></pre>
+        </section>
+
+        <section id="bfpay-list">
+            <h2>List Invoices</h2>
+            <p>Retrieve a list of your existing invoices.</p>
+
+            <h4>Endpoint</h4>
+            <pre><code class="language-http">GET /bfpay/invoices</code></pre>
+
+            <h4>Query Parameters</h4>
+            <ul>
+                <li><code>limit</code> (optional) — Maximum number of invoices to return (default: 50).</li>
+                <li><code>paymentStatus</code> (optional) — Filter by status: <code>pending</code>, <code>verified</code>, <code>expired</code>.</li>
+            </ul>
+
+            <h4>Response (<code>200 OK</code>)</h4>
+            <pre><code class="language-json">{
+  "invoices": [
+    {
+      "invoiceId": "inv_1234abc...",
+      "customerId": "123456789",
+      "amount": "10.50",
+      "paymentStatus": "pending",
+      "collectionStatus": "not_started"
+    }
+  ]
+}</code></pre>
+        </section>
+
+        <section id="bfpay-cancel">
+            <h2>Cancel an Invoice</h2>
+            <p>Forcefully cancels an unpaid invoice and permanently halts background monitoring. <strong>Always call this</strong> when a user clicks "Cancel" to free up server resources.</p>
+
+            <h4>Endpoint</h4>
+            <pre><code class="language-http">POST /bfpay/invoices/:invoiceId/cancel</code></pre>
+
+            <h4>Response (<code>200 OK</code>)</h4>
+            <pre><code class="language-json">{
+  "success": true,
+  "invoice": {
+    "invoiceId": "inv_1234abc...",
+    "paymentStatus": "expired",
+    "recordStatus": "archived"
+  }
+}</code></pre>
+        </section>
+
+        <section id="bfpay-transfer">
+            <h2>Direct Wallet Transfer</h2>
+            <p>Directly send BNB or USDT from your <code>index 0</code> Master Funding Wallet to any address. Your wallet must hold the amount you're sending, plus enough BNB for gas.</p>
+
+            <h4>Endpoint</h4>
+            <pre><code class="language-http">POST /bfpay/transfer</code></pre>
+
+            <h4>Request Payload</h4>
+            <pre><code class="language-json">{
+  "toAddress": "0xRecipientAddress...",
+  "amount": "50.00",
+  "token": "USDT"
+}</code></pre>
+
+            <h4>Response (<code>200 OK</code>)</h4>
+            <pre><code class="language-json">{
+  "success": true,
+  "txHash": "0xTransactionHash...",
+  "token": "USDT",
+  "amount": "50.00",
+  "toAddress": "0xRecipientAddress..."
+}</code></pre>
+        </section>
+
+        <section id="bfpay-wallets">
+            <h2>Wallet &amp; Network Monitoring</h2>
+
+            <h3>Check Funding Wallet Balance</h3>
+            <p>Your Master Funding Wallet (<code>index 0</code>) holds the BNB used to pay gas fees. <strong>If it runs out of BNB, all fund sweeping will halt.</strong></p>
+            <pre><code class="language-http">GET /bfpay/wallets/index0</code></pre>
+            <pre><code class="language-json">{
+  "wallet": {
+    "index": 0,
+    "address": "0x373A1C...",
+    "balances": {
+      "bnb": { "bnb": "0.00049" },
+      "usdt": { "amount": "0.0" }
+    }
+  }
+}</code></pre>
+
+            <h3>Check Any Address Balance</h3>
+            <pre><code class="language-http">GET /bfpay/wallets/address/:address/balance</code></pre>
+
+            <h3>Network Health &amp; Gas</h3>
+            <pre><code class="language-http">GET /bfpay/network</code></pre>
+            <pre><code class="language-json">{
+  "network": {
+    "chainId": 56,
+    "latestBlock": 39582103,
+    "gasPriceGwei": "1.02"
+  }
+}</code></pre>
+        </section>
+
+        <section id="bfpay-statuses">
+            <h2>Status Enums</h2>
+            <p>Understanding the states of an invoice:</p>
+
+            <h3><code>paymentStatus</code></h3>
+            <div class="table-responsive">
+                <table>
+                    <tr><th>Value</th><th>Meaning</th></tr>
+                    <tr><td><code>pending</code></td><td>Awaiting deposit.</td></tr>
+                    <tr><td><code>verified</code></td><td>Exact or overpayment received.</td></tr>
+                    <tr><td><code>underpaid</code></td><td>Partial payment — user needs to send the rest.</td></tr>
+                    <tr><td><code>expired</code></td><td>Invoice TTL elapsed without payment.</td></tr>
+                    <tr><td><code>late_payment</code></td><td>Paid after expiration.</td></tr>
+                </table>
+            </div>
+
+            <h3><code>collectionStatus</code></h3>
+            <div class="table-responsive">
+                <table>
+                    <tr><th>Value</th><th>Meaning</th></tr>
+                    <tr><td><code>not_started</code></td><td>Waiting for sweep worker.</td></tr>
+                    <tr><td><code>needs_bnb</code></td><td>Calculating gas, preparing BNB transfer.</td></tr>
+                    <tr><td><code>bnb_sent</code></td><td>BNB broadcasted, waiting for confirmation.</td></tr>
+                    <tr><td><code>sweeping</code></td><td>USDT sweep broadcasted.</td></tr>
+                    <tr><td><code>swept</code></td><td>USDT arrived at your <code>receivingAddress</code>.</td></tr>
+                    <tr><td><code>failed</code></td><td>Sweep failed permanently.</td></tr>
+                </table>
+            </div>
+
+            <h3><code>claimStatus</code></h3>
+            <div class="table-responsive">
+                <table>
+                    <tr><th>Value</th><th>Meaning</th></tr>
+                    <tr><td><code>unclaimed</code></td><td>Not activated yet.</td></tr>
+                    <tr><td><code>claimed</code></td><td>Finalized.</td></tr>
+                </table>
+            </div>
+
+            <h3>Common Error Codes</h3>
+            <div class="table-responsive">
+                <table>
+                    <tr><th>Code</th><th>Meaning</th></tr>
+                    <tr><td><code>INVALID_API_KEY</code></td><td>Verify your <code>x-api-key</code> header.</td></tr>
+                    <tr><td><code>MISSING_REQUIRED_FIELDS</code></td><td>A required payload key is missing.</td></tr>
+                    <tr><td><code>ALREADY_CLAIMED</code></td><td>Invoice was already claimed.</td></tr>
+                    <tr><td><code>PAYMENT_NOT_VERIFIED</code></td><td>Funds not yet received.</td></tr>
+                    <tr><td><code>MISSING_NOTIFICATION_METHOD</code></td><td>Neither <code>tempBotToken</code> nor <code>webhookUrl</code> was provided.</td></tr>
                 </table>
             </div>
         </section>
@@ -1311,84 +1646,21 @@ Admin Alerts / Auto-Ban Logic</code></pre>
                 &copy; 2026 BotFusion. All rights reserved.
             </div>
             <div>
+                <a href="/">Home</a> |
+                <a href="/docs.html">Documentation</a> |
+                <a href="/privacy.html">Privacy</a> |
+                <a href="/terms.html">Terms</a>
                 <a href="#overview">Setup</a> &nbsp;|&nbsp;
                 <a href="#api-auth">API Keys</a> &nbsp;|&nbsp;
                 <a href="#api-anomaly">Anomaly ML</a> &nbsp;|&nbsp;
-                <a href="#api-genqr">QR API</a>
+                <a href="#api-genqr">QR API</a> &nbsp;|&nbsp;
+                <a href="#api-tracking">Tracking API</a>
             </div>
         </footer>
     </main>
 
     <!-- JS for automatic Table of Contents highlighting based on scroll -->
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            // Mobile Menu Logic
-            const mobileMenuBtn = document.getElementById('mobile-menu-btn');
-            const sidebar = document.querySelector('.sidebar');
-            const overlay = document.getElementById('mobile-overlay');
-            const mainNavLinks = document.querySelectorAll('.sidebar .nav-link');
-
-            function toggleMenu() {
-                sidebar.classList.toggle('open');
-                overlay.classList.toggle('open');
-                // Prevent background scrolling when menu is open
-                document.body.style.overflow = sidebar.classList.contains('open') ? 'hidden' : '';
-            }
-
-            if (mobileMenuBtn && overlay) {
-                mobileMenuBtn.addEventListener('click', toggleMenu);
-                overlay.addEventListener('click', toggleMenu);
-            }
-
-            // Close menu when a nav link is clicked on mobile
-            mainNavLinks.forEach(link => {
-                link.addEventListener('click', () => {
-                    if (window.innerWidth <= 850 && sidebar.classList.contains('open')) {
-                        toggleMenu();
-                    }
-                });
-            });
-
-            // Intersection Observer for TOC
-            const tocLinks = document.querySelectorAll('.toc-link');
-            const sections = document.querySelectorAll('section, .sub-section');
-
-            const observerOptions = {
-                root: null,
-                rootMargin: '0px 0px -60% 0px', // Trigger slightly above middle of screen
-                threshold: 0
-            };
-
-            const observer = new IntersectionObserver(entries => {
-                entries.forEach(entry => {
-                    if (entry.isIntersecting) {
-                        const id = entry.target.getAttribute('id');
-
-                        // Remove active class from all links
-                        tocLinks.forEach(link => link.classList.remove('active'));
-
-                        // Add active class to corresponding nav link
-                        const activeLink = document.querySelector(`.toc-link[href="#${id}"]`);
-                        if (activeLink) {
-                            activeLink.classList.add('active');
-
-                            // If it's a sub-link, also highlight the parent section if needed (optional)
-                            if (activeLink.classList.contains('sub')) {
-                                // Find previous non-sub link in the DOM logic could go here
-                                // But simple highlighting of the exact subsection works best
-                            }
-                        }
-                    }
-                });
-            }, observerOptions);
-
-            sections.forEach(section => {
-                if (section.getAttribute('id')) {
-                    observer.observe(section);
-                }
-            });
-        });
-    </script>
+    <script src="docs.js"></script>
 </body>
 
 </html>
