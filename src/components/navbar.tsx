@@ -1,7 +1,7 @@
 import { Link, useLocation } from "react-router-dom";
 import { useAuth } from "@/store/auth-context";
 import { ThemeToggle } from "./theme-toggle";
-import { Shield, Key, Crown, Menu, X, LogOut, Bot, BookOpen } from "lucide-react";
+import { Shield, Key, Crown, Menu, X, LogOut, Bot, BookOpen, Settings as SettingsIcon } from "lucide-react";
 import { useState } from "react";
 
 // Import logo image
@@ -109,14 +109,28 @@ export function Navbar() {
 
                         {user ? (
                             <div className="flex items-center gap-3">
-                                <div className="flex items-center gap-2 text-sm bg-[var(--bg-surface)] border border-[var(--border-color)] px-3 py-1.5 rounded-full">
-                                    <span className="font-semibold">{user.email}</span>
+                                <Link
+                                    to="/settings"
+                                    className={`flex items-center gap-2 text-sm bg-[var(--bg-surface)] border border-[var(--border-color)] px-3 py-1.5 rounded-full hover:border-[var(--primary-color)] transition-colors ${
+                                        pathname === "/settings" ? "border-[var(--primary-color)] text-[var(--primary-color)]" : ""
+                                    }`}
+                                >
+                                    {user.profilePicture ? (
+                                        <img
+                                            src={user.profilePicture}
+                                            alt=""
+                                            className="w-5 h-5 rounded-full object-cover"
+                                        />
+                                    ) : (
+                                        <SettingsIcon size={16} className="text-[var(--text-muted)]" />
+                                    )}
+                                    <span className="font-semibold text-xs sm:text-sm">{user.email}</span>
                                     {user.isPremium && (
                                         <span title="Premium User" className="flex items-center text-lg">
                                             🔥
                                         </span>
                                     )}
-                                </div>
+                                </Link>
                                 <button onClick={logout} className="text-sm text-[var(--text-muted)] hover:text-[var(--destructive)]">
                                     Logout
                                 </button>
@@ -202,6 +216,15 @@ export function Navbar() {
                             >
                                 <BookOpen size={20} />
                                 <span>Documentation</span>
+                            </Link>
+
+                            <Link
+                                to="/settings"
+                                onClick={() => setSidebarOpen(false)}
+                                className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${pathname === "/settings" ? "bg-[var(--primary-color)]/10 text-[var(--primary-color)] font-semibold" : "text-[var(--text-secondary)] hover:bg-[var(--bg-surface-hover)]"}`}
+                            >
+                                <SettingsIcon size={20} />
+                                <span>Account & Security</span>
                             </Link>
 
                             <Link

@@ -1,11 +1,8 @@
 import { useState, useEffect } from "react";
 import { Key, RefreshCw, AlertTriangle, Terminal, ArrowLeft, Copy, Check, Bot, ShieldAlert, QrCode, Link2, MessageSquareWarning, ExternalLink } from "lucide-react";
 import { Link } from "react-router-dom";
-import { api } from "@/lib/api";
+import { api, API_BASE_URL } from "@/lib/api";
 import { motion, AnimatePresence } from "framer-motion";
-
-// Use environment variable or fallback for API documentation
-const API_BASE_URL = import.meta.env.VITE_API_URL || "https://botfusion.onrender.com";
 
 export default function Dashboard() {
     const [connectionKey, setConnectionKey] = useState<string | null>(null);

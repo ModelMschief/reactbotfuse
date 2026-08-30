@@ -70,7 +70,7 @@ export default function Home() {
                                 initial={{ opacity: 0, y: 20 }}
                                 animate={{ opacity: 1, y: 0 }}
                                 transition={{ duration: 0.5, delay: 0.1 }}
-                                className="text-5xl md:text-6xl lg:text-7xl font-extrabold tracking-tight mb-6 leading-[1.1] text-[var(--text-primary)]"
+                                className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-extrabold tracking-tight mb-6 leading-[1.1] text-[var(--text-primary)]"
                             >
                                 Deploy Powerful APIs & <br className="hidden lg:block" />
                                 <span className="text-transparent bg-clip-text bg-gradient-to-r from-[var(--primary-color)] to-orange-500">
@@ -82,7 +82,7 @@ export default function Home() {
                                 initial={{ opacity: 0, y: 20 }}
                                 animate={{ opacity: 1, y: 0 }}
                                 transition={{ duration: 0.5, delay: 0.2 }}
-                                className="text-lg md:text-xl text-[var(--text-muted)] mb-10 leading-relaxed font-light max-w-xl"
+                                className="text-base sm:text-lg md:text-xl text-[var(--text-muted)] mb-10 leading-relaxed font-light max-w-xl"
                             >
                                 BotFusion is the premier API provider for developers. Build resilient infrastructure with our enterprise-grade endpoints for realtime user syncing, ML-powered spam detection, and an automated, non-custodial crypto payment gateway for BSC and TON.
                             </motion.p>
@@ -96,14 +96,14 @@ export default function Home() {
                             className="flex flex-col gap-8"
                         >
                             {/* Mock Terminal Graphic */}
-                            <div className="bg-[#09090b] border border-gray-800 rounded-xl p-6 font-mono text-sm relative shadow-xl overflow-hidden text-left">
+                            <div className="bg-[#09090b] border border-gray-800 rounded-xl p-4 sm:p-6 font-mono text-xs sm:text-sm relative shadow-xl overflow-x-auto text-left">
                                 <div className="flex gap-2 mb-4">
                                     <div className="w-3 h-3 rounded-full bg-red-500/80" />
                                     <div className="w-3 h-3 rounded-full bg-yellow-500/80" />
                                     <div className="w-3 h-3 rounded-full bg-green-500/80" />
                                 </div>
-                                <div className="space-y-2">
-                                    <div className="text-gray-400">curl -X POST https://botfusion.api/autoup \</div>
+                                <div className="space-y-2 break-all sm:break-normal">
+                                    <div className="text-gray-400">curl -X POST https://botfusion.onrender.com/autoup \</div>
                                     <div className="text-gray-400 pl-4">-H "X-CONNECTION-KEY: <span className="text-[var(--primary-color)]">secret_key</span>" \</div>
                                     <div className="text-gray-400 pl-4">-d '&#123;"user_id": 123456789, "bot": "@my_bot"&#125;'</div>
                                     <div className="text-green-400 mt-4">&gt; {"{"}"status": "success", "synced": true{"}"}</div>

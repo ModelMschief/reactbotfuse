@@ -12,10 +12,10 @@ const getBaseUrl = () => {
     return "https://botfusion.onrender.com";
 };
 
-const BASE_URL = getBaseUrl();
+export const API_BASE_URL = getBaseUrl();
 
 export const api = axios.create({
-    baseURL: BASE_URL,
+    baseURL: API_BASE_URL,
     headers: {
         "Content-Type": "application/json",
     },
