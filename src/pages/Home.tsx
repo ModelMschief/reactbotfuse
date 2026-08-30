@@ -1,7 +1,7 @@
 import { Link } from "react-router-dom";
 import { useAuth } from "@/store/auth-context";
 import { motion } from "framer-motion";
-import { Shield, Zap, Activity, Server, Lock, Layers, ExternalLink } from "lucide-react";
+import { Shield, Zap, Activity, Server, Lock, Layers, ExternalLink, Coins } from "lucide-react";
 import { ParticleBackground } from "@/components/particle-background";
 
 // Import logo image
@@ -28,7 +28,7 @@ export default function Home() {
         <div className="min-h-screen bg-[var(--bg-app)] text-[var(--text-primary)] font-sans overflow-x-hidden">
 
             {/* Hero Section */}
-            <section className="relative pt-32 pb-24 md:pt-48 md:pb-32 overflow-hidden">
+            <section className="relative pt-20 pb-24 md:pt-32 md:pb-32 overflow-hidden">
                 {/* Background Glow & Particles */}
                 <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-[var(--primary-color)]/5 rounded-full blur-[120px] pointer-events-none" />
                 <ParticleBackground />
@@ -63,7 +63,7 @@ export default function Home() {
                                 transition={{ duration: 0.5 }}
                                 className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[var(--primary-color)]/10 text-[var(--primary-color)] text-xs font-bold uppercase tracking-wider mb-6 border border-[var(--primary-color)]/20"
                             >
-                                <Zap size={12} fill="currentColor" /> Enterprise Telegram Infrastructure
+                                <Zap size={12} fill="currentColor" /> Bot & Payment API Infrastructure
                             </motion.div>
 
                             <motion.h1
@@ -74,7 +74,7 @@ export default function Home() {
                             >
                                 Deploy Powerful APIs & <br className="hidden lg:block" />
                                 <span className="text-transparent bg-clip-text bg-gradient-to-r from-[var(--primary-color)] to-orange-500">
-                                    Unify Your Bots
+                                    Accept Crypto
                                 </span>
                             </motion.h1>
 
@@ -84,7 +84,7 @@ export default function Home() {
                                 transition={{ duration: 0.5, delay: 0.2 }}
                                 className="text-lg md:text-xl text-[var(--text-muted)] mb-10 leading-relaxed font-light max-w-xl"
                             >
-                                Stop wrestling with Telegram rate limits and scattered Python scripts. BotFusion is the all-in-one developer platform that provides enterprise-grade APIs for realtime user syncing, ML-powered spam detection, and a centralized hub to broadcast to millions across your entire bot fleet safely.
+                                BotFusion is the premier API provider for developers. Build resilient infrastructure with our enterprise-grade endpoints for realtime user syncing, ML-powered spam detection, and an automated, non-custodial crypto payment gateway for BSC and TON.
                             </motion.p>
                         </div>
 
@@ -115,9 +115,9 @@ export default function Home() {
                                 <Link to={user ? "/dashboard" : "/login"} className="btn btn-primary h-12 px-8 text-base font-bold transition-all w-full sm:w-auto shadow-sm hover:shadow-md">
                                     Start Building
                                 </Link>
-                                <a href="/docs.html" target="_blank" rel="noopener noreferrer" className="btn bg-[var(--bg-surface)] border border-[var(--border-color)] hover:bg-[var(--bg-surface-hover)] text-[var(--text-primary)] h-12 px-8 text-base transition-all w-full sm:w-auto shadow-sm">
+                                <Link to="/docs" className="btn bg-[var(--bg-surface)] border border-[var(--border-color)] hover:bg-[var(--bg-surface-hover)] text-[var(--text-primary)] h-12 px-8 text-base transition-all w-full sm:w-auto shadow-sm flex items-center justify-center">
                                     Read Docs <ExternalLink size={16} className="ml-2" />
-                                </a>
+                                </Link>
                             </div>
                         </motion.div>
                     </div>
@@ -132,7 +132,7 @@ export default function Home() {
                             { icon: Lock, label: "AES-256 Secured" },
                             { icon: Activity, label: "Rate-Limit Aware" },
                             { icon: Server, label: "99.9% Uptime" },
-                            { icon: Layers, label: "Multi-Bot Architecture" }
+                            { icon: Coins, label: "Non-Custodial Crypto Gateway" }
                         ].map((item, idx) => (
                             <div key={idx} className="flex items-center gap-2 font-medium">
                                 <item.icon size={20} className="text-[var(--text-muted)]" />
@@ -175,14 +175,14 @@ export default function Home() {
                             </p>
                         </motion.div>
 
-                        {/* Offline Broadcasting */}
+                        {/* BotFusion Pay API */}
                         <motion.div variants={itemVariants} className="card p-8 group hover:border-[var(--primary-color)]/30 transition-colors">
                             <div className="w-12 h-12 bg-[var(--bg-app)] border border-[var(--border-color)] rounded-lg flex items-center justify-center mb-6 text-[var(--primary-color)] group-hover:scale-110 transition-transform">
-                                <Zap size={24} />
+                                <Coins size={24} />
                             </div>
-                            <h3 className="text-xl font-bold mb-3">Offline Broadcasting</h3>
+                            <h3 className="text-xl font-bold mb-3">Crypto Payment API</h3>
                             <p className="text-[var(--text-muted)] leading-relaxed">
-                                Bot crashed? Server down? We broadcast directly via Telegram API, bypassing your local bot instance entirely.
+                                Integrate non-custodial BSC & TON payments directly into your apps. Zero middleman fees, automatic gas sweeping.
                             </p>
                         </motion.div>
 
@@ -216,7 +216,7 @@ export default function Home() {
                                             POST /score_user
                                         </span>
                                         <span className="font-mono text-xs p-2 rounded bg-orange-500/10 text-orange-400 border border-orange-500/20">
-                                            POST /genqr
+                                            POST /invoices
                                         </span>
                                     </div>
                                 </div>
@@ -239,10 +239,10 @@ export default function Home() {
                         <div className="hidden md:block absolute top-[24px] left-[10%] right-[10%] h-[2px] bg-[var(--border-color)] z-0" />
 
                         {[
-                            { step: "01", title: "Authenticate", desc: "Secure login via Telegram OTP. We verify identity to prevent abuse." },
-                            { step: "02", title: "Connect Bots", desc: "Add Bot Tokens. We validate ownership via Telegram's getMe method." },
-                            { step: "03", title: "Integrate APIs", desc: "Use your Connection Key to plug AutoUp user syncing seamlessly into your bot." },
-                            { step: "04", title: "Scale & Broadcast", desc: "Compose content, select bot subset, and fire. We handle rate-limit queues for you." }
+                            { step: "01", title: "Authenticate", desc: "Secure API access via developer keys and JWT tokens." },
+                            { step: "02", title: "Integrate Modules", desc: "Plug AutoUp user syncing and ML tracking seamlessly into your app." },
+                            { step: "03", title: "Monetize", desc: "Generate secure crypto invoices via POST /invoices and accept Web3 payments." },
+                            { step: "04", title: "Scale & Analyze", desc: "Manage millions of users, track real-time analytics, and broadcast via our infrastructure." }
                         ].map((item, idx) => (
                             <motion.div
                                 key={idx}
@@ -339,13 +339,12 @@ export default function Home() {
                     </h3>
 
                     <ul className="list-disc pl-6 space-y-2 text-[var(--text-muted)]">
-                        <li>Telegram Broadcast System</li>
+                        <li>Non-Custodial Crypto Payment API (BotFusion Pay)</li>
+                        <li>Automated USDT Invoicing on BSC and TON</li>
                         <li>Auto User Sync API (AutoUp)</li>
+                        <li>Telegram Broadcast Infrastructure</li>
                         <li>Telegram User Behavior Analysis and Anomaly Detection</li>
-                        <li>QR Code Generator API for Telegram Bots</li>
-                        <li>Telegram Link Tracking and Analytics</li>
                         <li>Multi-Bot Management Dashboard</li>
-                        <li>Telegram Moderation and NSFW Detection API</li>
                         <li>Automation Webhooks and Developer APIs</li>
                     </ul>
                 </div>
@@ -369,17 +368,17 @@ export default function Home() {
                             <h5 className="font-bold mb-4 uppercase text-xs tracking-wider text-[var(--text-primary)]">Platform</h5>
                             <ul className="space-y-3 text-sm text-[var(--text-muted)]">
                                 <li><Link to="/dashboard" className="hover:text-[var(--primary-color)] transition-colors">Dashboard</Link></li>
-                                <li><a href="/docs.html#api-autoup" target="_blank" rel="noopener noreferrer" className="hover:text-[var(--primary-color)] transition-colors">AutoUp Integration</a></li>
-                                <li><a href="/docs.html#premium-plans" target="_blank" rel="noopener noreferrer" className="hover:text-[var(--primary-color)] transition-colors">Premium Plans</a></li>
+                                <li><Link to="/pay" className="hover:text-[var(--primary-color)] transition-colors">Crypto API (BotFusion Pay)</Link></li>
+                                <li><Link to="/premium" className="hover:text-[var(--primary-color)] transition-colors">Premium Plans</Link></li>
                             </ul>
                         </div>
 
                         <div>
                             <h5 className="font-bold mb-4 uppercase text-xs tracking-wider text-[var(--text-primary)]">Developers</h5>
                             <ul className="space-y-3 text-sm text-[var(--text-muted)]">
-                                <li><a href="/docs.html" target="_blank" rel="noopener noreferrer" className="hover:text-[var(--primary-color)] transition-colors">Documentation</a></li>
-                                <li><a href="/docs.html#api-auth" target="_blank" rel="noopener noreferrer" className="hover:text-[var(--primary-color)] transition-colors">API Reference</a></li>
-                                <li><a href="/docs.html#api-limits-errors" target="_blank" rel="noopener noreferrer" className="hover:text-[var(--primary-color)] transition-colors">Rate Limits</a></li>
+                                <li><Link to="/docs" className="hover:text-[var(--primary-color)] transition-colors">Documentation</Link></li>
+                                <li><Link to="/docs?category=auth" className="hover:text-[var(--primary-color)] transition-colors">API Reference</Link></li>
+                                <li><Link to="/docs?endpoint=ratelimits" className="hover:text-[var(--primary-color)] transition-colors">Rate Limits</Link></li>
                             </ul>
                         </div>
 

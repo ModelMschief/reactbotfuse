@@ -196,8 +196,8 @@ export default function Dashboard() {
                         </div>
 
                         {/* Payment Gateway — Featured Card */}
-                        <a
-                            href="/pay.html"
+                        <Link
+                            to="/pay"
                             className="block mt-6 card bg-[var(--bg-surface)] border-[var(--border-color)] hover:border-[var(--primary-color)] transition-all group relative overflow-hidden"
                         >
                             <div className="absolute inset-0 bg-gradient-to-r from-[var(--fire-red,#dc2626)]/5 to-[var(--fire-orange,#f97316)]/5 pointer-events-none" />
@@ -213,7 +213,7 @@ export default function Dashboard() {
                                     Open Gateway <ExternalLink size={14} />
                                 </div>
                             </div>
-                        </a>
+                        </Link>
                     </motion.div>
                 ) : (
                     <motion.div
@@ -244,9 +244,9 @@ export default function Dashboard() {
                                         <div>
                                             <h2 className="text-2xl font-bold text-[var(--text-primary)]">AutoUp Integration API</h2>
                                             <p className="text-sm text-[var(--text-muted)] mt-1">Instantly sync new Telegram users to your bot audience.</p>
-                                            <a href="/docs.html#api-autoup" target="_blank" rel="noopener noreferrer" className="text-xs font-semibold text-[var(--primary-color)] hover:underline flex items-center gap-1 mt-2 w-fit">
+                                            <Link to="/docs?category=microservices&endpoint=api-autoup" className="text-xs font-semibold text-[var(--primary-color)] hover:underline flex items-center gap-1 mt-2 w-fit">
                                                 Read full documentation <ExternalLink size={12} />
-                                            </a>
+                                            </Link>
                                         </div>
                                     </div>
                                     
@@ -319,9 +319,9 @@ def update_user(user_id, bot_username):
                                         <div>
                                             <h2 className="text-2xl font-bold text-[var(--text-primary)]">Automated Account Detection API</h2>
                                             <p className="text-sm text-[var(--text-muted)] mt-1">Real-time behavioral risk scoring.</p>
-                                            <a href="/docs.html#api-anomaly" target="_blank" rel="noopener noreferrer" className="text-xs font-semibold text-[var(--primary-color)] hover:underline flex items-center gap-1 mt-2 w-fit">
+                                            <Link to="/docs?category=microservices&endpoint=api-score-user" className="text-xs font-semibold text-[var(--primary-color)] hover:underline flex items-center gap-1 mt-2 w-fit">
                                                 Read full documentation <ExternalLink size={12} />
-                                            </a>
+                                            </Link>
                                         </div>
                                     </div>
 
@@ -387,9 +387,9 @@ def update_user(user_id, bot_username):
                                         <div>
                                             <h2 className="text-2xl font-bold text-[var(--text-primary)]">QR Code Generation API</h2>
                                             <p className="text-sm text-[var(--text-muted)] mt-1">High-performance, stylized QR codes.</p>
-                                            <a href="/docs.html#api-genqr" target="_blank" rel="noopener noreferrer" className="text-xs font-semibold text-[var(--primary-color)] hover:underline flex items-center gap-1 mt-2 w-fit">
+                                            <Link to="/docs?category=microservices&endpoint=api-genqr" className="text-xs font-semibold text-[var(--primary-color)] hover:underline flex items-center gap-1 mt-2 w-fit">
                                                 Read full documentation <ExternalLink size={12} />
-                                            </a>
+                                            </Link>
                                         </div>
                                     </div>
 
@@ -437,9 +437,9 @@ Content-Type: application/json`}
                                         <div>
                                             <h2 className="text-2xl font-bold text-[var(--text-primary)]">URL Tracking API</h2>
                                             <p className="text-sm text-[var(--text-muted)] mt-1">Generate, monitor, and manage tracked short links.</p>
-                                            <a href="/docs.html#api-tracking" target="_blank" rel="noopener noreferrer" className="text-xs font-semibold text-[var(--primary-color)] hover:underline flex items-center gap-1 mt-2 w-fit">
+                                            <Link to="/docs?category=microservices&endpoint=api-gen-link-create" className="text-xs font-semibold text-[var(--primary-color)] hover:underline flex items-center gap-1 mt-2 w-fit">
                                                 Read full documentation <ExternalLink size={12} />
-                                            </a>
+                                            </Link>
                                         </div>
                                     </div>
 
@@ -491,9 +491,9 @@ Content-Type: application/json`}
                                         <div>
                                             <h2 className="text-2xl font-bold text-[var(--text-primary)]">Profanity Filter API</h2>
                                             <p className="text-sm text-[var(--text-muted)] mt-1">Check messages for banned content programmatically.</p>
-                                            <a href="/docs.html#api-profanity" target="_blank" rel="noopener noreferrer" className="text-xs font-semibold text-[var(--primary-color)] hover:underline flex items-center gap-1 mt-2 w-fit">
+                                            <Link to="/docs?category=microservices&endpoint=api-profanity-check" className="text-xs font-semibold text-[var(--primary-color)] hover:underline flex items-center gap-1 mt-2 w-fit">
                                                 Read full documentation <ExternalLink size={12} />
-                                            </a>
+                                            </Link>
                                         </div>
                                     </div>
 

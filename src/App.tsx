@@ -15,6 +15,7 @@ const ForgotPassword = lazy(() => import('@/pages/ForgotPassword'));
 const ResetPassword = lazy(() => import('@/pages/ResetPassword'));
 const Settings = lazy(() => import('@/pages/Settings'));
 const CryptoDashboard = lazy(() => import('@/pages/CryptoDashboard'));
+const Docs = lazy(() => import('@/pages/Docs'));
 
 import { ToastProvider } from '@/components/Toast';
 
@@ -42,6 +43,7 @@ function App() {
                                 <Route path="/forgot-password" element={<ForgotPassword />} />
                                 <Route path="/reset-password" element={<ResetPassword />} />
                                 <Route path="/pay" element={<CryptoDashboard />} />
+                                <Route path="/docs" element={<Docs />} />
                             </Routes>
                         </Suspense>
                     </div>
