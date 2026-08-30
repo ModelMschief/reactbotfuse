@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { useAuth } from "@/store/auth-context";
 import { useNavigate, useLocation, Link } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { Shield, Lock, Smartphone, Loader2, Mail, ArrowRight } from "lucide-react";
+import { Shield, Lock, Smartphone, Loader2, Mail, ArrowRight, Eye, EyeOff } from "lucide-react";
 import { API_BASE_URL } from "@/lib/api";
 
 function GoogleIcon({ className = "w-5 h-5" }: { className?: string }) {
@@ -41,6 +41,7 @@ export default function Login() {
     const [error, setError] = useState("");
     const [isLoading, setIsLoading] = useState(false);
     const [showOtpModal, setShowOtpModal] = useState(false);
+    const [showPassword, setShowPassword] = useState(false);
 
     // Check for query errors on mount (e.g. from OAuth redirects)
     useEffect(() => {
@@ -280,7 +281,7 @@ export default function Login() {
                                             placeholder="you@example.com"
                                             required
                                         />
-                                        <Mail size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[var(--text-muted)]" />
+                                        <Mail size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[var(--text-muted)] pointer-events-none" />
                                     </div>
                                 </div>
 
@@ -290,17 +291,26 @@ export default function Login() {
                                     </label>
                                     <div className="relative">
                                         <input
-                                            type="password"
+                                            type={showPassword ? "text" : "password"}
                                             value={password}
                                             onChange={(e) => {
                                                 setPassword(e.target.value);
                                                 setError("");
                                             }}
-                                            className="input-field pl-10"
+                                            className="input-field pl-10 pr-10"
                                             placeholder="••••••••"
                                             required
                                         />
-                                        <Lock size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[var(--text-muted)]" />
+                                        <Lock size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[var(--text-muted)] pointer-events-none" />
+                                        <button
+                                            type="button"
+                                            onClick={() => setShowPassword(!showPassword)}
+                                            className="absolute right-3.5 top-1/2 -translate-y-1/2 text-[var(--text-muted)] hover:text-[var(--text-primary)] transition-colors focus:outline-none"
+                                            tabIndex={-1}
+                                            aria-label={showPassword ? "Hide password" : "Show password"}
+                                        >
+                                            {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                                        </button>
                                     </div>
                                 </div>
 
