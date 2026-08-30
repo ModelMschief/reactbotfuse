@@ -71,6 +71,11 @@ export default function LoginSuccess() {
             try {
                 await loginWithToken(token, completeProfile);
                 setStatus("success");
+                // Clean global window.location.search if present
+                if (window.location.search) {
+                    const cleanUrl = window.location.origin + window.location.pathname + window.location.hash;
+                    window.history.replaceState({}, document.title, cleanUrl);
+                }
                 // Short delay for smooth visual transition
                 setTimeout(() => {
                     navigate("/dashboard", { replace: true });

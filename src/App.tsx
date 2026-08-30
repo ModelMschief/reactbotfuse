@@ -1,5 +1,5 @@
-import { lazy, Suspense } from 'react';
-import { HashRouter, Routes, Route } from 'react-router-dom';
+import { lazy, Suspense, useEffect } from 'react';
+import { HashRouter, Routes, Route, useNavigate, useLocation } from 'react-router-dom';
 import { AuthProvider } from '@/store/auth-context';
 import { Navbar } from '@/components/navbar';
 import { VersionChecker } from '@/components/VersionChecker';
@@ -25,6 +25,20 @@ import { useAuth } from '@/store/auth-context';
 
 function AppContent() {
     const { showTelegramModal, setShowTelegramModal } = useAuth();
+    const navigate = useNavigate();
+    const location = useLocation();
+
+    // Global OAuth handler: Catch OAuth tokens/errors that land outside /login-success (e.g. mobile landing page redirects)
+    useEffect(() => {
+        if (location.pathname !== "/login-success") {
+            const urlParams = new URLSearchParams(window.location.search);
+            const token = urlParams.get("token");
+            const error = urlParams.get("error");
+            if (token || error) {
+                navigate(`/login-success${window.location.search}`, { replace: true });
+            }
+        }
+    }, [location.pathname, navigate]);
 
     return (
         <>
