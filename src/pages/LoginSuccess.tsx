@@ -105,7 +105,7 @@ export default function LoginSuccess() {
                     <div className="space-y-4">
                         <Loader2 size={40} className="animate-spin text-[var(--primary-color)] mx-auto" />
                         <div>
-                            <h2 className="text-xl font-bold text-[var(--text-primary)]">Authenticating with Google</h2>
+                            <h2 className="text-xl font-bold text-[var(--text-primary)]">Authenticating Your Account</h2>
                             <p className="text-sm text-[var(--text-muted)] mt-1">
                                 Verifying your credentials and establishing a secure session...
                             </p>
