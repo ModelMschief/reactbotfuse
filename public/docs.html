@@ -318,7 +318,7 @@
             }
             .content {
                 margin-right: 0;
-                padding-right: 1.5rem;
+                padding-right: 2rem;
             }
         }
         
@@ -342,14 +342,52 @@
             .content {
                 margin-left: 0;
                 padding: 1.5rem;
-                padding-top: 5rem; /* For mobile header */
+                padding-top: 5rem;
                 max-width: 100%;
+                min-width: 0;
+                overflow-x: hidden;
             }
             h1 { font-size: 1.75rem; }
             h2 { font-size: 1.25rem; margin-top: 2rem; }
             h3 { font-size: 1.1rem; }
-            pre[class*="language-"] { padding-top: 2.5rem !important; }
+            pre[class*="language-"] { 
+                padding-top: 2.5rem !important;
+                overflow-x: auto;
+                -webkit-overflow-scrolling: touch;
+            }
             table { font-size: 0.875rem; }
+            .table-responsive {
+                overflow-x: auto;
+                -webkit-overflow-scrolling: touch;
+                border-radius: 0.5rem;
+            }
+            /* Better touch targets for mobile nav */
+            .nav-link {
+                padding: 0.625rem 0.5rem;
+                min-height: 44px;
+                display: flex;
+                align-items: center;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .content {
+                padding: 1rem;
+                padding-top: 5rem;
+            }
+            h1 { font-size: 1.5rem; }
+            h2 { font-size: 1.1rem; }
+            .mobile-header { padding: 0.75rem 1rem; }
+            pre[class*="language-"] code {
+                font-size: 0.8rem;
+            }
+            th, td { padding: 0.625rem 0.75rem; }
+        }
+
+        @media (min-width: 1280px) {
+            .content {
+                padding: 3rem 4rem;
+            }
         }
     </style>
 
