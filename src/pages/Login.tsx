@@ -277,7 +277,7 @@ export default function Login() {
                                                 setEmail(e.target.value);
                                                 setError("");
                                             }}
-                                            className="input-field pl-10"
+                                            className="input-field input-icon-left"
                                             placeholder="you@example.com"
                                             required
                                         />
@@ -297,7 +297,7 @@ export default function Login() {
                                                 setPassword(e.target.value);
                                                 setError("");
                                             }}
-                                            className="input-field pl-10 pr-10"
+                                            className="input-field input-icon-both"
                                             placeholder="••••••••"
                                             required
                                         />

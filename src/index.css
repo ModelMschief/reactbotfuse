@@ -143,6 +143,18 @@ body {
   box-shadow: 0 0 0 2px rgba(249, 115, 22, 0.1);
 }
 
+/* Icon-padded input helpers — forces padding regardless of cascade */
+.input-icon-left {
+  padding-left: 2.625rem !important;
+}
+.input-icon-right {
+  padding-right: 2.625rem !important;
+}
+.input-icon-both {
+  padding-left: 2.625rem !important;
+  padding-right: 2.625rem !important;
+}
+
 /* Utility Animations */
 @keyframes flame-flicker {
 
