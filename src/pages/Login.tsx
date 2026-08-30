@@ -28,6 +28,18 @@ function GoogleIcon({ className = "w-5 h-5" }: { className?: string }) {
     );
 }
 
+function GitHubIcon({ className = "w-5 h-5" }: { className?: string }) {
+    return (
+        <svg className={className} viewBox="0 0 24 24" fill="currentColor">
+            <path
+                fillRule="evenodd"
+                clipRule="evenodd"
+                d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.53 1.032 1.53 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z"
+            />
+        </svg>
+    );
+}
+
 export default function Login() {
     const { login, signupInit, verifyOtp } = useAuth();
     const navigate = useNavigate();
@@ -49,9 +61,9 @@ export default function Login() {
         const queryError = params.get("error");
         if (queryError) {
             if (queryError === "oauth_denied") {
-                setError("Google sign-in was cancelled. Please try again.");
+                setError("Sign-in was cancelled. Please try again.");
             } else if (queryError === "token_exchange_failed" || queryError === "userinfo_failed") {
-                setError("Failed to authenticate with Google. Please try again or use email login.");
+                setError("Failed to authenticate with provider. Please try again or use email login.");
             } else {
                 setError(`Authentication error: ${queryError}`);
             }
@@ -61,6 +73,11 @@ export default function Login() {
     const handleGoogleAuth = () => {
         // Redirect browser to backend Google OAuth initiation endpoint
         window.location.href = `${API_BASE_URL}/api/auth/google`;
+    };
+
+    const handleGitHubAuth = () => {
+        // Redirect browser to backend GitHub OAuth initiation endpoint
+        window.location.href = `${API_BASE_URL}/api/auth/github`;
     };
 
     const handleSubmit = async (e: React.FormEvent) => {
@@ -133,12 +150,15 @@ export default function Login() {
                     Enterprise-grade API management and mass broadcast infrastructure for Telegram bots. Synchronize audiences, detect abuse, and accept crypto.
                 </p>
 
-                <div className="mt-8 flex items-center gap-6 text-xs text-[var(--text-muted)]">
+                <div className="mt-8 flex flex-wrap items-center justify-center gap-4 sm:gap-6 text-xs text-[var(--text-muted)]">
                     <span className="flex items-center gap-1.5">
                         <Lock size={14} className="text-emerald-500" /> AES-256 Auth
                     </span>
                     <span className="flex items-center gap-1.5">
                         <GoogleIcon className="w-3.5 h-3.5" /> Google OAuth
+                    </span>
+                    <span className="flex items-center gap-1.5">
+                        <GitHubIcon className="w-3.5 h-3.5" /> GitHub
                     </span>
                     <span className="flex items-center gap-1.5">
                         <Smartphone size={14} className="text-blue-400" /> Telegram 2FA
@@ -239,8 +259,8 @@ export default function Login() {
                                 </p>
                             </div>
 
-                            {/* Google OAuth Button */}
-                            <div className="pt-2">
+                            {/* OAuth Social Buttons */}
+                            <div className="pt-2 space-y-2.5">
                                 <button
                                     type="button"
                                     onClick={handleGoogleAuth}
@@ -248,6 +268,15 @@ export default function Login() {
                                 >
                                     <GoogleIcon className="w-5 h-5 shrink-0" />
                                     <span>{isSignup ? "Sign up with Google" : "Continue with Google"}</span>
+                                </button>
+
+                                <button
+                                    type="button"
+                                    onClick={handleGitHubAuth}
+                                    className="w-full flex items-center justify-center gap-3 py-3 px-4 rounded-xl border border-[var(--border-color)] bg-[var(--bg-surface)] hover:bg-[var(--bg-surface-hover)] text-[var(--text-primary)] font-semibold text-sm transition-all shadow-sm hover:shadow-md active:scale-[0.99]"
+                                >
+                                    <GitHubIcon className="w-5 h-5 shrink-0" />
+                                    <span>{isSignup ? "Sign up with GitHub" : "Continue with GitHub"}</span>
                                 </button>
                             </div>
 
