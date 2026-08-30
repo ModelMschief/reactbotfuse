@@ -688,6 +688,21 @@
                 sync new users to your BotFusion dashboard in real-time. This eliminates the need for manual file
                 uploads.</p>
 
+            <div style="background: rgba(234,179,8,0.08); border: 1px solid rgba(234,179,8,0.35); border-radius: 0.75rem; padding: 1rem 1.25rem; margin: 1.25rem 0; display: flex; gap: 0.85rem; align-items: flex-start;">
+                <span style="font-size: 1.4rem; line-height: 1;">📱</span>
+                <div>
+                    <strong style="color: #fbbf24; font-size: 0.95rem;">Telegram Account Required</strong>
+                    <p style="margin: 0.4rem 0 0; font-size: 0.875rem; color: #9ca3af; line-height: 1.6;">
+                        Using the AutoUp API requires your BotFusion account to be linked to a Telegram account.
+                        This is a <strong style="color: #e5e7eb;">one-time identity verification</strong> step performed by our bot — 
+                        it does <em>not</em> give BotFusion access to your Telegram messages, contacts, or account in any way.
+                        It simply confirms you are a real person, not an automated script abusing the platform.
+                        <br><br>
+                        To link your Telegram: go to <strong style="color: #e5e7eb;">Dashboard → Settings → Account &amp; Security</strong> and follow the Telegram verification steps.
+                    </p>
+                </div>
+            </div>
+
             <h3>How it Works</h3>
             <ol>
                 <li>A user starts your bot on Telegram.</li>
@@ -695,6 +710,7 @@
                 <li>We verify the request using your <strong>Connection Key</strong>.</li>
                 <li>The user ID is instantly added to your database.</li>
             </ol>
+
 
             <h3>Sync User Endpoint</h3>
             <p><span class="badge badge-post">POST</span> <code>/autoup</code></p>
@@ -1119,6 +1135,20 @@ Admin Alerts / Auto-Ban Logic</code></pre>
                 <strong><code>https://botfusion.onrender.com</code></strong>
             </p>
 
+            <div style="background: rgba(234,179,8,0.08); border: 1px solid rgba(234,179,8,0.35); border-radius: 0.75rem; padding: 1rem 1.25rem; margin: 1.25rem 0; display: flex; gap: 0.85rem; align-items: flex-start;">
+                <span style="font-size: 1.4rem; line-height: 1;">📱</span>
+                <div>
+                    <strong style="color: #fbbf24; font-size: 0.95rem;">Telegram Account Required</strong>
+                    <p style="margin: 0.4rem 0 0; font-size: 0.875rem; color: #9ca3af; line-height: 1.6;">
+                        The Link Tracker API also requires your BotFusion account to be linked to a Telegram account.
+                        This is purely a <strong style="color: #e5e7eb;">one-time identity verification</strong> — our bot sends you a short OTP code to confirm your account is real.
+                        BotFusion does <em>not</em> read your messages, access your contacts, or interact with your Telegram account beyond this single verification step.
+                        <br><br>
+                        To link your Telegram: go to <strong style="color: #e5e7eb;">Dashboard → Settings → Account &amp; Security</strong> and follow the Telegram verification steps.
+                    </p>
+                </div>
+            </div>
+
             <div class="sub-section">
                 <h3>Global Constraints & Requirements</h3>
                 <p>Before using the API, note the following system rules:</p>
@@ -1246,39 +1276,27 @@ Content-Type: application/json</code></pre>
             </div>
         </section>
 
-        <!-- ================= NEW SECTION: PROFANITY FILTER API ================= -->
+        <!-- ================= PROFANITY FILTER API ================= -->
         <section id="api-profanity">
             <h2>Profanity Filter API</h2>
-            <p>The BotFusion Profanity Filter API enables developers to programmatically check messages for banned words or inappropriate content using our centralized filtering engine.</p>
-            <p>This ensures your bot's community stays clean from the moment a message is processed.</p>
 
-            <div class="sub-section">
-                <h3>1. Check a Message for Profanity</h3>
-                <p><span class="badge badge-post">POST</span> <code>/profanity_check</code></p>
-                <p>Pass the message payload. The system returns whether it flagged any profanity in the text.</p>
-
-                <h4>Headers</h4>
-                <pre><code class="language-text">X-CONNECTION-KEY: acct_your_secret_key
-Content-Type: application/json</code></pre>
-
-                <h4>Request Payload</h4>
-                <pre><code class="language-json">{
-  "message": "This is the string of text you want to check."
-}</code></pre>
-
-                <h4>Response - Profanity Detected (<code>200 OK</code>)</h4>
-                <pre><code class="language-json">{
-  "profanity": true,
-  "message": "Message contains blocked content."
-}</code></pre>
-
-                <h4>Response - Clean (<code>200 OK</code>)</h4>
-                <pre><code class="language-json">{
-  "profanity": false,
-  "message": "Message is clean!"
-}</code></pre>
+            <div style="background: rgba(239,68,68,0.08); border: 1px solid rgba(239,68,68,0.35); border-radius: 0.75rem; padding: 1.25rem 1.5rem; margin: 1.25rem 0; display: flex; gap: 1rem; align-items: flex-start;">
+                <span style="font-size: 1.75rem; line-height: 1;">🔧</span>
+                <div>
+                    <strong style="color: #f87171; font-size: 1rem;">Under Maintenance</strong>
+                    <p style="margin: 0.5rem 0 0; font-size: 0.875rem; color: #9ca3af; line-height: 1.6;">
+                        The Profanity Filter API is currently undergoing maintenance and improvements.
+                        It is <strong style="color: #e5e7eb;">temporarily unavailable</strong> for new integrations.
+                        <br><br>
+                        Existing integrations may still function but could experience instability. We recommend pausing
+                        any new development against this API until further notice.
+                        <br><br>
+                        We will update this page as soon as the API is back online. Thank you for your patience.
+                    </p>
+                </div>
             </div>
         </section>
+
 
         <section id="api-limits-errors">
             <h2>Rate Limits & Error Codes</h2>
