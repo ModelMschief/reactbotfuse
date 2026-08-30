@@ -16,32 +16,36 @@ const ResetPassword = lazy(() => import('@/pages/ResetPassword'));
 const Settings = lazy(() => import('@/pages/Settings'));
 const CryptoDashboard = lazy(() => import('@/pages/CryptoDashboard'));
 
+import { ToastProvider } from '@/components/Toast';
+
 function App() {
     return (
         <HashRouter>
             <AuthProvider>
-                <VersionChecker />
-                <Navbar />
-                {/* Spacer for fixed navbar */}
-                <div className="pt-20">
-                    <Suspense fallback={
-                        <div className="flex items-center justify-center h-[calc(100vh-80px)]">
-                            <Loader2 className="animate-spin text-[var(--primary-color)]" size={48} />
-                        </div>
-                    }>
-                        <Routes>
-                            <Route path="/" element={<Home />} />
-                            <Route path="/login" element={<Login />} />
-                            <Route path="/dashboard" element={<Dashboard />} />
-                            <Route path="/manage-bots" element={<BotManagement />} />
-                            <Route path="/premium" element={<Premium />} />
-                            <Route path="/settings" element={<Settings />} />
-                            <Route path="/forgot-password" element={<ForgotPassword />} />
-                            <Route path="/reset-password" element={<ResetPassword />} />
-                            <Route path="/pay" element={<CryptoDashboard />} />
-                        </Routes>
-                    </Suspense>
-                </div>
+                <ToastProvider>
+                    <VersionChecker />
+                    <Navbar />
+                    {/* Spacer for fixed navbar */}
+                    <div className="pt-20">
+                        <Suspense fallback={
+                            <div className="flex items-center justify-center h-[calc(100vh-80px)]">
+                                <Loader2 className="animate-spin text-[var(--primary-color)]" size={48} />
+                            </div>
+                        }>
+                            <Routes>
+                                <Route path="/" element={<Home />} />
+                                <Route path="/login" element={<Login />} />
+                                <Route path="/dashboard" element={<Dashboard />} />
+                                <Route path="/manage-bots" element={<BotManagement />} />
+                                <Route path="/premium" element={<Premium />} />
+                                <Route path="/settings" element={<Settings />} />
+                                <Route path="/forgot-password" element={<ForgotPassword />} />
+                                <Route path="/reset-password" element={<ResetPassword />} />
+                                <Route path="/pay" element={<CryptoDashboard />} />
+                            </Routes>
+                        </Suspense>
+                    </div>
+                </ToastProvider>
             </AuthProvider>
         </HashRouter>
     );
